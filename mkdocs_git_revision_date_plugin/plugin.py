@@ -9,7 +9,7 @@ from .util import Util
 class GitRevisionDatePlugin(BasePlugin):
     config_scheme = (
         ('enabled_if_env', config_options.Type(string_types)),
-    ),
+    )
 
     def __init__(self):
         self.enabled = True
