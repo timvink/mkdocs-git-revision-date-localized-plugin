@@ -5,7 +5,7 @@ setup(
     version='0.1.1',
     description='MkDocs plugin for setting revision date from git per markdown file.',
     keywords='mkdocs git meta yaml frontmatter',
-    url='https://github.com/zhaoterryy/mkdocs-git-revision-date-plugin/'
+    url='https://github.com/zhaoterryy/mkdocs-git-revision-date-plugin/',
     author='Terry Zhao',
     author_email='zhao.terryy@gmail.com',
     license='MIT',
