@@ -36,7 +36,10 @@ Use `page.meta.revision_date` in templates to access the revision date of the cu
 {% endblock %}
 ```
 
-More information about templates in the [MkDocs documentation][mkdocs-template].
+More information about templates [here][mkdocs-template].
+
+More information about blocks [here][mkdocs-block].
 
 [mkdocs-plugins]: http://www.mkdocs.org/user-guide/plugins/
 [mkdocs-template]: https://www.mkdocs.org/user-guide/custom-themes/#template-variables
+[mkdocs-block]: https://www.mkdocs.org/user-guide/styling-your-docs/#overriding-template-blocks
