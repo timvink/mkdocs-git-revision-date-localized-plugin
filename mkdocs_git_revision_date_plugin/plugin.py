@@ -8,12 +8,10 @@ from .util import Util
 
 class GitRevisionDatePlugin(BasePlugin):
     config_scheme = (
-        ('write_file_meta', config_options.Type(bool, default=False)),
-        ('enabled_if_env', config_options.Type(string_types))
-    )
+        ('enabled_if_env', config_options.Type(string_types)),
+    ),
 
     def __init__(self):
-        self.write = False
         self.enabled = True
         self.util = Util()
 
@@ -24,8 +22,6 @@ class GitRevisionDatePlugin(BasePlugin):
             if not self.enabled:
                 print('PDF export is disabled (set environment variable %s to 1 to enable)' % env_name)
                 return
-
-        self.write = self.config['write_file_meta']
 
     def on_page_markdown(self, markdown, page, config, files):
         if not self.enabled:
