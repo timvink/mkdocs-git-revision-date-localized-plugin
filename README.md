@@ -45,7 +45,7 @@ More information about blocks [here][mkdocs-block].
 ```md
 Page last revised on: {{ git_revision_date }}
 ```
-If using [mkdocs_macro_plugin](mkdocs-macro), it must be included after our plugin.
+If using [mkdocs_macro_plugin][mkdocs-macro], it must be included after our plugin.
 
 i.e., mkdocs.yml:
 ```yaml
