@@ -3,12 +3,14 @@ from os import environ
 from mkdocs.config import config_options
 from mkdocs.plugins import BasePlugin
 from mkdocs.utils import string_types
+from jinja2 import Template
 from .util import Util
 
 
 class GitRevisionDatePlugin(BasePlugin):
     config_scheme = (
         ('enabled_if_env', config_options.Type(string_types)),
+        ('modify_md', config_options.Type(bool, default=True))
     )
 
     def __init__(self):
@@ -35,4 +37,19 @@ class GitRevisionDatePlugin(BasePlugin):
             print('WARNING -  %s has no git logs, revision date defaulting to today\'s date' % page.file.src_path)
 
         page.meta['revision_date'] = revision_date
-        return markdown
+
+        if not self.config['modify_md']:
+            return markdown
+
+        if 'macros' in config['plugins']:
+            keys = list(config['plugins'].keys())
+            vals = list(config['plugins'].values())
+            if keys.index('macros') > vals.index(self):
+                new_markdown = '{{% set git_revision_date = \'{}\' %}}\n'.format(revision_date) + markdown
+                return new_markdown
+            else:
+                print('WARNING - macros plugin must be placed AFTER the git-revision-date plugin. Skipping markdown modifications')
+                return markdown
+        else:
+            md_template = Template(markdown)
+            return md_template.render({'git_revision_date': revision_date})
