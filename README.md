@@ -19,9 +19,10 @@ plugins:
 More information about plugins in the [MkDocs documentation][mkdocs-plugins].
 
 ## Usage
-Use `page.meta.revision_date` in templates to access the revision date of the current page in ISO format *(YYYY-mm-dd)*.
+The revision date will be displayed in ISO format *(YYYY-mm-dd)*.
 
-## Example
+### Templates - `page.meta.revision_date`:
+#### Example
 ```django hljs
 {% block footer %}
 <hr>
@@ -35,11 +36,37 @@ Use `page.meta.revision_date` in templates to access the revision date of the cu
 </p>
 {% endblock %}
 ```
-
 More information about templates [here][mkdocs-template].
 
 More information about blocks [here][mkdocs-block].
 
+### Markdown - `{{ git_revision_date }}`:
+#### Example
+```md
+Page last revised on: {{ git_revision_date }}
+```
+If using [mkdocs_macro_plugin](mkdocs-macro), it must be included after our plugin.
+
+i.e., mkdocs.yml:
+```yaml
+plugins:
+  - search
+  - git-revision-date
+  - macros
+```
+
+
 [mkdocs-plugins]: http://www.mkdocs.org/user-guide/plugins/
 [mkdocs-template]: https://www.mkdocs.org/user-guide/custom-themes/#template-variables
 [mkdocs-block]: https://www.mkdocs.org/user-guide/styling-your-docs/#overriding-template-blocks
+[mkdocs-macro]: https://github.com/fralau/mkdocs_macros_plugin
+
+## Options
+
+### `enabled_if_env`
+
+Setting this option will enable the build only if there is an environment variable set to 1. Default is not set.
+
+### `modify_md`
+
+Setting this option to false will disable the use of `{{ git_revision_date }}` in markdown files. Default is true.
