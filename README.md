@@ -29,7 +29,7 @@ The revision date will be displayed in ISO format *(YYYY-mm-dd)*.
 <p>{% if config.copyright %}
 <small>{{ config.copyright }}<br></small>
 {% endif %}
-<small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</small>
+<small>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</small>
 {% if page.meta.revision_date %}
 <small><br><i>Updated {{ page.meta.revision_date }}</i></small>
 {% endif %}
@@ -56,7 +56,7 @@ plugins:
 ```
 
 
-[mkdocs-plugins]: http://www.mkdocs.org/user-guide/plugins/
+[mkdocs-plugins]: https://www.mkdocs.org/user-guide/plugins/
 [mkdocs-template]: https://www.mkdocs.org/user-guide/custom-themes/#template-variables
 [mkdocs-block]: https://www.mkdocs.org/user-guide/styling-your-docs/#overriding-template-blocks
 [mkdocs-macro]: https://github.com/fralau/mkdocs_macros_plugin
