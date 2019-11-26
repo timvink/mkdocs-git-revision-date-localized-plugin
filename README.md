@@ -70,3 +70,7 @@ Setting this option will enable the build only if there is an environment variab
 ### `modify_md`
 
 Setting this option to false will disable the use of `{{ git_revision_date }}` in markdown files. Default is true.
+
+### `as_datetime`
+
+Setting this option to True will output git_revision_date as a python `datetime`. This means you can use jinja2 date formatting, for example as `{{ git_revision_date.strftime('%d %B %Y') }}`. Default is false.
