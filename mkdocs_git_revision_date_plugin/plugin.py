@@ -1,4 +1,5 @@
 from os import environ
+from datetime import datetime
 
 from mkdocs.config import config_options
 from mkdocs.plugins import BasePlugin
@@ -10,7 +11,8 @@ from .util import Util
 class GitRevisionDatePlugin(BasePlugin):
     config_scheme = (
         ('enabled_if_env', config_options.Type(string_types)),
-        ('modify_md', config_options.Type(bool, default=True))
+        ('modify_md', config_options.Type(bool, default=True)),
+        ('as_datetime', config_options.Type(bool, default=False)),
     )
 
     def __init__(self):
@@ -32,9 +34,11 @@ class GitRevisionDatePlugin(BasePlugin):
         revision_date = self.util.get_revision_date_for_file(page.file.abs_src_path)
 
         if not revision_date:
-            from datetime import datetime
-            revision_date = datetime.now().date()
+            revision_date = datetime.now().date().strftime('%Y-%m-%d')
             print('WARNING -  %s has no git logs, revision date defaulting to today\'s date' % page.file.src_path)
+
+        if self.config['as_datetime']:
+            revision_date = datetime.strptime(revision_date,'%Y-%m-%d')
 
         page.meta['revision_date'] = revision_date
 
