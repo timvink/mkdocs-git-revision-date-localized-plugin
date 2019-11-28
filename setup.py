@@ -13,7 +13,8 @@ setup(
     install_requires=[
         'mkdocs>=0.17',
         'GitPython',
-        'jinja2'
+        'jinja2',
+        'timeago>=1.0.10'
     ],
     packages=find_packages(),
     entry_points={

@@ -8,6 +8,7 @@ Install the plugin using pip:
 `pip install mkdocs-git-revision-date-plugin`
 
 Activate the plugin in `mkdocs.yml`:
+
 ```yaml
 plugins:
   - search
@@ -70,3 +71,23 @@ Setting this option will enable the build only if there is an environment variab
 ### `modify_md`
 
 Setting this option to false will disable the use of `{{ git_revision_date }}` in markdown files. Default is true.
+
+## Template filters
+
+In addition to Jinja's default filter and [mkdocs's custom filter](https://www.mkdocs.org/user-guide/custom-themes/#template-filters) this plugin makes the `totimeago` filter available for use in your mkdocs template. It uses [timeago](https://github.com/hustcc/timeago) to display the relative time.
+
+#### Example
+
+```django hljs
+<i>Updated {{ page.meta.revision_date }}</i>
+<i>Updated {{ page.meta.revision_date | totimeago }}</i>
+<i>Updated {{ page.meta.revision_date | totimeago('nl') }}</i>
+```
+
+Example output:
+
+```
+Updated 2019-11-28
+Updated 20 hours ago
+Updated 20 uren geleden
+```

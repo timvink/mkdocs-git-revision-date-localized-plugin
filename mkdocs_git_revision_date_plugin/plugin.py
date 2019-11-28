@@ -5,6 +5,7 @@ from mkdocs.plugins import BasePlugin
 from mkdocs.utils import string_types
 from jinja2 import Template
 from .util import Util
+from .filters import to_timeago
 
 
 class GitRevisionDatePlugin(BasePlugin):
@@ -17,6 +18,10 @@ class GitRevisionDatePlugin(BasePlugin):
         self.enabled = True
         self.util = Util()
 
+    def on_env(self, env, **kwargs) :
+        env.filters['totimeago'] = to_timeago
+        return env
+        
     def on_config(self, config):
         env_name = self.config['enabled_if_env']
         if env_name:
