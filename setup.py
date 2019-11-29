@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='mkdocs-git-revision-date-plugin',
-    version='0.1.5',
+    version='0.2',
     description='MkDocs plugin for setting revision date from git per markdown file.',
     keywords='mkdocs git meta yaml frontmatter',
     url='https://github.com/zhaoterryy/mkdocs-git-revision-date-plugin/',
