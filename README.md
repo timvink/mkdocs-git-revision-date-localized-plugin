@@ -1,72 +1,67 @@
-# mkdocs-git-revision-date-plugin
+# mkdocs-git-revision-date-localized-plugin
 
-MkDocs plugin for setting revision date from git per markdown file.
+[MkDocs](https://www.mkdocs.org/) plugin that displays the localized date of the last modification of a markdown file. Forked from [mkdocs-git-revision-date-plugin](https://github.com/zhaoterryy/mkdocs-git-revision-date-plugin)
 
 ## Setup
+
 Install the plugin using pip:
 
-`pip install mkdocs-git-revision-date-plugin`
+```bash
+# FIRST VERSION NOT YET PUBLISHED
+pip install mkdocs-git-revision-date-localized-plugin
+```
 
 Activate the plugin in `mkdocs.yml`:
+
 ```yaml
 plugins:
-  - search
   - git-revision-date
 ```
-
-> **Note:** If you have no `plugins` entry in your config file yet, you'll likely also want to add the `search` plugin. MkDocs enables it by default if there is no `plugins` entry set, but now you have to enable it explicitly.
-
-More information about plugins in the [MkDocs documentation][mkdocs-plugins].
 
 ## Usage
-The revision date will be displayed in ISO format *(YYYY-mm-dd)*.
 
-### Templates - `page.meta.revision_date`:
-#### Example
+### In theme templates
+
+In templates you can use `page.meta.git_revision_date_localized`:
+
 ```django hljs
-{% block footer %}
-<hr>
-<p>{% if config.copyright %}
-<small>{{ config.copyright }}<br></small>
+{% if page.meta.git_revision_date_localized %}
+<small><br><i>Updated {{ page.meta.git_revision_date_localized }}</i></small>
 {% endif %}
-<small>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</small>
-{% if page.meta.revision_date %}
-<small><br><i>Updated {{ page.meta.revision_date }}</i></small>
-{% endif %}
-</p>
-{% endblock %}
-```
-More information about templates [here][mkdocs-template].
-
-More information about blocks [here][mkdocs-block].
-
-### Markdown - `{{ git_revision_date }}`:
-#### Example
-```md
-Page last revised on: {{ git_revision_date }}
-```
-If using [mkdocs_macro_plugin][mkdocs-macro], it must be included after our plugin.
-
-i.e., mkdocs.yml:
-```yaml
-plugins:
-  - search
-  - git-revision-date
-  - macros
 ```
 
+### In markdown pages
 
-[mkdocs-plugins]: https://www.mkdocs.org/user-guide/plugins/
-[mkdocs-template]: https://www.mkdocs.org/user-guide/custom-themes/#template-variables
-[mkdocs-block]: https://www.mkdocs.org/user-guide/styling-your-docs/#overriding-template-blocks
-[mkdocs-macro]: https://github.com/fralau/mkdocs_macros_plugin
+In your markdown files you can use `{{ git_revision_date_localized }}`:
+
+```django hljs
+Updated {{ git_revision_date_localized_iso }}
+```
+
+## Localization updates
+
+There are three date formats:
+
+- A date string format (using [babel](https://github.com/python-babel/babel/tree/master/babel)
+- A ISO format *(YYYY-mm-dd)*
+- A time ago format (using [timeago](https://github.com/hustcc/timeago)
+
+```django hljs
+<i>Updated {{ git_revision_date_localized }}</i>
+<i>Updated {{ git_revision_date_localized_iso }}</i>
+<i>Updated {{ git_revision_date_localized_timeago }}</i>
+```
+
+Output:
+
+```
+Updated 28 November, 2019
+Updated 2019-11-28
+Updated 20 hours agon
+```
 
 ## Options
 
-### `enabled_if_env`
+### `locale`
 
-Setting this option will enable the build only if there is an environment variable set to 1. Default is not set.
-
-### `modify_md`
-
-Setting this option to false will disable the use of `{{ git_revision_date }}` in markdown files. Default is true.
+Set this option to a two letter [ISO639](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code to use a another language. This will overwrite any locale setting in `mkdocs` or your theme. If no locale is set fallback is English (`en`).
