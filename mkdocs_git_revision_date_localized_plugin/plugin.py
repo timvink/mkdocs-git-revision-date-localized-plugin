@@ -11,7 +11,7 @@ from datetime import datetime
 class GitRevisionDateLocalizedPlugin(BasePlugin):
     config_scheme = (
         ('locale', config_options.Type(string_types, default='')),
-        ('modify_md', config_options.Type(bool, default=True))
+        ('type', config_options.Type(string_types, default='date'))
     )
 
     def __init__(self):
@@ -51,20 +51,18 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             path = page.file.abs_src_path,
             locale = self.locale
         )
+        revision_date = revision_dates[self.config['type']] 
 
-        for variable, date in revision_dates.items():
-            page.meta[variable] = date
+        page.meta['git_revision_date_localized'] = revision_date
         
         if 'macros' in config['plugins']:
             keys = list(config['plugins'].keys())
             vals = list(config['plugins'].values())
             if keys.index('macros') > vals.index(self):
-                for variable, date in revision_dates.items():
-                    markdown = '{{% set' + variable + f" = '{date}' " + ' %}}' + markdown
-                return markdown
+                return '{{% set git_revision_date = \'{}\' %}}\n'.format(revision_date) + markdown
             else:
                 print('WARNING - macros plugin must be placed AFTER the git-revision-date-localized plugin. Skipping markdown modifications')
                 return markdown
         else:
-            return Template(markdown).render(revision_dates)
+            return Template(markdown).render({'git_revision_date_localized': revision_date})
         

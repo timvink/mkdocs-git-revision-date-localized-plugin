@@ -19,11 +19,11 @@ class Util:
 
         # Localized versions
         revision_dates = {
-            'git_revision_date_localized' : format_date(revision_date, format="long", locale=locale), 
-            'git_revision_date_localized_time' : format_date(revision_date, format="long", locale=locale) + ' ' +revision_date.strftime("%H:%M:%S"),
-            'git_revision_date_localized_iso' : revision_date.strftime("%Y-%m-%d"), 
-            'git_revision_date_localized_iso_time' : revision_date.strftime("%Y-%m-%d %H:%M:%S"), 
-            'git_revision_date_localized_timeago' : timeago.format(revision_date, locale = locale)
+            'date' : format_date(revision_date, format="long", locale=locale), 
+            'datetime' : format_date(revision_date, format="long", locale=locale) + ' ' +revision_date.strftime("%H:%M:%S"),
+            'iso_date' : revision_date.strftime("%Y-%m-%d"), 
+            'iso_datetime' : revision_date.strftime("%Y-%m-%d %H:%M:%S"), 
+            'timeago' : timeago.format(revision_date, locale = locale)
         }
     
         return revision_dates
