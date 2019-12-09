@@ -18,7 +18,7 @@ Activate the plugin in `mkdocs.yml`:
 
 ```yaml
 plugins:
-  - git-revision-date
+  - git-revision-date-localized
 ```
 
 ## Usage
