@@ -1,13 +1,16 @@
 # mkdocs-git-revision-date-localized-plugin
 
-[MkDocs](https://www.mkdocs.org/) plugin that displays the localized date of the last modification of a markdown file. Forked from [mkdocs-git-revision-date-plugin](https://github.com/zhaoterryy/mkdocs-git-revision-date-plugin)
+[MkDocs](https://www.mkdocs.org/) plugin that enables displaying the localized date of the last git modification of a markdown file. Forked from [mkdocs-git-revision-date-plugin](https://github.com/zhaoterryy/mkdocs-git-revision-date-plugin).
+
+![example](example.png)
+
+(*Example when used together with [mkdocs-material](https://github.com/squidfunk/mkdocs-material) theme*)
 
 ## Setup
 
 Install the plugin using pip:
 
 ```bash
-# FIRST VERSION NOT YET PUBLISHED
 pip install mkdocs-git-revision-date-localized-plugin
 ```
 
@@ -26,7 +29,7 @@ In templates you can use `page.meta.git_revision_date_localized`:
 
 ```django hljs
 {% if page.meta.git_revision_date_localized %}
-<small><br><i>Updated {{ page.meta.git_revision_date_localized }}</i></small>
+  Last update: {{ page.meta.git_revision_date_localized }}
 {% endif %}
 ```
 
@@ -35,29 +38,29 @@ In templates you can use `page.meta.git_revision_date_localized`:
 In your markdown files you can use `{{ git_revision_date_localized }}`:
 
 ```django hljs
-Updated {{ git_revision_date_localized_iso }}
+Last update: {{ git_revision_date_localized }}
 ```
 
-## Localization updates
+## Localizated variants
 
-There are three date formats:
-
-- A date string format (using [babel](https://github.com/python-babel/babel/tree/master/babel)
-- A ISO format *(YYYY-mm-dd)*
-- A time ago format (using [timeago](https://github.com/hustcc/timeago)
+The plugin uses [babel](https://github.com/python-babel/babel/tree/master/babel) and [timeago](https://github.com/hustcc/timeago) to provide different date formats:
 
 ```django hljs
-<i>Updated {{ git_revision_date_localized }}</i>
-<i>Updated {{ git_revision_date_localized_iso }}</i>
-<i>Updated {{ git_revision_date_localized_timeago }}</i>
+{{ git_revision_date_localized }}
+{{ git_revision_date_localized_time }}
+{{ git_revision_date_localized_iso }}
+{{ git_revision_date_localized_iso_time }}
+{{ git_revision_date_localized_timeago }}
 ```
 
 Output:
 
 ```
-Updated 28 November, 2019
-Updated 2019-11-28
-Updated 20 hours agon
+28 November, 2019
+28 November, 2019 13:57:28
+2019-11-28
+2019-11-28 13:57:26
+20 hours ago
 ```
 
 ## Options
