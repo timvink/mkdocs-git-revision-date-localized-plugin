@@ -1,10 +1,10 @@
+import re
 from os import environ
 from datetime import datetime
 
 from mkdocs.config import config_options
 from mkdocs.plugins import BasePlugin
 from mkdocs.utils import string_types
-from jinja2 import Template
 from .util import Util
 
 
@@ -55,5 +55,14 @@ class GitRevisionDatePlugin(BasePlugin):
                 print('WARNING - macros plugin must be placed AFTER the git-revision-date plugin. Skipping markdown modifications')
                 return markdown
         else:
-            md_template = Template(markdown)
-            return md_template.render({'git_revision_date': revision_date})
+            markdown = re.sub(r"\{\{(\s)*git_revision_date(\s)*\}\}",
+                          revision_date,
+                          markdown,
+                          flags=re.IGNORECASE)
+
+            markdown = re.sub(r"\{\{\s*page\.meta\.git_revision_date\s*\}\}",
+                          revision_date,
+                          markdown,
+                          flags=re.IGNORECASE)
+            
+            return markdown
