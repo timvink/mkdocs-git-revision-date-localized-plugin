@@ -23,6 +23,10 @@ plugins:
 
 ## Usage
 
+### In supported themes
+
+- [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) offers support for this plugin, see [setup instructions](https://squidfunk.github.io/mkdocs-material/extensions/revision_date/)
+
 ### In theme templates
 
 In templates you can use `page.meta.git_revision_date_localized`:
@@ -62,7 +66,7 @@ Set this option to a two letter [ISO639](https://en.wikipedia.org/wiki/List_of_I
 
 ### Example
 
-Setting a different configuration:
+Example of setting both options:
 
 ```yaml
 # mkdocs.yml
