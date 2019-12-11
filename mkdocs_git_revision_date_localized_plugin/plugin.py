@@ -1,9 +1,9 @@
+import re
 from os import environ
 
 from mkdocs.config import config_options
 from mkdocs.plugins import BasePlugin
 from mkdocs.utils import string_types
-from jinja2 import Template
 from .util import Util
 from datetime import datetime
 
@@ -64,5 +64,23 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
                 print('WARNING - macros plugin must be placed AFTER the git-revision-date-localized plugin. Skipping markdown modifications')
                 return markdown
         else:
-            return Template(markdown).render({'git_revision_date_localized': revision_date})
+            #print("TEST TEST")
+            # print()
+            # print(f"revision_date: {revision_date}")
+            # revision_date = "2019-21-12"
+            # markdown = "text with {{ git_revision_date_localized }} here"
+            
+            markdown = re.sub(r"\{\{(\s)*git_revision_date_localized(\s)*\}\}",
+                          revision_date,
+                          markdown,
+                          flags=re.IGNORECASE)
+            
+            # print(markdown)
+
+            markdown = re.sub(r"\{\{\s*page\.meta\.git_revision_date_localized\s*\}\}",
+                          revision_date,
+                          markdown,
+                          flags=re.IGNORECASE)
+            
+            return markdown
         
