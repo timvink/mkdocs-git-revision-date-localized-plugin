@@ -64,18 +64,10 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
                 print('WARNING - macros plugin must be placed AFTER the git-revision-date-localized plugin. Skipping markdown modifications')
                 return markdown
         else:
-            #print("TEST TEST")
-            # print()
-            # print(f"revision_date: {revision_date}")
-            # revision_date = "2019-21-12"
-            # markdown = "text with {{ git_revision_date_localized }} here"
-            
             markdown = re.sub(r"\{\{(\s)*git_revision_date_localized(\s)*\}\}",
                           revision_date,
                           markdown,
                           flags=re.IGNORECASE)
-            
-            # print(markdown)
 
             markdown = re.sub(r"\{\{\s*page\.meta\.git_revision_date_localized\s*\}\}",
                           revision_date,
