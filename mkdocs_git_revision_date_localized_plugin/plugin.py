@@ -21,26 +21,29 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
     def on_config(self, config):
 
         # Get locale settings
-        mkdocs_locale = self.config.get('locale')
+        mkdocs_locale = config.get('locale')
         plugin_locale = self.config['locale']
-        theme_locale = vars(self.config['theme']).get('_vars', {}).get('locale')
-        if theme_locale is None:
-            theme_locale = vars(self.config['theme']).get('_vars', {}).get('language')
         
-        # First prio: plugin locale
+        theme_locale = vars(config['theme']).get('_vars', {}).get('locale')
+        if theme_locale is None:
+            theme_locale = vars(config['theme']).get('_vars', {}).get('language')
+        
+        # First prio: theme
+        if theme_locale:
+            self.locale = theme_locale
+            return
+        
+        # Second prio: plugin locale     
         if plugin_locale != '':
             self.locale = plugin_locale
             return
-        
-        # Second prio: theme
-        if theme_locale:
-            self.locale = theme_locale
         
         # Third is mkdocs locale setting (might be added in the future)
         if mkdocs_locale:
             self.locale = mkdocs_locale
         
-        # Final fallback is english
+        # If none set then english
+        self.locale = 'en'
         return
         
 
