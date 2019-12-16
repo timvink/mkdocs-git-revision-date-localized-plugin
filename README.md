@@ -66,7 +66,7 @@ Set this option to one of `date`, `datetime`, `iso_date`, `iso_datetime` or `tim
 
 ### `locale`
 
-Set this option to a two letter [ISO639](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code to use a another language. This will overwrite any locale setting in `mkdocs` or your theme. If no locale is set fallback is English (`en`).
+Set this option to a two letter [ISO639](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code to use a another language. If you have also set `locale` or `language` in your theme this setting will be ignored. If no locale is set fallback is English (`en`).
 
 ### Example
 
