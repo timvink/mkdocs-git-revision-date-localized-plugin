@@ -1,3 +1,7 @@
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/mkdocs-git-revision-date-localized-plugin)
+![PyPI](https://img.shields.io/pypi/v/mkdocs-git-revision-date-localized-plugin)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/mkdocs-git-revision-date-localized-plugin)
+ 
 # mkdocs-git-revision-date-localized-plugin
 
 [MkDocs](https://www.mkdocs.org/) plugin that enables displaying the localized date of the last git modification of a markdown file. Forked from [mkdocs-git-revision-date-plugin](https://github.com/zhaoterryy/mkdocs-git-revision-date-plugin). The plugin uses [babel](https://github.com/python-babel/babel/tree/master/babel) and [timeago](https://github.com/hustcc/timeago) to provide different localized date formats.
