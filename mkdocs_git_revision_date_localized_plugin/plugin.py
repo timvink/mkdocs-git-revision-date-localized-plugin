@@ -21,23 +21,22 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
     def on_config(self, config):
 
         # Get locale settings
-        mkdocs_locale = config.get('locale')
+        mkdocs_locale = self.config.get('locale')
         plugin_locale = self.config['locale']
-        theme_locale = vars(config['theme']).get('_vars', {}).get('locale')
+        theme_locale = vars(self.config['theme']).get('_vars', {}).get('locale')
         if theme_locale is None:
-            theme_locale = vars(config['theme']).get('_vars', {}).get('language')
+            theme_locale = vars(self.config['theme']).get('_vars', {}).get('language')
         
         # First prio: plugin locale
         if plugin_locale != '':
-            if plugin_locale != mkdocs_locale:
-                print(f"WARNING - plugin locale setting '{plugin_locale}' will overwrite mkdocs locale '{mkdocs_locale}'")
-            self.locale = mkdocs_locale
+            self.locale = plugin_locale
             return
         
         # Second prio: theme
         if theme_locale:
             self.locale = theme_locale
-        # Third is mkdocs locale setting (might be add in the future)
+        
+        # Third is mkdocs locale setting (might be added in the future)
         if mkdocs_locale:
             self.locale = mkdocs_locale
         
