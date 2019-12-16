@@ -29,7 +29,7 @@ plugins:
 
 ### In supported themes
 
-- [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) offers support for this plugin, see [setup instructions](https://squidfunk.github.io/mkdocs-material/extensions/revision_date/)
+- [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) offers support for this plugin, see [setup instructions](https://squidfunk.github.io/mkdocs-material/extensions/revision-date/)
 
 ### In theme templates
 
