@@ -4,7 +4,7 @@
  
 # mkdocs-git-revision-date-localized-plugin
 
-[MkDocs](https://www.mkdocs.org/) plugin that enables displaying the localized date of the last git modification of a markdown file. Forked from [mkdocs-git-revision-date-plugin](https://github.com/zhaoterryy/mkdocs-git-revision-date-plugin). The plugin uses [babel](https://github.com/python-babel/babel/tree/master/babel) and [timeago](https://github.com/hustcc/timeago) to provide different localized date formats.
+[MkDocs](https://www.mkdocs.org/) plugin that enables displaying the date of the last git modification of a page. The plugin uses [babel](https://github.com/python-babel/babel/tree/master/babel) and [timeago.js](https://github.com/hustcc/timeago.js) to provide different localized date formats. Initial fork from [mkdocs-git-revision-date-plugin](https://github.com/zhaoterryy/mkdocs-git-revision-date-plugin).
 
 ![example](https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/raw/master/example.png)
 
@@ -66,7 +66,12 @@ Set this option to one of `date`, `datetime`, `iso_date`, `iso_datetime` or `tim
 
 ### `locale`
 
-Set this option to a two letter [ISO639](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code to use a another language. If you have also set `locale` or `language` in your theme this setting will be ignored. If no locale is set fallback is English (`en`).
+Specify a two letter [ISO639](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code to display dates in your preferred language.
+
+- When used in combination with `type: date` or `type: datetime`, translation is done using [babel](https://github.com/python-babel/babel) which supports [these locales](http://www.unicode.org/cldr/charts/latest/supplemental/territory_language_information.html)
+- When used in combination with `type: timeago` then [timeago.js](https://github.com/hustcc/timeago.js) is added to your website, which supports [these locales](https://github.com/hustcc/timeago.js/tree/master/src/lang). If you specify a locale not supported by timeago.js, the fallback is English (`en`)
+- When not set, this plugin will look for `locale` or `language` options set in your theme. If also not set, the fallback is English (`en`)
+
 
 ### Example
 
