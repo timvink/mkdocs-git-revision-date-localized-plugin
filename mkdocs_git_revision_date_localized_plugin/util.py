@@ -19,15 +19,17 @@ class Util:
             dict: localized date variants 
         """
         
-        unix_timestamp = int(self.g.log(path, n=1, date='short', format='%at'))
-        timestamp_in_ms = unix_timestamp * 1000
+        unix_timestamp = self.g.log(path, n=1, date='short', format='%at')
         
         if not unix_timestamp:
-            revision_date = datetime.now()
-            print('WARNING -  %s has no git logs, revision date defaulting to today\'s date' % path)
-        else:
-            revision_date = datetime.utcfromtimestamp(unix_timestamp)
-
+            unix_timestamp = datetime.now().timestamp() 
+            print('WARNING - %s has no git logs, using current timestamp' % path)
+        
+        unix_timestamp = int(unix_timestamp)
+        timestamp_in_ms = unix_timestamp * 1000
+        
+        revision_date = datetime.utcfromtimestamp(unix_timestamp)
+        
         return {
             'date' : format_date(revision_date, format="long", locale=locale), 
             'datetime' : format_date(revision_date, format="long", locale=locale) + ' ' +revision_date.strftime("%H:%M:%S"),
