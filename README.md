@@ -12,24 +12,27 @@
 
 ## Setup
 
-Install the plugin using pip:
+Install the plugin using `pip` with the following command:
 
 ```bash
 pip install mkdocs-git-revision-date-localized-plugin
 ```
 
-Activate the plugin in `mkdocs.yml`:
+Next, add the following lines to your `mkdocs.yml`:
 
 ```yaml
 plugins:
+  - search
   - git-revision-date-localized
 ```
+
+> If you have no `plugins` entry in your config file yet, you'll likely also want to add the `search` plugin. MkDocs enables it by default if there is no `plugins` entry set.
 
 ## Usage
 
 ### In supported themes
 
-- [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) offers support for this plugin, see [setup instructions](https://squidfunk.github.io/mkdocs-material/extensions/revision-date/)
+- [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) offers support for this plugin, see [setup instructions](https://squidfunk.github.io/mkdocs-material/plugins/revision-date/)
 
 ### In theme templates
 
@@ -49,19 +52,18 @@ In your markdown files you can use `{{ git_revision_date_localized }}`:
 Last update: {{ git_revision_date_localized }}
 ```
 
-
 ## Options
 
 ### `type`
 
-Set this option to one of `date`, `datetime`, `iso_date`, `iso_datetime` or `timeago`. Default is `date`. Example outputs:
+To change the date format, set the `type` parameter to one of `date`, `datetime`, `iso_date`, `iso_datetime` or `timeago`. Default is `date`. Example outputs:
 
 ```bash
-28 November, 2019 # type: date
-28 November, 2019 13:57:28 # type: datetime
-2019-11-28 # type: iso_date
-2019-11-28 13:57:26 # type: iso_datetime
-20 hours ago # type: timeago
+28 November, 2019           # type: date
+28 November, 2019 13:57:28  # type: datetime
+2019-11-28                  # type: iso_date
+2019-11-28 13:57:26         # type: iso_datetime
+20 hours ago                # type: timeago
 ```
 
 ### `locale`
@@ -82,5 +84,11 @@ Example of setting both options:
 plugins:
   - git-revision-date-localized:
     type: timeago
-    locale: nl
+    locale: en
+```
+
+Result:
+
+```
+20 hours ago
 ```
