@@ -1,6 +1,8 @@
+[![Actions Status](https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/workflows/pytest/badge.svg)](https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/actions)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/mkdocs-git-revision-date-localized-plugin)
 ![PyPI](https://img.shields.io/pypi/v/mkdocs-git-revision-date-localized-plugin)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/mkdocs-git-revision-date-localized-plugin)
+[![codecov](https://codecov.io/gh/timvink/mkdocs-git-revision-date-localized-plugin/branch/master/graph/badge.svg)](https://codecov.io/gh/timvink/mkdocs-git-revision-date-localized-plugin)
  
 # mkdocs-git-revision-date-localized-plugin
 
