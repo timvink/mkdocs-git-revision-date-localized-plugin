@@ -50,7 +50,7 @@ def test_basic_working(tmp_path):
     index_file = tmp_path/'index.html'
     built_site_tests(tmp_path)
     contents = index_file.read_text()
-    assert re.search(r"Laatst geüpdatet op\:\s[\w].+", contents) 
+    assert re.search(r"Laatst ge\u00FCpdatet op\:\s[\w].+", contents) 
     
     # Test timeago
     result = build_docs_setup('test/basic_setup/mkdocs_timeago.yml', tmp_path)
