@@ -1,0 +1,10 @@
+site_name: test gitrevisiondatelocalized_plugin
+use_directory_urls: true
+
+theme:
+    name: 'material'
+    language: nl
+
+plugins:
+    - search
+    - git-revision-date-localized

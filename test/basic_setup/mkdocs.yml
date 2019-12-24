@@ -1,0 +1,6 @@
+site_name: test gitrevisiondatelocalized_plugin
+use_directory_urls: true
+
+plugins:
+    - search
+    - git-revision-date-localized
