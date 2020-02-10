@@ -1,13 +1,12 @@
 import re
 from mkdocs.config import config_options
 from mkdocs.plugins import BasePlugin
-from mkdocs.utils import string_types
 from .util import Util
 
 class GitRevisionDateLocalizedPlugin(BasePlugin):
     config_scheme = (
-        ('locale', config_options.Type(string_types, default='')),
-        ('type', config_options.Type(string_types, default='date'))
+        ('locale', config_options.Type(str, default='')),
+        ('type', config_options.Type(str, default='date'))
     )
 
     def __init__(self):

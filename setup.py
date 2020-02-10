@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='mkdocs-git-revision-date-localized-plugin',
-    version='0.4.5',
+    version='0.4.6',
     description='Mkdocs plugin that enables displaying the localized date of the last git modification of a markdown file.',
     long_description=long_description,
     long_description_content_type="text/markdown",
