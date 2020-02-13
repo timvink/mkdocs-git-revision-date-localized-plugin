@@ -22,7 +22,7 @@ class Util:
         unix_timestamp = self.g.log(path, n=1, date='short', format='%at')
         
         if not unix_timestamp:
-            unix_timestamp = datetime.now().timestamp() 
+            unix_timestamp = datetime.utcnow().timestamp() 
             print('WARNING - %s has no git logs, using current timestamp' % path)
         
         unix_timestamp = int(unix_timestamp)
