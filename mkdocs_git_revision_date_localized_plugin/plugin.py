@@ -77,8 +77,8 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
           <script src="https://cdnjs.cloudflare.com/ajax/libs/timeago.js/4.0.0-beta.2/timeago.min.js"></script>
           <script src="https://cdnjs.cloudflare.com/ajax/libs/timeago.js/4.0.0-beta.2/timeago.locales.min.js"></script>
           <script>
-            const nodes = document.querySelectorAll('.timeago');
-            const locale = nodes[0].getAttribute('locale');
+            var nodes = document.querySelectorAll('.timeago');
+            var locale = nodes[0].getAttribute('locale');
             timeago.render(nodes, locale);
           </script>
         """
