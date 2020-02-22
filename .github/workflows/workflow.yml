@@ -14,7 +14,7 @@ jobs:
         python-version: 3.7
     - name: Generate coverage report
       run: |
-        pip install -r test/test_requirements.txt
+        pip install -r tests/test_requirements.txt
         pip install -e .
         pytest --cov=mkdocs_git_revision_date_localized_plugin --cov-report=xml
     - name: Static code checking with pyflakes
