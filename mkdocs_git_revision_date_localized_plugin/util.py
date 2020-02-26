@@ -6,8 +6,8 @@ from babel.dates import format_date
 
 class Util:
 
-    def __init__(self):
-        self.g = Git()
+    def __init__(self, path = "."):
+        self.repo = Git(path)
 
     @staticmethod
     def _date_formats(unix_timestamp, locale = 'en'):
@@ -42,14 +42,14 @@ class Util:
         Determine localized date variants for a given file
         
         Args:
-            path (str): Location of a file that is part of a GIT repository
+            path (str): Location of a markdownfile that is part of a GIT repository
             locale (str, optional): Locale code of language to use. Defaults to 'en'.
         
         Returns:
             dict: localized date variants 
         """
         
-        unix_timestamp = self.g.log(path, n=1, date='short', format='%at')
+        unix_timestamp = self.repo.log(path, n=1, date='short', format='%at')
         
 
         if not unix_timestamp:
