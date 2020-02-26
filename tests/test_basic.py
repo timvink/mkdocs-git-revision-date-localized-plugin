@@ -15,6 +15,7 @@ import yaml
 import shutil
 import pytest
 import git
+import logging
 
 from mkdocs_git_revision_date_localized_plugin.util import Util
 
@@ -44,6 +45,8 @@ def setup_clean_mkdocs_folder(mkdocs_yml_path, output_path):
     
     # Create empty 'testproject' folder    
     if os.path.exists(testproject_path):
+        logging.warning("""This command does not work on windows. 
+        Refactor your test to use setup_clean_mkdocs_folder() only once""")
         shutil.rmtree(testproject_path)
 
     # Copy correct mkdocs.yml file and our test 'docs/'        
@@ -62,6 +65,9 @@ def setup_commit_history(testproject_path):
     
     Args:
         testproject_path (Path): Path to test project
+        
+    Returns:
+        repo (repo): git.Repo object
     """
     assert not os.path.exists(testproject_path / '.git') 
 
@@ -75,8 +81,19 @@ def setup_commit_history(testproject_path):
     try: 
         repo.git.add('mkdocs.yml')
         repo.git.commit(message = 'add mkdocs', author = author)
+
         repo.git.add('docs/first_page.md')
         repo.git.commit(message = 'first page', author = author)
+        file_name = os.path.join(testproject_path, 'docs/first_page.md')
+        with open(file_name, 'w+') as the_file:
+            the_file.write('Hello\n')
+        repo.git.add('docs/first_page.md')
+        repo.git.commit(message = 'first page update 1', author = author)
+        with open(file_name, 'w') as the_file:
+            the_file.write('# First Test Page Edited\n\nSome Lorem text')
+        repo.git.add('docs/first_page.md')
+        repo.git.commit(message = 'first page update 2', author = author)
+        
         repo.git.add('docs/second_page.md')
         repo.git.commit(message = 'second page', author = author)
         repo.git.add('docs/index.md')
@@ -87,6 +104,8 @@ def setup_commit_history(testproject_path):
     except:
         os.chdir(cwd)
         raise
+    
+    return repo
 
 def build_docs_setup(testproject_path):
     """
@@ -225,23 +244,45 @@ def test_type_unknown(tmp_path):
         tmp_path, 
         'tests/basic_setup/mkdocs_unknown_type.yml') 
 
-def test_low_fetch_depth(tmp_path):
+def test_low_fetch_depth(tmp_path, caplog):
     """
     On gitlab and github runners, a GIT might have a low fetch 
     depth, which means commits are not available. 
     This should throw informative errors.
     """
     
-    pass
+    testproject_path = setup_clean_mkdocs_folder('tests/basic_setup/mkdocs.yml', tmp_path)
+    repo = setup_commit_history(testproject_path) 
     
-    # Test correct error messages when GIT is not available
-    #target_dir = os.path.join(tmp_path, 'nogit')
-    #shutil.copytree(os.path.join(os.getcwd(), 'test/basic_setup'), 
-    #                target_dir)
-    
-    # ...
-    #result = build_docs_setup(os.path.join(target_dir,'mkdocs.yml'), target_dir)
+    # Create a second, clean folder to clone to
+    cloned_folder = tmp_path.parent / 'clonedrepo'
+    if os.path.exists(cloned_folder):
+        shutil.rmtree(cloned_folder)
+    os.mkdir(cloned_folder)
+   
+    # Clone the local repo with fetch depth of 1 
+    repo = git.Repo.init(cloned_folder, bare = False)
+    origin = repo.create_remote('origin', testproject_path)
+    origin.fetch(depth=1, prune=True)
+    repo.create_head('master', origin.refs.master)  # create local branch "master" from remote "master"
+    repo.heads.master.set_tracking_branch(origin.refs.master)  # set local "master" to track remote "master
+    repo.heads.master.checkout()  # checkout local "master" to working tree
 
-    #with pytest.warns(UserWarning):
-    #    assert result.exit_code == 0, "'mkdocs build' command failed"
+    # should not raise warning
+    result = build_docs_setup(cloned_folder)
+    assert result.exit_code == 0
     
+    # should raise warning
+    os.environ["GITLAB_CI"] = "1"
+    result = build_docs_setup(cloned_folder)
+    assert result.exit_code == 0
+    assert 'Running on a gitlab runner' in caplog.text
+
+    del os.environ['GITLAB_CI']
+    os.environ["GITHUB_ACTIONS"] = "1"
+    result = build_docs_setup(cloned_folder)
+    assert result.exit_code == 0
+    assert 'Running on github actions might' in caplog.text
+    
+
+# TODO: Test correct error messages when GIT is not available

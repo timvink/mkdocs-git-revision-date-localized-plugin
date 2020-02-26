@@ -4,10 +4,31 @@ from git import Git
 from datetime import datetime
 from babel.dates import format_date
 
+
 class Util:
 
     def __init__(self, path = "."):
         self.repo = Git(path)
+        
+        # Checks when running builds on CI
+        # See https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/10
+        if is_shallow_clone(self.repo):
+            n_commits = commit_count(self.repo)
+
+            if os.environ.get('GITLAB_CI') and n_commits < 50:
+                logging.warning("""
+                       Running on a gitlab runner might lead to wrong git revision dates
+                       due to a shallow git fetch depth.  
+                       Make sure to set GIT_DEPTH to 1000 in your .gitlab-ci.yml file.
+                       (see https://docs.gitlab.com/ee/user/project/pipelines/settings.html#git-shallow-clone).
+                       """)
+            if os.environ.get('GITHUB_ACTIONS') and n_commits == 1:
+                logging.warning("""
+                       Running on github actions might lead to wrong git revision dates
+                       due to a shallow git fetch depth. 
+                       Try setting fetch-depth to 0 in your github action
+                       (see https://github.com/actions/checkout).
+                       """)
 
     @staticmethod
     def _date_formats(unix_timestamp, locale = 'en'):
@@ -50,27 +71,43 @@ class Util:
         """
         
         unix_timestamp = self.repo.log(path, n=1, date='short', format='%at')
-        
-
+                    
         if not unix_timestamp:
-            
-            if os.environ.get('GITLAB_CI'):
-                raise EnvironmentError("""Cannot access git commit for '%s'. 
-                       Try setting GIT_DEPTH to 1000 in your .gitlab-ci.yml file.
-                       (see https://docs.gitlab.com/ee/user/project/pipelines/settings.html#git-shallow-clone).
-                       Or disable mkdocs-git-revision-date-localized-plugin when using gitlab runners.
-                       """ % path)
-
-            if os.environ.get('GITHUB_ACTIONS'):
-                raise EnvironmentError("""Cannot access git commit for '%s'. 
-                       Try setting fetch-depth to 1 in your github action
-                       (see https://github.com/actions/checkout).
-                       Or disable mkdocs-git-revision-date-localized-plugin when using github actions.
-                       """ % path)
-
             unix_timestamp = datetime.utcnow().timestamp()
             logging.warning('%s has no git logs, using current timestamp' % path)
-            
-
         
         return self._date_formats(unix_timestamp)
+
+def is_shallow_clone(repo):
+    """
+    Helper function to determine if repository 
+    is a shallow clone.
+    
+    References:
+    https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/10
+    https://stackoverflow.com/a/37203240/5525118
+    
+    Args:
+        repo (git.Repo): Repository
+        
+    Returns:
+        bool: If a repo is shallow clone
+    """
+    return os.path.exists(".git/shallow")
+
+
+def commit_count(repo):
+    """
+    Helper function to determine the number of commits in a repository
+    
+    Args:
+        repo (git.Repo): Repository
+        
+    Returns:
+        count (int): Number of commits
+    """
+    refs = repo.for_each_ref().split('\n')
+    refs = [x.split()[0] for x in refs]
+
+    counts = [int(repo.rev_list(x, count=True, first_parent=True)) for x in refs]
+    return max(counts)
