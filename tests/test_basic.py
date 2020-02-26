@@ -67,22 +67,22 @@ def setup_commit_history(testproject_path):
 
     repo = git.Repo.init(testproject_path, bare = False)
     author = "Test Person <testtest@gmail.com>"
-        
+    
     # Change the working directory
     cwd = os.getcwd()
     os.chdir(testproject_path)
-   
+    
     try: 
         repo.git.add('mkdocs.yml')
         repo.git.commit(message = 'add mkdocs', author = author)
         repo.git.add('docs/first_page.md')
-        repo.git.commit(message = 'first page', author = author) 
+        repo.git.commit(message = 'first page', author = author)
         repo.git.add('docs/second_page.md')
         repo.git.commit(message = 'second page', author = author)
         repo.git.add('docs/index.md')
         repo.git.commit(message = 'homepage', author = author)
         repo.git.add('docs/page_with_tag.md')
-        repo.git.commit(message = 'homepage', author = author)   
+        repo.git.commit(message = 'homepage', author = author)
         os.chdir(cwd)
     except:
         os.chdir(cwd)
@@ -180,11 +180,15 @@ def test_missing_git_repo(tmp_path):
     result = build_docs_setup(testproject_path)
     assert result.exit_code == 1, "'mkdocs build' command succeeded while there is no GIT repo"
 
-def test_basic_locale_builds(tmp_path):
+def test_build_no_options(tmp_path):
     # Enable plugin with no extra options set
     validate_mkdocs_file(tmp_path, 'tests/basic_setup/mkdocs.yml')
+    
+def test_build_locale_plugin(tmp_path):
     # Enable plugin with plugin locale set to 'nl'
     validate_mkdocs_file(tmp_path, 'tests/basic_setup/mkdocs_plugin_locale.yml')
+   
+def test_build_locale_mkdocs(tmp_path):
     # Enable plugin with mkdocs locale set to 'nl' 
     validate_mkdocs_file(tmp_path, 'tests/basic_setup/mkdocs_locale.yml')
 
@@ -203,27 +207,24 @@ def test_material_theme(tmp_path):
     contents = index_file.read_text()
     assert re.search(r"Letztes Update\:\s[\w].+", contents) 
 
-def test_type_builds(tmp_path):
-    """
-    Test the different 'type' parameters
-    """
-    
+def test_type_timeago(tmp_path):
     # type: 'timeago'
     testproject_path = validate_mkdocs_file(
         tmp_path, 
         'tests/basic_setup/mkdocs_timeago.yml')
 
+def test_type_datetime(tmp_path):
     # type: 'datetime'
     testproject_path = validate_mkdocs_file(
         tmp_path, 
         'tests/basic_setup/mkdocs_datetime.yml')
 
+def test_type_unknown(tmp_path):
     with pytest.raises(AssertionError):
        testproject_path = validate_mkdocs_file(
         tmp_path, 
         'tests/basic_setup/mkdocs_unknown_type.yml') 
-    
-   
+
 def test_low_fetch_depth(tmp_path):
     """
     On gitlab and github runners, a GIT might have a low fetch 
