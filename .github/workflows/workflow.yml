@@ -1,5 +1,5 @@
 name: pytest
-on: [push]
+on: [push, pull_request]
 jobs:
   run:
     runs-on: ${{ matrix.os }}
