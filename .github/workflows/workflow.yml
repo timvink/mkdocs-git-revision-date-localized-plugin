@@ -14,6 +14,8 @@ jobs:
         python-version: 3.7
     - name: Generate coverage report
       run: |
+        git config --global user.name "Github Action"
+        git config --global user.email "githubaction@gmail.com"
         pip install -r tests/test_requirements.txt
         pip install -e .
         pytest --cov=mkdocs_git_revision_date_localized_plugin --cov-report=xml
