@@ -14,7 +14,7 @@ setup(
     author='Tim Vink',
     author_email='vinktim@gmail.com',
     license='MIT',
-    python_requires='>=3.4',
+    python_requires='>=3.5',
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
