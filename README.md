@@ -3,6 +3,8 @@
 ![PyPI](https://img.shields.io/pypi/v/mkdocs-git-revision-date-localized-plugin)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/mkdocs-git-revision-date-localized-plugin)
 [![codecov](https://codecov.io/gh/timvink/mkdocs-git-revision-date-localized-plugin/branch/master/graph/badge.svg)](https://codecov.io/gh/timvink/mkdocs-git-revision-date-localized-plugin)
+![GitHub contributors](https://img.shields.io/github/contributors/timvink/mkdocs-git-revision-date-localized-plugin)
+![PyPI - License](https://img.shields.io/pypi/l/mkdocs-git-revision-date-localized-plugin)
  
 # mkdocs-git-revision-date-localized-plugin
 
