@@ -16,6 +16,7 @@ class Util:
             n_commits = commit_count(self.repo)
 
             if os.environ.get('GITLAB_CI') and n_commits < 50:
+                # Default is GIT_DEPTH of 50 for gitlab
                 logging.warning("""
                        Running on a gitlab runner might lead to wrong git revision dates
                        due to a shallow git fetch depth.  
@@ -23,6 +24,7 @@ class Util:
                        (see https://docs.gitlab.com/ee/user/project/pipelines/settings.html#git-shallow-clone).
                        """)
             if os.environ.get('GITHUB_ACTIONS') and n_commits == 1:
+                # Default is fetch-depth of 1 for github actions
                 logging.warning("""
                        Running on github actions might lead to wrong git revision dates
                        due to a shallow git fetch depth. 
