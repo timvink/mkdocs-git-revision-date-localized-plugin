@@ -83,7 +83,7 @@ class Util:
         try:
             unix_timestamp = self.repo.log(path, n=1, date="short", format="%at")
         except GitCommandError as err:
-            logging.error("Unable to read git logs. Traced error: {}".format(err))
+            logging.error("Unable to read git logs. Traced error: %s" % err)
             unix_timestamp = None
 
         if not unix_timestamp:
