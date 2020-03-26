@@ -103,15 +103,13 @@ class Util:
             if ignore_missing_git:
                 unix_timestamp = None
                 logging.warning(
-                    "Unable to perform command: git log.."
-                    " Is git installed?"
+                    "Unable to perform command: git log. Is git installed?"
                     " Option 'ignoring_missing_git' enabled: so keep building..."
                 )
             else:
                 logging.error(
-                    "Unable to read git logs of '%s'. "
+                    "Unable to perform command: git log. Is git installed?"
                     "To ignore this error, set option 'ignoring_missing_git: true'"
-                    % path
                 )
                 raise err
 
