@@ -39,6 +39,8 @@ The plugin needs access to the last commit that touched a file to be able to ret
 - github actions: set `fetch_depth` to `0` ([docs](https://github.com/actions/checkout))
 - gitlab runners: set `GIT_DEPTH` to `1000` ([docs](https://docs.gitlab.com/ee/user/project/pipelines/settings.html#git-shallow-clone))
 
+----
+
 ## Usage
 
 ### In supported themes
@@ -85,21 +87,29 @@ Specify a two letter [ISO639](https://en.wikipedia.org/wiki/List_of_ISO_639-1_co
 - When used in combination with `type: timeago` then [timeago.js](https://github.com/hustcc/timeago.js) is added to your website, which supports [these locales](https://github.com/hustcc/timeago.js/tree/master/src/lang). If you specify a locale not supported by timeago.js, the fallback is English (`en`)
 - When not set, this plugin will look for `locale` or `language` options set in your theme. If also not set, the fallback is English (`en`)
 
+### `ignore_missing_git`
+
+If you need to ignore the Git exceptions during `git log` operations, set this option to `true` (default is `false`).
+
+In addition, if you need to completely ignore if Git is reachable or installed, you should set the environment variable ["GIT_PYTHON_REFRESH"] to `quiet`.
+
+----
 
 ### Example
 
-Example of setting both options:
+Example with all options:
 
 ```yaml
 # mkdocs.yml
 plugins:
   - git-revision-date-localized:
-    type: timeago
     locale: en
+    type: timeago
+    ignore_missing_git: true
 ```
 
 Result:
 
-```
+```txt
 20 hours ago
 ```
