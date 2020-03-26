@@ -68,7 +68,9 @@ class Util:
             % (timestamp_in_ms, locale),
         }
 
-    def get_revision_date_for_file(self, path: str, locale: str = "en") -> dict:
+    def get_revision_date_for_file(
+        self, path: str, locale: str = "en", ignore_missing_git: bool = False
+    ) -> dict:
         """
         Determine localized date variants for a given file
 
@@ -84,7 +86,10 @@ class Util:
             unix_timestamp = self.repo.log(path, n=1, date="short", format="%at")
         except GitCommandError as err:
             logging.error("Unable to read git logs. Traced error: %s" % err)
-            unix_timestamp = None
+            if ignore_missing_git:
+                unix_timestamp = None
+            else:
+                raise err
 
         if not unix_timestamp:
             unix_timestamp = datetime.utcnow().timestamp()
