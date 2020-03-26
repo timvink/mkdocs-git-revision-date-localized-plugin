@@ -85,10 +85,17 @@ class Util:
         try:
             unix_timestamp = self.repo.log(path, n=1, date="short", format="%at")
         except GitCommandError as err:
-            logging.error("Unable to read git logs. Traced error: %s" % err)
             if ignore_missing_git:
                 unix_timestamp = None
+                logging.warning(
+                    "Unable to read git logs of '%s'."
+                    " Is git log readable?"
+                    " Option 'ignoring_missing_git' enabled: so keep building..." % path
+                )
             else:
+                logging.error(
+                    "Unable to read git logs of '%s'. Traced error: %s" % path, err
+                )
                 raise err
 
         if not unix_timestamp:
