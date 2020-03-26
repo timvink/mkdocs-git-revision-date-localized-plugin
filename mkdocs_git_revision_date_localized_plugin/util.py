@@ -5,7 +5,7 @@ from datetime import datetime
 
 # 3rd party
 from babel.dates import format_date
-from git import Git
+from git import Git, GitCommandError
 
 
 class Util:
@@ -80,7 +80,10 @@ class Util:
             dict: localized date variants
         """
 
-        unix_timestamp = self.repo.log(path, n=1, date="short", format="%at")
+        try:
+            unix_timestamp = self.repo.log(path, n=1, date="short", format="%at")
+        except GitCommandError as err:
+            logging.error("Unable to read git logs. Traced error: {}".format(err))
 
         if not unix_timestamp:
             unix_timestamp = datetime.utcnow().timestamp()
