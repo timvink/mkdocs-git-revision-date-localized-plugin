@@ -217,6 +217,19 @@ def test_missing_git_repo(tmp_path):
     ), "'mkdocs build' command succeeded while there is no GIT repo"
 
 
+def test_missing_git_repo_ignored(tmp_path):
+    """
+    When there is no GIT repo, the git error should be ignored.
+    """
+    testproject_path = setup_clean_mkdocs_folder(
+        mkdocs_yml_path="tests/basic_setup/mkdocs_ignore_missing_git.yml",
+        output_path=tmp_path,
+    )
+
+    result = build_docs_setup(testproject_path)
+    assert result.exit_code == 0
+
+
 def test_build_no_options(tmp_path):
     # Enable plugin with no extra options set
     validate_mkdocs_file(tmp_path, "tests/basic_setup/mkdocs.yml")
