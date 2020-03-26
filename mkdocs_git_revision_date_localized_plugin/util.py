@@ -5,7 +5,7 @@ from datetime import datetime
 
 # 3rd party
 from babel.dates import format_date
-from git import Git, GitCommandError
+from git import Git, GitCommandError, GitCommandNotFound
 
 
 class Util:
@@ -81,7 +81,7 @@ class Util:
         Returns:
             dict: localized date variants
         """
-
+        # perform git log operation
         try:
             unix_timestamp = self.repo.log(path, n=1, date="short", format="%at")
         except GitCommandError as err:
@@ -99,7 +99,23 @@ class Util:
                     % path
                 )
                 raise err
+        except GitCommandNotFound as err:
+            if ignore_missing_git:
+                unix_timestamp = None
+                logging.warning(
+                    "Unable to perform command: git log.."
+                    " Is git installed?"
+                    " Option 'ignoring_missing_git' enabled: so keep building..."
+                )
+            else:
+                logging.error(
+                    "Unable to read git logs of '%s'. "
+                    "To ignore this error, set option 'ignoring_missing_git: true'"
+                    % path
+                )
+                raise err
 
+        # create timestamp
         if not unix_timestamp:
             unix_timestamp = datetime.utcnow().timestamp()
             logging.warning("%s has no git logs, using current timestamp" % path)
