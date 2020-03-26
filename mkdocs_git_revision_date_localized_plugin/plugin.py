@@ -4,6 +4,7 @@ import re
 # 3rd party
 from mkdocs.config import config_options
 from mkdocs.plugins import BasePlugin
+from mkdocs.structure.nav import Page
 
 # package modules
 from .util import Util
@@ -19,7 +20,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         self.locale = "en"
         self.util = Util()
 
-    def on_config(self, config):
+    def on_config(self, config: config_options.Config) -> dict:
         """
         Determine which locale to use.
 
@@ -56,7 +57,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
 
         return config
 
-    def on_post_page(self, output_content, **kwargs):
+    def on_post_page(self, output_content: str, **kwargs) -> str:
         """
         Add timeago.js as a CDN to the HTML page.
         The CDN with latest version timeago.js can be found on
@@ -91,7 +92,9 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         idx = output_content.index("</body>")
         return output_content[:idx] + extra_js + output_content[idx:]
 
-    def on_page_markdown(self, markdown, page, config, files):
+    def on_page_markdown(
+        self, markdown: str, page: Page, config: config_options.Config, files
+    ) -> str:
         """
         Replace jinja2 tags in markdown and templates with the localized dates
 

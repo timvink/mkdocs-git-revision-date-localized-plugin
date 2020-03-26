@@ -9,7 +9,7 @@ from git import Git, GitCommandError
 
 
 class Util:
-    def __init__(self, path="."):
+    def __init__(self, path: str = "."):
         self.repo = Git(path)
 
         # Checks when running builds on CI
@@ -39,7 +39,7 @@ class Util:
                 )
 
     @staticmethod
-    def _date_formats(unix_timestamp, locale="en"):
+    def _date_formats(unix_timestamp: float, locale="en") -> dict:
         """
         Returns different date formats / types.
 
@@ -68,7 +68,7 @@ class Util:
             % (timestamp_in_ms, locale),
         }
 
-    def get_revision_date_for_file(self, path, locale="en"):
+    def get_revision_date_for_file(self, path: str, locale: str = "en") -> dict:
         """
         Determine localized date variants for a given file
 
@@ -93,7 +93,7 @@ class Util:
         return self._date_formats(unix_timestamp)
 
 
-def is_shallow_clone(repo):
+def is_shallow_clone(repo: Git) -> bool:
     """
     Helper function to determine if repository
     is a shallow clone.
@@ -111,7 +111,7 @@ def is_shallow_clone(repo):
     return os.path.exists(".git/shallow")
 
 
-def commit_count(repo):
+def commit_count(repo: Git) -> bool:
     """
     Helper function to determine the number of commits in a repository
 
