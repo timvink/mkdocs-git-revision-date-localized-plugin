@@ -1,8 +1,11 @@
-import os
+# standard library
 import logging
-from git import Git
+import os
 from datetime import datetime
+
+# 3rd party
 from babel.dates import format_date
+from git import Git
 
 
 class Util:

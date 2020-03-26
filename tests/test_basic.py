@@ -9,18 +9,21 @@ You can reproduce locally with:
 >>> os.mkdir(tmp_path)
 """
 
-import re
-import os
-import yaml
-import shutil
-import pytest
-import git
+# standard lib
 import logging
+import os
+import re
+import shutil
 
-from mkdocs_git_revision_date_localized_plugin.util import Util
-
+# 3rd partu
+import git
+import pytest
+import yaml
 from click.testing import CliRunner
 from mkdocs.__main__ import build_command
+
+# package module
+from mkdocs_git_revision_date_localized_plugin.util import Util
 
 
 def load_config(mkdocs_path):

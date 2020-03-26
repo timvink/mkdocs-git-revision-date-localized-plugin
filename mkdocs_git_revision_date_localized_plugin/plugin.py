@@ -1,6 +1,11 @@
+# standard lib
 import re
+
+# 3rd party
 from mkdocs.config import config_options
 from mkdocs.plugins import BasePlugin
+
+# package modules
 from .util import Util
 
 
