@@ -94,7 +94,9 @@ class Util:
                 )
             else:
                 logging.error(
-                    "Unable to read git logs of '%s'. Traced error: %s" % path, err
+                    "Unable to read git logs of '%s'. "
+                    "To ignore this error, set option 'ignoring_missing_git: true'"
+                    % path
                 )
                 raise err
 
