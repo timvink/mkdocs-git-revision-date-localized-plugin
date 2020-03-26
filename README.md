@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/timvink/mkdocs-git-revision-date-localized-plugin/branch/master/graph/badge.svg)](https://codecov.io/gh/timvink/mkdocs-git-revision-date-localized-plugin)
 ![GitHub contributors](https://img.shields.io/github/contributors/timvink/mkdocs-git-revision-date-localized-plugin)
 ![PyPI - License](https://img.shields.io/pypi/l/mkdocs-git-revision-date-localized-plugin)
- 
+
 # mkdocs-git-revision-date-localized-plugin
 
 [MkDocs](https://www.mkdocs.org/) plugin that enables displaying the date of the last git modification of a page. The plugin uses [babel](https://github.com/python-babel/babel/tree/master/babel) and [timeago.js](https://github.com/hustcc/timeago.js) to provide different localized date formats. Initial fork from [mkdocs-git-revision-date-plugin](https://github.com/zhaoterryy/mkdocs-git-revision-date-plugin).
@@ -34,7 +34,7 @@ plugins:
 
 ### When using CI runners
 
-The plugin needs access to the last commit that touched a file to be able to retrieve the date. If you build your docs using CI then you might need to change the default settings: 
+The plugin needs access to the last commit that touched a file to be able to retrieve the date. If you build your docs using CI then you might need to change the default settings:
 
 - github actions: set `fetch_depth` to `0` ([docs](https://github.com/actions/checkout))
 - gitlab runners: set `GIT_DEPTH` to `1000` ([docs](https://docs.gitlab.com/ee/user/project/pipelines/settings.html#git-shallow-clone))
