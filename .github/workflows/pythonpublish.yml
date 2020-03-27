@@ -23,7 +23,7 @@ jobs:
         git config --global user.email "githubaction@gmail.com"
         pip install -r tests/test_requirements.txt
         pip install -e .
-        pytest 
+        pytest
     - name: Build and publish
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
