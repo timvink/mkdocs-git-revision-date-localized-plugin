@@ -280,7 +280,7 @@ def test_material_theme(tmp_path):
     # In mkdocs-material, a 'last update' should appear
     # in German because locale is set to 'de'
     index_file = testproject_path / "site/index.html"
-    contents = index_file.read_text()
+    contents = index_file.read_text(encoding="utf8")
     assert re.search(r"Letztes Update\:\s[\w].+", contents)
 
 
