@@ -78,7 +78,7 @@ class Util:
             unix_timestamp = datetime.utcnow().timestamp()
             logging.warning('%s has no git logs, using current timestamp' % path)
         
-        return self._date_formats(unix_timestamp)
+        return self._date_formats(unix_timestamp=unix_timestamp, locale=locale)
 
 def is_shallow_clone(repo):
     """
