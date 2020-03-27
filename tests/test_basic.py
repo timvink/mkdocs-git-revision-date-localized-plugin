@@ -26,13 +26,9 @@ from mkdocs.config import load_config
 # other 3rd party
 import git
 import pytest
-import yaml
 from click.testing import CliRunner
 
 # package module
-from mkdocs_git_revision_date_localized_plugin.plugin import (
-    GitRevisionDateLocalizedPlugin,
-)
 from mkdocs_git_revision_date_localized_plugin.util import Util
 
 # #############################################################################
@@ -44,10 +40,11 @@ PLUGIN_NAME = "git-revision-date-localized"
 # custom log level to get plugin info messages
 logging.basicConfig(level=logging.INFO)
 
+
 # #############################################################################
 # ########## Helpers ###############
 # ##################################
-def get_locale_from_config(mkdocs_path):
+def get_plugin_config_from_mkdocs(mkdocs_path) -> dict:
     # instanciate plugin
     cfg_mkdocs = load_config(mkdocs_path)
 
@@ -65,7 +62,7 @@ def get_locale_from_config(mkdocs_path):
         "Locale '%s' determined from %s"
         % (plugin_loaded.config.get("locale"), mkdocs_path)
     )
-    return plugin_loaded.config.get("locale")
+    return plugin_loaded.config
 
 
 def setup_clean_mkdocs_folder(mkdocs_yml_path, output_path):
@@ -179,7 +176,7 @@ def build_docs_setup(testproject_path):
         raise
 
 
-def validate_build(testproject_path, project_locale: str):
+def validate_build(testproject_path, plugin_config: dict):
     """
     Validates a build from a testproject
 
@@ -200,7 +197,9 @@ def validate_build(testproject_path, project_locale: str):
 
     repo = Util(testproject_path)
     date_formats = repo.get_revision_date_for_file(
-        path=testproject_path / "docs/page_with_tag.md", locale=project_locale
+        path=testproject_path / "docs/page_with_tag.md",
+        locale=plugin_config.get("locale"),
+        fallback_to_build_date=plugin_config.get("fallback_to_build_date"),
     )
 
     searches = [re.search(x, contents) for x in date_formats.values()]
@@ -225,7 +224,7 @@ def validate_mkdocs_file(temp_path: str, mkdocs_yml_file: str):
 
     # validate build with locale retrieved from mkdocs config file
     validate_build(
-        testproject_path, project_locale=get_locale_from_config(mkdocs_yml_file)
+        testproject_path, plugin_config=get_plugin_config_from_mkdocs(mkdocs_yml_file)
     )
 
     return testproject_path
