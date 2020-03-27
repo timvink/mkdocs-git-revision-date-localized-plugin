@@ -521,3 +521,4 @@ MigrationBackup/
 # VS Code custom
 .venv/
 .vscode/
+tests/basic_setup/site
