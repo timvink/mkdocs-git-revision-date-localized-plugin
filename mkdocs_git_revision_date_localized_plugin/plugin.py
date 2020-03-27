@@ -1,4 +1,5 @@
 # standard lib
+import logging
 import re
 
 # 3rd party
@@ -7,7 +8,7 @@ from mkdocs.plugins import BasePlugin
 from mkdocs.structure.nav import Page
 
 # package modules
-from .util import Util
+from mkdocs_git_revision_date_localized_plugin.util import Util
 
 
 class GitRevisionDateLocalizedPlugin(BasePlugin):
@@ -129,3 +130,20 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             markdown,
             flags=re.IGNORECASE,
         )
+
+
+# ##############################################################################
+# ##### Stand alone program ########
+# ##################################
+if __name__ == "__main__":
+    """Standalone execution and quick tests."""
+    # set log on debug
+    logging.basicConfig(level=logging.DEBUG)
+
+    # instanciate
+    plg = GitRevisionDateLocalizedPlugin()
+
+    # minimal tests
+    assert plg.locale == "en"
+    assert isinstance(plg.config, dict)
+    assert plg.config == {}
