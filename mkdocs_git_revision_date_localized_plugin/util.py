@@ -2,7 +2,7 @@ import os
 import logging
 from git import Git
 from datetime import datetime
-from babel.dates import format_date
+from babel.dates import format_date, format_datetime
 
 
 class Util:
@@ -53,7 +53,7 @@ class Util:
         
         return {
             'date' : format_date(revision_date, format="long", locale=locale), 
-            'datetime' : format_date(revision_date, format="long", locale=locale) + ' ' +revision_date.strftime("%H:%M:%S"),
+            "datetime": format_datetime(revision_date, format="medium", locale=locale),
             'iso_date' : revision_date.strftime("%Y-%m-%d"), 
             'iso_datetime' : revision_date.strftime("%Y-%m-%d %H:%M:%S"), 
             'timeago' : "<span class='timeago' datetime='%s' locale='%s'></span>" % (timestamp_in_ms, locale)
