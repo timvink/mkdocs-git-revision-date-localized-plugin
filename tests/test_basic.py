@@ -198,7 +198,6 @@ def validate_build(testproject_path, project_locale: str):
     )
 
     searches = [re.search(x, contents) for x in date_formats.values()]
-    print(searches)
     assert any(searches), "No correct date formats output was found"
 
 
