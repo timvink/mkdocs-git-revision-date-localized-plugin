@@ -1,0 +1,9 @@
+site_name: test gitrevisiondatelocalized_plugin
+use_directory_urls: true
+
+theme:
+    name: 'material'
+
+plugins:
+    - search
+    - git-revision-date-localized
