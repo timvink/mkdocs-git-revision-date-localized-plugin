@@ -188,7 +188,7 @@ def validate_build(testproject_path, project_locale: str):
     # Make sure with markdown tag has valid
     # git revision date tag
     page_with_tag = testproject_path / "site/page_with_tag/index.html"
-    contents = page_with_tag.read_text()
+    contents = page_with_tag.read_text(encoding="utf8")
     assert re.search(r"Markdown tag\:\s[<span>|\w].+", contents)
 
     repo = Util(testproject_path)
