@@ -9,18 +9,25 @@ You can reproduce locally with:
 >>> os.mkdir(tmp_path)
 """
 
+# #############################################################################
+# ########## Libraries #############
+# ##################################
+
 # standard lib
 import logging
 import os
 import re
 import shutil
 
-# 3rd partu
+# MkDocs
+from mkdocs.__main__ import build_command
+from mkdocs.config import load_config
+
+# other 3rd party
 import git
 import pytest
 import yaml
 from click.testing import CliRunner
-from mkdocs.__main__ import build_command
 
 # package module
 from mkdocs_git_revision_date_localized_plugin.plugin import (
@@ -28,37 +35,37 @@ from mkdocs_git_revision_date_localized_plugin.plugin import (
 )
 from mkdocs_git_revision_date_localized_plugin.util import Util
 
-# GLOBALS
+# #############################################################################
+# ######## Globals #################
+# ##################################
 
-plugin_name = "git-revision-date-localized"
+PLUGIN_NAME = "git-revision-date-localized"
 
 # custom log level to get plugin info messages
 logging.basicConfig(level=logging.INFO)
 
-# HELPERS
+# #############################################################################
+# ########## Helpers ###############
+# ##################################
 def get_locale_from_config(mkdocs_path):
     # instanciate plugin
-    plg = GitRevisionDateLocalizedPlugin()
+    cfg_mkdocs = load_config(mkdocs_path)
 
-    # return yaml.load(open(mkdocs_path, "rb"), Loader=yaml.Loader)
-    cfg = yaml.load(open(mkdocs_path, "rb"), Loader=yaml.Loader)
+    plugins = cfg_mkdocs.get("plugins")
+    plugin_loaded = plugins.get(PLUGIN_NAME)
+
+    cfg = plugin_loaded.on_config(cfg_mkdocs)
     logging.info("Fixture configuration loaded: " + str(cfg))
 
-    # get plugin  config
-    if "plugins" in cfg and plugin_name not in cfg.get("plugins"):
-        t = [i for i in cfg.get("plugins") if isinstance(i, dict) and plugin_name in i]
-        plg.config = t[0].get(plugin_name, {})
-    elif "plugins" in cfg and plugin_name in cfg.get("plugins"):
-        plg.config = cfg.get(plugin_name, {})
-    else:
-        pass
+    assert (
+        plugin_loaded.config.get("locale") is not None
+    ), "Locale should never be None after plugin is loaded"
 
-    # use plugin config loader
-    plg.on_config(cfg)
-
-    assert plg.locale is not None, "Locale should never be None after plugin is loaded"
-
-    return plg.locale
+    logging.info(
+        "Locale '%s' determined from %s"
+        % (plugin_loaded.config.get("locale"), mkdocs_path)
+    )
+    return plugin_loaded.config.get("locale")
 
 
 def setup_clean_mkdocs_folder(mkdocs_yml_path, output_path):
@@ -193,8 +200,7 @@ def validate_build(testproject_path, project_locale: str):
 
     repo = Util(testproject_path)
     date_formats = repo.get_revision_date_for_file(
-        path=testproject_path / "docs/page_with_tag.md",
-        locale=project_locale
+        path=testproject_path / "docs/page_with_tag.md", locale=project_locale
     )
 
     searches = [re.search(x, contents) for x in date_formats.values()]
@@ -225,9 +231,9 @@ def validate_mkdocs_file(temp_path: str, mkdocs_yml_file: str):
     return testproject_path
 
 
-#### Tests ####
-
-
+# #############################################################################
+# ########### Tests ################
+# ##################################
 def test_date_formats():
     u = Util()
     assert u._date_formats(1582397529) == {
