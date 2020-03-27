@@ -116,8 +116,8 @@ class Util:
         # create timestamp
         if not unix_timestamp:
             unix_timestamp = datetime.utcnow().timestamp()
-            logging.warning('%s has no git logs, using current timestamp' % path)
-        
+            logging.warning("%s has no git logs, using current timestamp" % path)
+
         return self._date_formats(unix_timestamp=unix_timestamp, locale=locale)
 
 
