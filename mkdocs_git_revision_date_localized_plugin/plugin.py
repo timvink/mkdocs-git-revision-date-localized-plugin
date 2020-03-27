@@ -168,16 +168,4 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
 # ##################################
 if __name__ == "__main__":
     """Standalone execution and quick tests."""
-    # set log on debug
-    logging.basicConfig(level=logging.DEBUG)
-
-    # instanciate
-    plg = GitRevisionDateLocalizedPlugin()
-
-    # minimal tests
-    assert plg.locale == "en"
-    assert isinstance(plg.config, dict)
-    assert plg.config == {}
-
-    plg.load_config({"locale": "fr"})
-    print(plg.config)
+    pass
