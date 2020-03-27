@@ -1,4 +1,5 @@
 # standard lib
+import logging
 import re
 
 # 3rd party
@@ -7,18 +8,17 @@ from mkdocs.plugins import BasePlugin
 from mkdocs.structure.nav import Page
 
 # package modules
-from .util import Util
+from mkdocs_git_revision_date_localized_plugin.util import Util
 
 
 class GitRevisionDateLocalizedPlugin(BasePlugin):
     config_scheme = (
         ("fallback_to_build_date", config_options.Type(bool, default=False)),
-        ("locale", config_options.Type(str, default="")),
+        ("locale", config_options.Type(str, default=None)),
         ("type", config_options.Type(str, default="date")),
     )
 
     def __init__(self):
-        self.locale = "en"
         self.util = Util()
 
     def on_config(self, config: config_options.Config) -> dict:
@@ -37,24 +37,56 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             dict: global configuration object
         """
 
-        # Get locale settings
-        mkdocs_locale = config.get("locale", "")
-        plugin_locale = self.config["locale"]
-        theme_locale = vars(config["theme"]).get("_vars", {}).get("locale", "")
-        if theme_locale == "":
-            theme_locale = vars(config["theme"]).get("_vars", {}).get("language", "")
+        # Get locale settings - might be added in future mkdocs versions
+        # see: https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/24
+        mkdocs_locale = config.get("locale", None)
+
+        # Get locale from plugin configuration
+        plugin_locale = self.config.get("locale", None)
+
+        # theme locale
+        if "theme" in config and "locale" in config.get("theme"):
+            custom_theme = config.get("theme")
+            theme_locale = custom_theme._vars.get("locale")
+            logging.debug(
+                "Locale '%s' extracted from the custom theme: '%s'"
+                % (theme_locale, custom_theme.name)
+            )
+        elif "theme" in config and "language" in config.get("theme"):
+            custom_theme = config.get("theme")
+            theme_locale = custom_theme._vars.get("language")
+            logging.debug(
+                "Locale '%s' extracted from the custom theme: '%s'"
+                % (theme_locale, custom_theme.name)
+            )
+
+        else:
+            theme_locale = None
+            logging.debug(
+                "No locale found in theme configuration (or no custom theme set)"
+            )
 
         # First prio: plugin locale
-        if plugin_locale != "":
-            self.locale = plugin_locale
+        if plugin_locale:
+            locale_set = plugin_locale
+            logging.debug("Using locale from plugin configuration: %s" % locale_set)
         # Second prio: theme locale
-        elif theme_locale != "":
-            self.locale = theme_locale
+        elif theme_locale:
+            locale_set = theme_locale
+            logging.debug(
+                "Locale not set in plugin. Fallback to theme configuration: %s"
+                % locale_set
+            )
         # Third prio is mkdocs locale (which might be added in the future)
-        elif mkdocs_locale != "":
-            self.locale = mkdocs_locale
+        elif mkdocs_locale:
+            locale_set = mkdocs_locale
+            logging.debug("Using locale from mkdocs configuration: %s" % locale_set)
         else:
-            self.locale = "en"
+            locale_set = "en"
+            logging.debug("No locale set. Fallback to: %s" % locale_set)
+
+        # set locale also in plugin configuration
+        self.config["locale"] = locale_set
 
         return config
 
@@ -78,7 +110,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             str: output of rendered template as string
         """
 
-        if self.config["type"] != "timeago":
+        if self.config.get("type") != "timeago":
             return output_content
 
         extra_js = """
@@ -118,7 +150,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
 
         revision_dates = self.util.get_revision_date_for_file(
             path=page.file.abs_src_path,
-            locale=self.locale,
+            locale=self.config.get("locale", "en"),
             fallback_to_build_date=self.config.get("fallback_to_build_date"),
         )
         revision_date = revision_dates[self.config["type"]]
@@ -129,3 +161,11 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             markdown,
             flags=re.IGNORECASE,
         )
+
+
+# ##############################################################################
+# ##### Stand alone program ########
+# ##################################
+if __name__ == "__main__":
+    """Standalone execution and quick tests."""
+    pass

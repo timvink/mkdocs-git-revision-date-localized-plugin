@@ -9,25 +9,60 @@ You can reproduce locally with:
 >>> os.mkdir(tmp_path)
 """
 
+# #############################################################################
+# ########## Libraries #############
+# ##################################
+
 # standard lib
 import logging
 import os
 import re
 import shutil
 
-# 3rd partu
+# MkDocs
+from mkdocs.__main__ import build_command
+from mkdocs.config import load_config
+
+# other 3rd party
 import git
 import pytest
-import yaml
 from click.testing import CliRunner
-from mkdocs.__main__ import build_command
 
 # package module
 from mkdocs_git_revision_date_localized_plugin.util import Util
 
+# #############################################################################
+# ######## Globals #################
+# ##################################
 
-def load_config(mkdocs_path):
-    return yaml.load(open(mkdocs_path, "rb"), Loader=yaml.Loader)
+PLUGIN_NAME = "git-revision-date-localized"
+
+# custom log level to get plugin info messages
+logging.basicConfig(level=logging.INFO)
+
+
+# #############################################################################
+# ########## Helpers ###############
+# ##################################
+def get_plugin_config_from_mkdocs(mkdocs_path) -> dict:
+    # instanciate plugin
+    cfg_mkdocs = load_config(mkdocs_path)
+
+    plugins = cfg_mkdocs.get("plugins")
+    plugin_loaded = plugins.get(PLUGIN_NAME)
+
+    cfg = plugin_loaded.on_config(cfg_mkdocs)
+    logging.info("Fixture configuration loaded: " + str(cfg))
+
+    assert (
+        plugin_loaded.config.get("locale") is not None
+    ), "Locale should never be None after plugin is loaded"
+
+    logging.info(
+        "Locale '%s' determined from %s"
+        % (plugin_loaded.config.get("locale"), mkdocs_path)
+    )
+    return plugin_loaded.config
 
 
 def setup_clean_mkdocs_folder(mkdocs_yml_path, output_path):
@@ -141,7 +176,7 @@ def build_docs_setup(testproject_path):
         raise
 
 
-def validate_build(testproject_path):
+def validate_build(testproject_path, plugin_config: dict):
     """
     Validates a build from a testproject
 
@@ -157,19 +192,21 @@ def validate_build(testproject_path):
     # Make sure with markdown tag has valid
     # git revision date tag
     page_with_tag = testproject_path / "site/page_with_tag/index.html"
-    contents = page_with_tag.read_text()
+    contents = page_with_tag.read_text(encoding="utf8")
     assert re.search(r"Markdown tag\:\s[<span>|\w].+", contents)
 
     repo = Util(testproject_path)
     date_formats = repo.get_revision_date_for_file(
-        testproject_path / "docs/page_with_tag.md"
+        path=testproject_path / "docs/page_with_tag.md",
+        locale=plugin_config.get("locale"),
+        fallback_to_build_date=plugin_config.get("fallback_to_build_date"),
     )
 
     searches = [re.search(x, contents) for x in date_formats.values()]
     assert any(searches), "No correct date formats output was found"
 
 
-def validate_mkdocs_file(temp_path, mkdocs_yml_file):
+def validate_mkdocs_file(temp_path: str, mkdocs_yml_file: str):
     """
     Creates a clean mkdocs project
     for a mkdocs YML file, builds and validates it.
@@ -184,14 +221,18 @@ def validate_mkdocs_file(temp_path, mkdocs_yml_file):
     setup_commit_history(testproject_path)
     result = build_docs_setup(testproject_path)
     assert result.exit_code == 0, "'mkdocs build' command failed"
-    validate_build(testproject_path)
+
+    # validate build with locale retrieved from mkdocs config file
+    validate_build(
+        testproject_path, plugin_config=get_plugin_config_from_mkdocs(mkdocs_yml_file)
+    )
 
     return testproject_path
 
 
-#### Tests ####
-
-
+# #############################################################################
+# ########### Tests ################
+# ##################################
 def test_date_formats():
     u = Util()
     assert u._date_formats(1582397529) == {
@@ -217,19 +258,6 @@ def test_missing_git_repo(tmp_path):
     ), "'mkdocs build' command succeeded while there is no GIT repo"
 
 
-def test_missing_git_repo_ignored(tmp_path):
-    """
-    When there is no GIT repo, the git error should be ignored.
-    """
-    testproject_path = setup_clean_mkdocs_folder(
-        mkdocs_yml_path="tests/basic_setup/mkdocs_fallback_to_build_date.yml",
-        output_path=tmp_path,
-    )
-
-    result = build_docs_setup(testproject_path)
-    assert result.exit_code == 0
-
-
 def test_build_no_options(tmp_path):
     # Enable plugin with no extra options set
     validate_mkdocs_file(tmp_path, "tests/basic_setup/mkdocs.yml")
@@ -241,7 +269,7 @@ def test_build_locale_plugin(tmp_path):
 
 
 def test_build_locale_mkdocs(tmp_path):
-    # Enable plugin with mkdocs locale set to 'nl'
+    # Enable plugin with mkdocs locale set to 'fr'
     validate_mkdocs_file(tmp_path, "tests/basic_setup/mkdocs_locale.yml")
 
 
@@ -257,9 +285,24 @@ def test_material_theme(tmp_path):
     # In mkdocs-material, a 'last update' should appear
     # in German because locale is set to 'de'
     index_file = testproject_path / "site/index.html"
-    contents = index_file.read_text()
+    contents = index_file.read_text(encoding="utf8")
     assert re.search(r"Letztes Update\:\s[\w].+", contents)
 
+
+def test_material_theme_no_locale(tmp_path):
+    """
+    When using mkdocs-material theme, test correct working
+    """
+    # theme set to 'material' with 'language' set to 'de'
+    testproject_path = validate_mkdocs_file(
+        tmp_path, "tests/basic_setup/mkdocs_theme_no_locale.yml"
+    )
+
+    # In mkdocs-material, a 'last update' should appear
+    # in German because locale is set to 'de'
+    index_file = testproject_path / "site/index.html"
+    contents = index_file.read_text(encoding="utf8")
+    assert re.search(r"Last update\:\s[\w].+", contents)
 
 def test_type_timeago(tmp_path):
     # type: 'timeago'
