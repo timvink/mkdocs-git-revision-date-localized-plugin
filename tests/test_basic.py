@@ -23,12 +23,42 @@ from click.testing import CliRunner
 from mkdocs.__main__ import build_command
 
 # package module
+from mkdocs_git_revision_date_localized_plugin.plugin import (
+    GitRevisionDateLocalizedPlugin,
+)
 from mkdocs_git_revision_date_localized_plugin.util import Util
 
+# GLOBALS
 
+plugin_name = "git-revision-date-localized"
 
-def load_config(mkdocs_path):
-    return yaml.load(open(mkdocs_path, "rb"), Loader=yaml.Loader)
+# custom log level to get plugin info messages
+logging.basicConfig(level=logging.INFO)
+
+# HELPERS
+def get_locale_from_config(mkdocs_path):
+    # instanciate plugin
+    plg = GitRevisionDateLocalizedPlugin()
+
+    # return yaml.load(open(mkdocs_path, "rb"), Loader=yaml.Loader)
+    cfg = yaml.load(open(mkdocs_path, "rb"), Loader=yaml.Loader)
+    logging.info("Fixture configuration loaded: " + str(cfg))
+
+    # get plugin  config
+    if "plugins" in cfg and plugin_name not in cfg.get("plugins"):
+        t = [i for i in cfg.get("plugins") if isinstance(i, dict) and plugin_name in i]
+        plg.config = t[0].get(plugin_name, {})
+    elif "plugins" in cfg and plugin_name in cfg.get("plugins"):
+        plg.config = cfg.get(plugin_name, {})
+    else:
+        pass
+
+    # use plugin config loader
+    plg.on_config(cfg)
+
+    assert plg.locale is not None, "Locale should never be None after plugin is loaded"
+
+    return plg.locale
 
 
 def setup_clean_mkdocs_folder(mkdocs_yml_path, output_path):
@@ -163,10 +193,12 @@ def validate_build(testproject_path, project_locale: str):
 
     repo = Util(testproject_path)
     date_formats = repo.get_revision_date_for_file(
-        testproject_path / "docs/page_with_tag.md"
+        path=testproject_path / "docs/page_with_tag.md",
+        locale=project_locale
     )
 
     searches = [re.search(x, contents) for x in date_formats.values()]
+    print(searches)
     assert any(searches), "No correct date formats output was found"
 
 
@@ -179,16 +211,17 @@ def validate_mkdocs_file(temp_path: str, mkdocs_yml_file: str):
         temp_path (PosixPath): Path to temporary folder
         mkdocs_yml_file (PosixPath): Path to mkdocs.yml file
     """
-    # retrieve/validate configuration file
-    project_config = yaml.load(open(mkdocs_yml_file, "rb"), Loader=yaml.Loader)
-
     testproject_path = setup_clean_mkdocs_folder(
         mkdocs_yml_path=mkdocs_yml_file, output_path=temp_path
     )
     setup_commit_history(testproject_path)
     result = build_docs_setup(testproject_path)
     assert result.exit_code == 0, "'mkdocs build' command failed"
-    validate_build(testproject_path)
+
+    # validate build with locale retrieved from mkdocs config file
+    validate_build(
+        testproject_path, project_locale=get_locale_from_config(mkdocs_yml_file)
+    )
 
     return testproject_path
 
