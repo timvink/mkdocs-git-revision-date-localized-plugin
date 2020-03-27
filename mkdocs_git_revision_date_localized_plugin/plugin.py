@@ -12,7 +12,7 @@ from .util import Util
 
 class GitRevisionDateLocalizedPlugin(BasePlugin):
     config_scheme = (
-        ("ignore_missing_git", config_options.Type(bool, default=False)),
+        ("fallback_to_build_date", config_options.Type(bool, default=False)),
         ("locale", config_options.Type(str, default="")),
         ("type", config_options.Type(str, default="date")),
     )
@@ -119,7 +119,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         revision_dates = self.util.get_revision_date_for_file(
             path=page.file.abs_src_path,
             locale=self.locale,
-            ignore_missing_git=self.config.get("ignore_missing_git"),
+            fallback_to_build_date=self.config.get("fallback_to_build_date"),
         )
         revision_date = revision_dates[self.config["type"]]
         page.meta["git_revision_date_localized"] = revision_date

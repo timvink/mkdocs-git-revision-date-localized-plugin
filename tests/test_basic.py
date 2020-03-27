@@ -222,7 +222,7 @@ def test_missing_git_repo_ignored(tmp_path):
     When there is no GIT repo, the git error should be ignored.
     """
     testproject_path = setup_clean_mkdocs_folder(
-        mkdocs_yml_path="tests/basic_setup/mkdocs_ignore_missing_git.yml",
+        mkdocs_yml_path="tests/basic_setup/mkdocs_fallback_to_build_date.yml",
         output_path=tmp_path,
     )
 

@@ -69,7 +69,7 @@ class Util:
         }
 
     def get_revision_date_for_file(
-        self, path: str, locale: str = "en", ignore_missing_git: bool = False
+        self, path: str, locale: str = "en", fallback_to_build_date: bool = False
     ) -> dict:
         """
         Determine localized date variants for a given file
@@ -85,7 +85,7 @@ class Util:
         try:
             unix_timestamp = self.repo.log(path, n=1, date="short", format="%at")
         except GitCommandError as err:
-            if ignore_missing_git:
+            if fallback_to_build_date:
                 unix_timestamp = None
                 logging.warning(
                     "Unable to read git logs of '%s'."
@@ -100,7 +100,7 @@ class Util:
                 )
                 raise err
         except GitCommandNotFound as err:
-            if ignore_missing_git:
+            if fallback_to_build_date:
                 unix_timestamp = None
                 logging.warning(
                     "Unable to perform command: git log. Is git installed?"
