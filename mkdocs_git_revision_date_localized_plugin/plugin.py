@@ -6,7 +6,6 @@ import re
 from mkdocs.config import config_options
 from mkdocs.plugins import BasePlugin
 from mkdocs.structure.nav import Page
-from mkdocs.theme import Theme
 
 # package modules
 from mkdocs_git_revision_date_localized_plugin.util import Util
