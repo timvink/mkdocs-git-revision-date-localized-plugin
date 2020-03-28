@@ -304,6 +304,7 @@ def test_material_theme_no_locale(tmp_path):
     contents = index_file.read_text(encoding="utf8")
     assert re.search(r"Last update\:\s[\w].+", contents)
 
+
 def test_type_timeago(tmp_path):
     # type: 'timeago'
     testproject_path = validate_mkdocs_file(
