@@ -59,11 +59,12 @@ class Util:
         logging.debug("Revision date: %s - Locale: %s" % (revision_date, locale))
 
         return {
-            'date' : format_date(revision_date, format="long", locale=locale), 
+            "date": format_date(revision_date, format="long", locale=locale),
             "datetime": format_datetime(revision_date, format="medium", locale=locale),
-            'iso_date' : revision_date.strftime("%Y-%m-%d"), 
-            'iso_datetime' : revision_date.strftime("%Y-%m-%d %H:%M:%S"), 
-            'timeago' : "<span class='timeago' datetime='%s' locale='%s'></span>" % (timestamp_in_ms, locale)
+            "iso_date": revision_date.strftime("%Y-%m-%d"),
+            "iso_datetime": revision_date.strftime("%Y-%m-%d %H:%M:%S"),
+            "timeago": "<span class='timeago' datetime='%s' locale='%s'></span>"
+            % (timestamp_in_ms, locale),
         }
 
     def get_revision_date_for_file(
