@@ -237,7 +237,7 @@ def test_date_formats():
     u = Util()
     assert u._date_formats(1582397529) == {
         "date": "February 22, 2020",
-        "datetime": "February 22, 2020 18:52:09",
+        "datetime": "February 22, 2020 at 6:52:09 PM UTC",
         "iso_date": "2020-02-22",
         "iso_datetime": "2020-02-22 18:52:09",
         "timeago": "<span class='timeago' datetime='1582397529000' locale='en'></span>",
