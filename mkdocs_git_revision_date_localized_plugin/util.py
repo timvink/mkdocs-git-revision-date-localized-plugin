@@ -60,7 +60,7 @@ class Util:
 
         return {
             "date": format_date(revision_date, format="long", locale=locale),
-            "datetime": format_datetime(revision_date, format="medium", locale=locale),
+            "datetime": format_datetime(revision_date, format="long", locale=locale),
             "iso_date": revision_date.strftime("%Y-%m-%d"),
             "iso_datetime": revision_date.strftime("%Y-%m-%d %H:%M:%S"),
             "timeago": "<span class='timeago' datetime='%s' locale='%s'></span>"
