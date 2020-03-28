@@ -1,7 +1,7 @@
 site_name: test gitrevisiondatelocalized_plugin
 use_directory_urls: true
 
-locale: nl
+locale: fr
 
 plugins:
     - search

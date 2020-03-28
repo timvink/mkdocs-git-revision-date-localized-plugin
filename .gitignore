@@ -517,3 +517,8 @@ healthchecksdb
 # Backup folder for Package Reference Convert tool in Visual Studio 2017
 MigrationBackup/
 # End of https://www.gitignore.io/api/r,macos,python,pycharm,windows,visualstudio,jupyternotebooks
+
+# VS Code custom
+.venv/
+.vscode/
+tests/basic_setup/site

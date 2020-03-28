@@ -4,4 +4,4 @@ use_directory_urls: true
 plugins:
     - search
     - git-revision-date-localized:
-        locale: nl
+        fallback_to_build_date: true
