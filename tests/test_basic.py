@@ -307,23 +307,17 @@ def test_material_theme_no_locale(tmp_path):
 
 def test_type_timeago(tmp_path):
     # type: 'timeago'
-    testproject_path = validate_mkdocs_file(
-        tmp_path, "tests/basic_setup/mkdocs_timeago.yml"
-    )
+    validate_mkdocs_file(tmp_path, "tests/basic_setup/mkdocs_timeago.yml")
 
 
 def test_type_datetime(tmp_path):
     # type: 'datetime'
-    testproject_path = validate_mkdocs_file(
-        tmp_path, "tests/basic_setup/mkdocs_datetime.yml"
-    )
+    validate_mkdocs_file(tmp_path, "tests/basic_setup/mkdocs_datetime.yml")
 
 
 def test_type_unknown(tmp_path):
     with pytest.raises(AssertionError):
-        testproject_path = validate_mkdocs_file(
-            tmp_path, "tests/basic_setup/mkdocs_unknown_type.yml"
-        )
+        validate_mkdocs_file(tmp_path, "tests/basic_setup/mkdocs_unknown_type.yml")
 
 
 def test_low_fetch_depth(tmp_path, caplog):
