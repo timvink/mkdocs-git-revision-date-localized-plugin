@@ -89,9 +89,7 @@ Specify a two letter [ISO639](https://en.wikipedia.org/wiki/List_of_ISO_639-1_co
 
 ### `fallback_to_build_date`
 
-If you need to ignore the Git exceptions during `git log` operations, set this option to `true` (default is `false`).
-
-In addition, if you need to completely ignore if Git is reachable or installed, you should set the environment variable ["GIT_PYTHON_REFRESH"] to `quiet`.
+If set to `true` (default is `false`) the plugin will use the time when running `mkdocs build` instead of the git revision date. This means the revision date will be inaccurate, but this can be useful if your build environment has no access to GIT and you want to ignore the Git exceptions during `git log`.
 
 ----
 
