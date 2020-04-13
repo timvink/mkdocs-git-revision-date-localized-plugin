@@ -91,12 +91,12 @@ class Util:
                 logging.warning(
                     "Unable to read git logs of '%s'."
                     " Is git log readable?"
-                    " Option 'ignoring_missing_git' enabled: so keep building..." % path
+                    " Option 'fallback_to_build_date' enabled: so keep building..." % path
                 )
             else:
                 logging.error(
                     "Unable to read git logs of '%s'. "
-                    "To ignore this error, set option 'ignoring_missing_git: true'"
+                    "To ignore this error, set option 'fallback_to_build_date: true'"
                     % path
                 )
                 raise err
@@ -105,12 +105,12 @@ class Util:
                 unix_timestamp = None
                 logging.warning(
                     "Unable to perform command: git log. Is git installed?"
-                    " Option 'ignoring_missing_git' enabled: so keep building..."
+                    " Option 'fallback_to_build_date' enabled: so keep building..."
                 )
             else:
                 logging.error(
                     "Unable to perform command: git log. Is git installed?"
-                    "To ignore this error, set option 'ignoring_missing_git: true'"
+                    "To ignore this error, set option 'fallback_to_build_date: true'"
                 )
                 raise err
 
