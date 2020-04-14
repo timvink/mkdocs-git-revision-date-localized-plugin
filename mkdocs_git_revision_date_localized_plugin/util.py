@@ -1,6 +1,7 @@
 # standard library
 import logging
 import os
+import time
 from datetime import datetime
 
 # 3rd party
@@ -116,7 +117,7 @@ class Util:
 
         # create timestamp
         if not unix_timestamp:
-            unix_timestamp = datetime.utcnow().timestamp()
+            unix_timestamp = time.time()
             logging.warning("%s has no git logs, using current timestamp" % path)
 
         return self._date_formats(unix_timestamp=unix_timestamp, locale=locale)
