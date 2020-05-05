@@ -10,7 +10,7 @@ from git import Git, GitCommandError, GitCommandNotFound
 
 
 class Util:
-    def __init__(self, path: str = "."):
+    def __init__(self, path: str = "./docs"):
         self.repo = Git(path)
 
         # Checks when running builds on CI
