@@ -16,10 +16,11 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         ("fallback_to_build_date", config_options.Type(bool, default=False)),
         ("locale", config_options.Type(str, default=None)),
         ("type", config_options.Type(str, default="date")),
+        ("git_path", config_options.Type(str, default=".")),
     )
 
     def __init__(self):
-        self.util = Util()
+        pass
 
     def on_config(self, config: config_options.Config) -> dict:
         """
@@ -36,6 +37,8 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         Returns:
             dict: global configuration object
         """
+
+        self.util = Util(path=self.config.get("git_path", "."))
 
         # Get locale settings - might be added in future mkdocs versions
         # see: https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/24

@@ -91,6 +91,10 @@ Specify a two letter [ISO639](https://en.wikipedia.org/wiki/List_of_ISO_639-1_co
 
 If set to `true` (default is `false`) the plugin will use the time when running `mkdocs build` instead of the git revision date. This means the revision date will be inaccurate, but this can be useful if your build environment has no access to GIT and you want to ignore the Git exceptions during `git log`.
 
+### `git_path`
+
+Specify a path to the folder that is a git repository (the folder that contains `.git`). If not specified, default path is `.`.
+
 ----
 
 ### Example
@@ -104,6 +108,7 @@ plugins:
     locale: en
     type: timeago
     fallback_to_build_date: true
+    git_path: ./docs
 ```
 
 Result:
