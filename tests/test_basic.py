@@ -177,7 +177,7 @@ def build_docs_setup(testproject_path):
         raise
 
 
-def validate_build(testproject_path, plugin_config: dict):
+def validate_build(testproject_path, plugin_config: dict = {}):
     """
     Validates a build from a testproject
 
@@ -196,7 +196,7 @@ def validate_build(testproject_path, plugin_config: dict):
     contents = page_with_tag.read_text(encoding="utf8")
     assert re.search(r"Markdown tag\:\s[<span>|\w].+", contents)
 
-    repo = Util(str(testproject_path))
+    repo = Util(str(testproject_path / "docs"))
     date_formats = repo.get_revision_date_for_file(
         path=str(testproject_path / "docs/page_with_tag.md"),
         locale=plugin_config.get("locale"),
@@ -231,9 +231,11 @@ def validate_mkdocs_file(temp_path: str, mkdocs_yml_file: str):
     return testproject_path
 
 
-# #############################################################################
+# ##################################
 # ########### Tests ################
 # ##################################
+
+
 def test_date_formats():
     u = Util()
     assert u._date_formats(1582397529) == {
@@ -319,6 +321,44 @@ def test_type_datetime(tmp_path):
 def test_type_unknown(tmp_path):
     with pytest.raises(AssertionError):
         validate_mkdocs_file(tmp_path, "tests/basic_setup/mkdocs_unknown_type.yml")
+
+
+def test_git_in_docs_dir(tmp_path):
+    """
+    In https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/pull/31 
+    a use case is described where `.git` dir lives in `docs/`
+    """
+
+    testproject_path = setup_clean_mkdocs_folder(
+        "tests/basic_setup/mkdocs.yml", tmp_path
+    )
+
+    # Setup git repo in the 'docs' dir
+    testproject_docs = str(testproject_path / "docs")
+    repo = git.Repo.init(testproject_docs, bare=False)
+    author = "Test Person <testtest@gmail.com>"
+
+    # Change the working directory
+    cwd = os.getcwd()
+    os.chdir(testproject_docs)
+
+    try:
+        repo.git.add("page_with_tag.md")
+        repo.git.commit(message="homepage", author=author)
+        os.chdir(cwd)
+    except:
+        os.chdir(cwd)
+        raise
+
+    # Build project
+    result = build_docs_setup(testproject_path)
+    assert result.exit_code == 0
+    validate_build(
+        testproject_path,
+        plugin_config=get_plugin_config_from_mkdocs(
+            str(testproject_path / "mkdocs.yml")
+        ),
+    )
 
 
 def test_low_fetch_depth(tmp_path, caplog):
