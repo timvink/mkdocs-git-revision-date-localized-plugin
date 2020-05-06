@@ -84,16 +84,16 @@ def setup_clean_mkdocs_folder(mkdocs_yml_path, output_path):
     testproject_path = output_path / "testproject"
 
     # Create empty 'testproject' folder
-    if os.path.exists(testproject_path):
+    if os.path.exists(str(testproject_path)):
         logging.warning(
             """This command does not work on windows.
         Refactor your test to use setup_clean_mkdocs_folder() only once"""
         )
-        shutil.rmtree(testproject_path)
+        shutil.rmtree(str(testproject_path))
 
     # Copy correct mkdocs.yml file and our test 'docs/'
-    shutil.copytree("tests/basic_setup/docs", testproject_path / "docs")
-    shutil.copyfile(mkdocs_yml_path, testproject_path / "mkdocs.yml")
+    shutil.copytree("tests/basic_setup/docs", str(testproject_path / "docs"))
+    shutil.copyfile(mkdocs_yml_path, str(testproject_path / "mkdocs.yml"))
 
     return testproject_path
 
@@ -112,7 +112,8 @@ def setup_commit_history(testproject_path):
     Returns:
         repo (repo): git.Repo object
     """
-    assert not os.path.exists(testproject_path / ".git")
+    assert not os.path.exists(str(testproject_path / ".git"))
+    testproject_path = str(testproject_path)
 
     repo = git.Repo.init(testproject_path, bare=False)
     author = "Test Person <testtest@gmail.com>"
@@ -164,7 +165,7 @@ def build_docs_setup(testproject_path):
 
     # TODO: Try specifying path in CliRunner, this function could be one-liner
     cwd = os.getcwd()
-    os.chdir(testproject_path)
+    os.chdir(str(testproject_path))
 
     try:
         runner = CliRunner()
@@ -183,11 +184,11 @@ def validate_build(testproject_path, plugin_config: dict):
     Args:
         testproject_path (Path): Path to test project
     """
-    assert os.path.exists(testproject_path / "site")
+    assert os.path.exists(str(testproject_path / "site"))
 
     # Make sure index file exists
     index_file = testproject_path / "site/index.html"
-    assert index_file.exists(), f"{index_file} does not exist"
+    assert index_file.exists(), "%s does not exist" % index_file
 
     # Make sure with markdown tag has valid
     # git revision date tag
@@ -195,9 +196,9 @@ def validate_build(testproject_path, plugin_config: dict):
     contents = page_with_tag.read_text(encoding="utf8")
     assert re.search(r"Markdown tag\:\s[<span>|\w].+", contents)
 
-    repo = Util(testproject_path)
+    repo = Util(str(testproject_path))
     date_formats = repo.get_revision_date_for_file(
-        path=testproject_path / "docs/page_with_tag.md",
+        path=str(testproject_path / "docs/page_with_tag.md"),
         locale=plugin_config.get("locale"),
         fallback_to_build_date=plugin_config.get("fallback_to_build_date"),
     )
@@ -333,14 +334,14 @@ def test_low_fetch_depth(tmp_path, caplog):
     repo = setup_commit_history(testproject_path)
 
     # Create a second, clean folder to clone to
-    cloned_folder = tmp_path.parent / "clonedrepo"
+    cloned_folder = str(tmp_path.parent / "clonedrepo")
     if os.path.exists(cloned_folder):
         shutil.rmtree(cloned_folder)
-    os.mkdir(cloned_folder)
+    # os.mkdir(cloned_folder)
 
     # Clone the local repo with fetch depth of 1
     repo = git.Repo.init(cloned_folder, bare=False)
-    origin = repo.create_remote("origin", testproject_path)
+    origin = repo.create_remote("origin", str(testproject_path))
     origin.fetch(depth=1, prune=True)
     repo.create_head(
         "master", origin.refs.master
