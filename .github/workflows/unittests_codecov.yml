@@ -1,0 +1,72 @@
+name: pytest
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the master branch
+  push:
+    branches:
+      - master
+    pull_request:
+      branches:
+        - master
+jobs:
+  run:
+    name: Run unit tests with codecov upload
+    runs-on: ${{ matrix.os }}
+    env:
+      USING_COVERAGE: '3.7'
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: [3.5, 3.6, 3.7]
+    steps:
+    - uses: actions/checkout@master
+
+    - name: Setup Python
+      uses: actions/setup-python@master
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    # https://github.com/actions/virtual-environments/issues/294
+    - name: Configure path to rc.exe for Python 3.5
+      run: |
+        function Invoke-VSDevEnvironment {
+            $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+            $installationPath = & $vswhere -prerelease -legacy -latest -property installationPath
+            $Command = Join-Path $installationPath "Common7\Tools\vsdevcmd.bat"
+                & "${env:COMSPEC}" /s /c "`"$Command`" -no_logo && set" | Foreach-Object {
+                if ($_ -match '^([^=]+)=(.*)') {
+                    [System.Environment]::SetEnvironmentVariable($matches[1], $matches[2])
+                }
+            }
+        }
+        Invoke-VSDevEnvironment
+        Get-Command rc.exe | Format-Table -AutoSize
+      if: matrix.os == 'windows-latest' && matrix.python-version == '3.5'
+
+    - name: Install dependencies
+      run: |
+        pip3 install --upgrade pip
+        pip3 install --upgrade setuptools
+        pip3 install --upgrade wheel
+        pip3 install pyflakes
+        pip3 install -r tests/test_requirements.txt
+        pip3 install -e .
+
+    - name: Static code checking with pyflakes
+      run: |
+        pyflakes mkdocs_git_revision_date_localized_plugin
+
+    - name: Generate coverage report
+      run: |
+        git config --global user.name "Github Action"
+        git config --global user.email "githubaction@gmail.com"
+        pytest --cov=mkdocs_git_revision_date_localized_plugin --cov-report=xml
+
+    - name: Upload coverage to Codecov
+      if: "contains(env.USING_COVERAGE, matrix.python-version)"
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./coverage.xml
+        flags: unittests
+        fail_ci_if_error: true

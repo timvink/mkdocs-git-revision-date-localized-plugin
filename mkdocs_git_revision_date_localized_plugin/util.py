@@ -92,7 +92,8 @@ class Util:
                 logging.warning(
                     "Unable to read git logs of '%s'."
                     " Is git log readable?"
-                    " Option 'fallback_to_build_date' enabled: so keep building..." % path
+                    " Option 'fallback_to_build_date' enabled: so keep building..."
+                    % path
                 )
             else:
                 logging.error(
