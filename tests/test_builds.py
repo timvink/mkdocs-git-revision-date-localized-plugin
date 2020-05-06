@@ -7,6 +7,7 @@ You can reproduce locally with:
 >>> from pathlib import Path
 >>> tmp_path = Path(tempfile.gettempdir()) / 'pytest-testname'
 >>> os.mkdir(tmp_path)
+
 """
 
 # #############################################################################
@@ -92,7 +93,7 @@ def setup_clean_mkdocs_folder(mkdocs_yml_path, output_path):
         shutil.rmtree(str(testproject_path))
 
     # Copy correct mkdocs.yml file and our test 'docs/'
-    shutil.copytree("tests/basic_setup/docs", str(testproject_path / "docs"))
+    shutil.copytree("tests/fixtures/basic_project/docs", str(testproject_path / "docs"))
     shutil.copyfile(mkdocs_yml_path, str(testproject_path / "mkdocs.yml"))
 
     return testproject_path
@@ -252,7 +253,7 @@ def test_missing_git_repo(tmp_path):
     When there is no GIT repo, this should fail
     """
     testproject_path = setup_clean_mkdocs_folder(
-        mkdocs_yml_path="tests/basic_setup/mkdocs.yml", output_path=tmp_path
+        mkdocs_yml_path="tests/fixtures/basic_project/mkdocs.yml", output_path=tmp_path
     )
 
     result = build_docs_setup(testproject_path)
@@ -263,17 +264,19 @@ def test_missing_git_repo(tmp_path):
 
 def test_build_no_options(tmp_path):
     # Enable plugin with no extra options set
-    validate_mkdocs_file(tmp_path, "tests/basic_setup/mkdocs.yml")
+    validate_mkdocs_file(tmp_path, "tests/fixtures/basic_project/mkdocs.yml")
 
 
 def test_build_locale_plugin(tmp_path):
     # Enable plugin with plugin locale set to 'nl'
-    validate_mkdocs_file(tmp_path, "tests/basic_setup/mkdocs_plugin_locale.yml")
+    validate_mkdocs_file(
+        tmp_path, "tests/fixtures/basic_project/mkdocs_plugin_locale.yml"
+    )
 
 
 def test_build_locale_mkdocs(tmp_path):
     # Enable plugin with mkdocs locale set to 'fr'
-    validate_mkdocs_file(tmp_path, "tests/basic_setup/mkdocs_locale.yml")
+    validate_mkdocs_file(tmp_path, "tests/fixtures/basic_project/mkdocs_locale.yml")
 
 
 def test_material_theme(tmp_path):
@@ -282,7 +285,7 @@ def test_material_theme(tmp_path):
     """
     # theme set to 'material' with 'language' set to 'de'
     testproject_path = validate_mkdocs_file(
-        tmp_path, "tests/basic_setup/mkdocs_theme_locale.yml"
+        tmp_path, "tests/fixtures/basic_project/mkdocs_theme_locale.yml"
     )
 
     # In mkdocs-material, a 'last update' should appear
@@ -298,7 +301,7 @@ def test_material_theme_no_locale(tmp_path):
     """
     # theme set to 'material' with 'language' set to 'de'
     testproject_path = validate_mkdocs_file(
-        tmp_path, "tests/basic_setup/mkdocs_theme_no_locale.yml"
+        tmp_path, "tests/fixtures/basic_project/mkdocs_theme_no_locale.yml"
     )
 
     # In mkdocs-material, a 'last update' should appear
@@ -310,17 +313,19 @@ def test_material_theme_no_locale(tmp_path):
 
 def test_type_timeago(tmp_path):
     # type: 'timeago'
-    validate_mkdocs_file(tmp_path, "tests/basic_setup/mkdocs_timeago.yml")
+    validate_mkdocs_file(tmp_path, "tests/fixtures/basic_project/mkdocs_timeago.yml")
 
 
 def test_type_datetime(tmp_path):
     # type: 'datetime'
-    validate_mkdocs_file(tmp_path, "tests/basic_setup/mkdocs_datetime.yml")
+    validate_mkdocs_file(tmp_path, "tests/fixtures/basic_project/mkdocs_datetime.yml")
 
 
 def test_type_unknown(tmp_path):
     with pytest.raises(AssertionError):
-        validate_mkdocs_file(tmp_path, "tests/basic_setup/mkdocs_unknown_type.yml")
+        validate_mkdocs_file(
+            tmp_path, "tests/fixtures/basic_project/mkdocs_unknown_type.yml"
+        )
 
 
 def test_git_in_docs_dir(tmp_path):
@@ -330,7 +335,7 @@ def test_git_in_docs_dir(tmp_path):
     """
 
     testproject_path = setup_clean_mkdocs_folder(
-        "tests/basic_setup/mkdocs.yml", tmp_path
+        "tests/fixtures/basic_project/mkdocs.yml", tmp_path
     )
 
     # Setup git repo in the 'docs' dir
@@ -369,7 +374,7 @@ def test_low_fetch_depth(tmp_path, caplog):
     """
 
     testproject_path = setup_clean_mkdocs_folder(
-        "tests/basic_setup/mkdocs.yml", tmp_path
+        "tests/fixtures/basic_project/mkdocs.yml", tmp_path
     )
     repo = setup_commit_history(testproject_path)
 
