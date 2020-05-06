@@ -1,0 +1,9 @@
+site_name: demo revision date
+use_directory_urls: false
+
+theme:
+    name: material
+
+plugins:
+    - search
+    - git-revision-date-localized
