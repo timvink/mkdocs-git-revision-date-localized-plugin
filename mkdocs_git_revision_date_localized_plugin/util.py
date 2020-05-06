@@ -6,12 +6,13 @@ from datetime import datetime
 
 # 3rd party
 from babel.dates import format_date
-from git import Git, GitCommandError, GitCommandNotFound
+from git import Repo, Git, GitCommandError, GitCommandNotFound
 
 
 class Util:
     def __init__(self, path: str = "."):
-        self.repo = Git(path)
+        git_repo = Repo(path, search_parent_directories=True)
+        self.repo = git_repo.git
 
         # Checks when running builds on CI
         # See https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/10
