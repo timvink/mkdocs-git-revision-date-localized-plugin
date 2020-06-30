@@ -10,10 +10,6 @@ You can reproduce locally with:
 
 """
 
-# #############################################################################
-# ########## Libraries #############
-# ##################################
-
 # standard lib
 import logging
 import os
@@ -32,25 +28,25 @@ from click.testing import CliRunner
 # package module
 from mkdocs_git_revision_date_localized_plugin.util import Util
 
-# #############################################################################
+# ##################################
 # ######## Globals #################
 # ##################################
-
-PLUGIN_NAME = "git-revision-date-localized"
 
 # custom log level to get plugin info messages
 logging.basicConfig(level=logging.INFO)
 
 
-# #############################################################################
+# ##################################
 # ########## Helpers ###############
 # ##################################
+
+
 def get_plugin_config_from_mkdocs(mkdocs_path) -> dict:
     # instanciate plugin
     cfg_mkdocs = load_config(mkdocs_path)
 
     plugins = cfg_mkdocs.get("plugins")
-    plugin_loaded = plugins.get(PLUGIN_NAME)
+    plugin_loaded = plugins.get("git-revision-date-localized")
 
     cfg = plugin_loaded.on_config(cfg_mkdocs)
     logging.info("Fixture configuration loaded: " + str(cfg))
@@ -195,7 +191,7 @@ def validate_build(testproject_path, plugin_config: dict = {}):
     # git revision date tag
     page_with_tag = testproject_path / "site/page_with_tag/index.html"
     contents = page_with_tag.read_text(encoding="utf8")
-    assert re.search(r"Markdown tag\:\s[<span>|\w].+", contents)
+    assert re.search(r"renders as\:\s[<span>|\w].+", contents)
 
     repo = Util(str(testproject_path / "docs"))
     date_formats = repo.get_revision_date_for_file(
@@ -244,22 +240,29 @@ def test_date_formats():
         "datetime": "February 22, 2020 18:52:09",
         "iso_date": "2020-02-22",
         "iso_datetime": "2020-02-22 18:52:09",
-        "timeago": "<span class='timeago' datetime='1582397529000' locale='en'></span>",
+        "timeago": "<span class='timeago' datetime='2020-02-22T18:52:09+00:00' locale='en'></span>",
     }
 
 
-def test_missing_git_repo(tmp_path):
+def test_git_not_available(tmp_path, recwarn):
     """
     When there is no GIT repo, this should fail
     """
-    testproject_path = setup_clean_mkdocs_folder(
-        mkdocs_yml_path="tests/fixtures/basic_project/mkdocs.yml", output_path=tmp_path
-    )
 
+    testproject_path = setup_clean_mkdocs_folder(
+        "tests/fixtures/basic_project/mkdocs.yml", tmp_path
+    )
     result = build_docs_setup(testproject_path)
     assert (
         result.exit_code == 1
     ), "'mkdocs build' command succeeded while there is no GIT repo"
+
+    # assert there's a no error when fallback to build date is set to true
+    testproject_path = setup_clean_mkdocs_folder(
+        "tests/fixtures/basic_project/mkdocs_fallback_to_build_date.yml", tmp_path
+    )
+    result = build_docs_setup(testproject_path)
+    assert result.exit_code == 0
 
 
 def test_build_no_options(tmp_path):
@@ -279,13 +282,19 @@ def test_build_locale_mkdocs(tmp_path):
     validate_mkdocs_file(tmp_path, "tests/fixtures/basic_project/mkdocs_locale.yml")
 
 
-def test_material_theme(tmp_path):
+def test_build_material_theme_timeago(tmp_path):
+    validate_mkdocs_file(
+        tmp_path, "tests/fixtures/basic_project/mkdocs_theme_timeago.yml"
+    )
+
+
+def test_build_material_theme(tmp_path):
     """
     When using mkdocs-material theme, test correct working
     """
     # theme set to 'material' with 'language' set to 'de'
     testproject_path = validate_mkdocs_file(
-        tmp_path, "tests/fixtures/basic_project/mkdocs_theme_locale.yml"
+        tmp_path, "tests/fixtures/basic_project/mkdocs_theme_language.yml"
     )
 
     # In mkdocs-material, a 'last update' should appear
@@ -293,6 +302,23 @@ def test_material_theme(tmp_path):
     index_file = testproject_path / "site/index.html"
     contents = index_file.read_text(encoding="utf8")
     assert re.search(r"Letztes Update\:\s[\w].+", contents)
+
+
+def test_material_theme_locale(tmp_path):
+    """
+    When using mkdocs-material theme, test correct working
+    """
+    # theme set to 'material' with 'locale' set to 'de'
+    testproject_path = validate_mkdocs_file(
+        tmp_path, "tests/fixtures/basic_project/mkdocs_theme_locale.yml"
+    )
+
+    # In mkdocs-material, a 'last update' should appear
+    # in english instead of German because you should use 'language' and not locale.
+    # The date will be in german though
+    index_file = testproject_path / "site/index.html"
+    contents = index_file.read_text(encoding="utf8")
+    assert re.search(r"Last update\:\s[\w].+", contents)
 
 
 def test_material_theme_no_locale(tmp_path):
@@ -312,12 +338,10 @@ def test_material_theme_no_locale(tmp_path):
 
 
 def test_type_timeago(tmp_path):
-    # type: 'timeago'
     validate_mkdocs_file(tmp_path, "tests/fixtures/basic_project/mkdocs_timeago.yml")
 
 
 def test_type_datetime(tmp_path):
-    # type: 'datetime'
     validate_mkdocs_file(tmp_path, "tests/fixtures/basic_project/mkdocs_datetime.yml")
 
 
@@ -326,6 +350,12 @@ def test_type_unknown(tmp_path):
         validate_mkdocs_file(
             tmp_path, "tests/fixtures/basic_project/mkdocs_unknown_type.yml"
         )
+
+
+def test_build_with_timezone(tmp_path):
+    validate_mkdocs_file(
+        tmp_path, "tests/fixtures/basic_project/mkdocs_theme_timeago.yml"
+    )
 
 
 def test_git_in_docs_dir(tmp_path):
@@ -411,6 +441,3 @@ def test_low_fetch_depth(tmp_path, caplog):
     result = build_docs_setup(cloned_folder)
     assert result.exit_code == 0
     assert "Running on github actions might" in caplog.text
-
-
-# TODO: Test correct error messages when GIT is not available

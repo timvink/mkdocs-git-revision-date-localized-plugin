@@ -3,8 +3,8 @@ use_directory_urls: true
 
 theme:
     name: 'material'
-    locale: de
 
 plugins:
     - search
-    - git-revision-date-localized
+    - git-revision-date-localized:
+        type: timeago
