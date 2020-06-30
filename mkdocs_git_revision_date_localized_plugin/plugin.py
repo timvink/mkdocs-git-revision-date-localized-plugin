@@ -16,9 +16,10 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         ("fallback_to_build_date", config_options.Type(bool, default=False)),
         ("locale", config_options.Type(str, default=None)),
         ("type", config_options.Type(str, default="date")),
+        ("timezone", config_options.Type(str, default="UTC")),
     )
 
-    def on_config(self, config: config_options.Config) -> dict:
+    def on_config(self, config: config_options.Config, **kwargs) -> dict:
         """
         Determine which locale to use.
 
@@ -33,7 +34,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         Returns:
             dict: global configuration object
         """
-        self.util = Util(path=config["docs_dir"])
+        self.util = Util(path=config["docs_dir"], config=self.config)
 
         # Get locale settings - might be added in future mkdocs versions
         # see: https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/24
@@ -124,7 +125,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         return output_content[:idx] + extra_js + output_content[idx:]
 
     def on_page_markdown(
-        self, markdown: str, page: Page, config: config_options.Config, files
+        self, markdown: str, page: Page, config: config_options.Config, files, **kwargs
     ) -> str:
         """
         Replace jinja2 tags in markdown and templates with the localized dates
@@ -149,6 +150,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         revision_dates = self.util.get_revision_date_for_file(
             path=page.file.abs_src_path,
             locale=self.config.get("locale", "en"),
+            time_zone=self.config.get("time_zone", "UTC"),
             fallback_to_build_date=self.config.get("fallback_to_build_date"),
         )
         revision_date = revision_dates[self.config["type"]]

@@ -1,6 +1,3 @@
 # test page
 
-this page has a git authors tag.
-
-Markdown tag: {{ git_revision_date_localized }}
-
+Tag <mark>\{\{ git_revision_date_localized \}\}</mark> renders as: {{ git_revision_date_localized }}

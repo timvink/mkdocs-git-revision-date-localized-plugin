@@ -32,14 +32,17 @@ plugins:
 
 > If you have no `plugins` entry in your config file yet, you'll likely also want to add the `search` plugin. MkDocs enables it by default if there is no `plugins` entry set.
 
-### Note when using on CI runners
+### Note when using build environments
 
-The plugin needs access to the last commit that touched a file to be able to retrieve the date. If you build your docs using CI then you might need to change your settings:
+This plugin needs access to the last commit that touched a specific file to be able to retrieve the date. By default many build environments only retrieve the last commit, which means you might need to:
+<details>
+  <summary>Change your CI settings</summary>
+  
+  - github actions: set `fetch_depth` to `0` ([docs](https://github.com/actions/checkout))
+  - gitlab runners: set `GIT_DEPTH` to `1000` ([docs](https://docs.gitlab.com/ee/user/project/pipelines/settings.html#git-shallow-clone))
+  - bitbucket pipelines: set `clone: depth: full` ([docs](https://support.atlassian.com/bitbucket-cloud/docs/configure-bitbucket-pipelinesyml/))
+</details>
 
-- github actions: set `fetch_depth` to `0` ([docs](https://github.com/actions/checkout))
-- gitlab runners: set `GIT_DEPTH` to `1000` ([docs](https://docs.gitlab.com/ee/user/project/pipelines/settings.html#git-shallow-clone))
-
-----
 
 ## Usage
 
@@ -72,9 +75,10 @@ You can customize the plugin by setting options in `mkdocs.yml`. For example:
 ```yml
 plugins:
   - git-revision-date-localized:
-    type: timeago
-    locale: en
-    fallback_to_build_date: false
+      type: timeago
+      time_zone: Europe/Amsterdam
+      locale: en
+      fallback_to_build_date: false
 ```
 
 ### `type`
@@ -89,6 +93,10 @@ Default is `date`. To change the date format, set the `type` parameter to one of
 20 hours ago                # type: timeago
 ```
 
+### `time_zone`
+
+Default is `UTC`. Specify a time zone database name ([reference](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)). This option is especially relevant when using `type: datetime` and `type: iso_datetime`. Note that when using [timeago](http://timeago.yarp.com/) (with `type: timeago`) any difference in time zones between server and client will be handled automatically.
+
 ### `locale`
 
 Default is `None`. Specify a two letter [ISO639](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code to display dates in your preferred language.
@@ -99,7 +107,7 @@ Default is `None`. Specify a two letter [ISO639](https://en.wikipedia.org/wiki/L
 
 ### `fallback_to_build_date`
 
-Default is `false`. If set to `true` the plugin will use the time when running `mkdocs build` instead of the git revision date. This means the revision date will be inaccurate, but this can be useful if your build environment has no access to GIT and you want to ignore the Git exceptions during `git log`.
+Default is `false`. If set to `true` the plugin will use the time at `mkdocs build` instead of the file's last git revision date. This means the revision date is incorrect, but this can be acceptable if you want your project to also successfully build in environments with no access to GIT.
 
 ## Contributing
 
