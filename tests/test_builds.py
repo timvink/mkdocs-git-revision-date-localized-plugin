@@ -200,7 +200,7 @@ def validate_build(testproject_path, plugin_config: dict = {}):
         fallback_to_build_date=plugin_config.get("fallback_to_build_date"),
     )
 
-    searches = [re.search(x, contents) for x in date_formats.values()]
+    searches = [x in contents for x in date_formats.values()]
     assert any(searches), "No correct date formats output was found"
 
 
@@ -240,7 +240,7 @@ def test_date_formats():
         "datetime": "February 22, 2020 18:52:09",
         "iso_date": "2020-02-22",
         "iso_datetime": "2020-02-22 18:52:09",
-        "timeago": "<span class='timeago' datetime='2020-02-22T18:52:09+00:00' locale='en'></span>",
+        "timeago": '<span class="timeago" datetime="2020-02-22T18:52:09+00:00" locale="en"></span>',
     }
 
 
@@ -301,7 +301,7 @@ def test_build_material_theme(tmp_path):
     # in German because locale is set to 'de'
     index_file = testproject_path / "site/index.html"
     contents = index_file.read_text(encoding="utf8")
-    assert re.search(r"Letztes Update\:\s[\w].+", contents)
+    assert re.search(r"Letztes Update\:\s[<span class].+", contents)
 
 
 def test_material_theme_locale(tmp_path):
@@ -318,7 +318,7 @@ def test_material_theme_locale(tmp_path):
     # The date will be in german though
     index_file = testproject_path / "site/index.html"
     contents = index_file.read_text(encoding="utf8")
-    assert re.search(r"Last update\:\s[\w].+", contents)
+    assert re.search(r"Last update\:\s[<span class].+", contents)
 
 
 def test_material_theme_no_locale(tmp_path):
@@ -334,7 +334,7 @@ def test_material_theme_no_locale(tmp_path):
     # in German because locale is set to 'de'
     index_file = testproject_path / "site/index.html"
     contents = index_file.read_text(encoding="utf8")
-    assert re.search(r"Last update\:\s[\w].+", contents)
+    assert re.search(r"Last update\:\s[<span class].+", contents)
 
 
 def test_type_timeago(tmp_path):

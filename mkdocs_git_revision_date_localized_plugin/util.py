@@ -64,7 +64,7 @@ class Util:
             + loc_revision_date.strftime("%H:%M:%S"),
             "iso_date": loc_revision_date.strftime("%Y-%m-%d"),
             "iso_datetime": loc_revision_date.strftime("%Y-%m-%d %H:%M:%S"),
-            "timeago": "<span class='timeago' datetime='%s' locale='%s'></span>"
+            "timeago": '<span class="timeago" datetime="%s" locale="%s"></span>'
             % (loc_revision_date.isoformat(), locale),
         }
 
@@ -132,6 +132,15 @@ class Util:
                     % path
                 )
 
-        return self._date_formats(
+        date_formats = self._date_formats(
             unix_timestamp=unix_timestamp, time_zone=time_zone, locale=locale
         )
+
+        # Wrap in <span> for styling
+        for date_type, date_string in date_formats.items():
+            date_formats[date_type] = (
+                '<span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-%s">%s</span>'
+                % (date_type, date_string)
+            )
+
+        return date_formats
