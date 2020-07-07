@@ -112,6 +112,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         if self.config.get("type") != "timeago":
             return output_content
 
+        # Insert timeago.js dependencies
         extra_js = """
           <script src="https://cdnjs.cloudflare.com/ajax/libs/timeago.js/4.0.0-beta.2/timeago.min.js"></script>
           <script src="https://cdnjs.cloudflare.com/ajax/libs/timeago.js/4.0.0-beta.2/timeago.locales.min.js"></script>
@@ -122,7 +123,23 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
           </script>
         """
         idx = output_content.index("</body>")
-        return output_content[:idx] + extra_js + output_content[idx:]
+        output_content = output_content[:idx] + extra_js + output_content[idx:]
+
+        # timeago output is dynamic, which breaks when you print a page
+        # This ensures fallback to type "iso_date"
+        extra_css = """
+        <style>
+        .git-revision-date-localized-plugin-iso_date { display: none }
+        @media print {
+           .git-revision-date-localized-plugin-iso_date { display: inline } 
+           .git-revision-date-localized-plugin-timeago { display: none } 
+        }
+        </style>
+        """
+        idx = output_content.index("</head>")
+        output_content = output_content[:idx] + extra_css + output_content[idx:]
+
+        return output_content
 
     def on_page_markdown(
         self, markdown: str, page: Page, config: config_options.Config, files, **kwargs
@@ -154,6 +171,13 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             fallback_to_build_date=self.config.get("fallback_to_build_date"),
         )
         revision_date = revision_dates[self.config["type"]]
+
+        # timeago output is dynamic, which breaks when you print a page
+        # This ensures fallback to type "iso_date"
+        # controlled via CSS (see on_post_page() event)
+        if self.config["type"] == "timeago":
+            revision_date += revision_dates["iso_date"]
+
         page.meta["git_revision_date_localized"] = revision_date
         return re.sub(
             r"\{\{\s*[page\.meta\.]*git_revision_date_localized\s*\}\}",
