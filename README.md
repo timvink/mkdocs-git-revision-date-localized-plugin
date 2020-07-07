@@ -68,6 +68,8 @@ When writing your own [custom themes](https://www.mkdocs.org/user-guide/custom-t
 {% endif %}
 ```
 
+You can style the output using CSS: the date outputs are always wrapped in `<span class='git-revision-date-localized-plugin git-revision-date-localized-plugin-{type}></span>` (where `{type}` is replaced with the `type` option set in the plugin).
+
 ## Options
 
 You can customize the plugin by setting options in `mkdocs.yml`. For example:
@@ -86,7 +88,7 @@ plugins:
 Default is `date`. To change the date format, set the `type` parameter to one of `date`, `datetime`, `iso_date`, `iso_datetime` or `timeago`. Example outputs:
 
 ```bash
-28 November, 2019           # type: date
+28 November, 2019           # type: date (default)
 28 November, 2019 13:57:28  # type: datetime
 2019-11-28                  # type: iso_date
 2019-11-28 13:57:26         # type: iso_datetime
