@@ -109,7 +109,7 @@ Default is `None`. Specify a two letter [ISO639](https://en.wikipedia.org/wiki/L
 
 ### `fallback_to_build_date`
 
-Default is `false`. If set to `true` the plugin will use the time at `mkdocs build` instead of the file's last git revision date. This means the revision date is incorrect, but this can be acceptable if you want your project to also successfully build in environments with no access to GIT.
+Default is `false`. If set to `true` the plugin will use the time at `mkdocs build` instead of the file's last git revision date *when git is not available*. This means the revision date can be incorrect, but this can be acceptable if you want your project to also successfully build in environments with no access to GIT.
 
 ## Contributing
 
