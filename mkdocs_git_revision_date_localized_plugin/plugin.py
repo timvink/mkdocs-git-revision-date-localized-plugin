@@ -89,6 +89,51 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
 
         return config
 
+    def on_page_markdown(
+        self, markdown: str, page: Page, config: config_options.Config, files, **kwargs
+    ) -> str:
+        """
+        Replace jinja2 tags in markdown and templates with the localized dates
+
+        The page_markdown event is called after the page's markdown is loaded
+        from file and can be used to alter the Markdown source text.
+        The meta- data has been stripped off and is available as page.meta
+        at this point.
+
+        https://www.mkdocs.org/user-guide/plugins/#on_page_markdown
+
+        Args:
+            markdown (str): Markdown source text of page as string
+            page: mkdocs.nav.Page instance
+            config: global configuration object
+            site_navigation: global navigation object
+
+        Returns:
+            str: Markdown source text of page as string
+        """
+
+        revision_dates = self.util.get_revision_date_for_file(
+            path=page.file.abs_src_path,
+            locale=self.config.get("locale", "en"),
+            time_zone=self.config.get("time_zone", "UTC"),
+            fallback_to_build_date=self.config.get("fallback_to_build_date"),
+        )
+        revision_date = revision_dates[self.config["type"]]
+
+        # timeago output is dynamic, which breaks when you print a page
+        # This ensures fallback to type "iso_date"
+        # controlled via CSS (see on_post_page() event)
+        if self.config["type"] == "timeago":
+            revision_date += revision_dates["iso_date"]
+
+        page.meta["git_revision_date_localized"] = revision_date
+        return re.sub(
+            r"\{\{\s*[page\.meta\.]*git_revision_date_localized\s*\}\}",
+            revision_date,
+            markdown,
+            flags=re.IGNORECASE,
+        )
+
     def on_post_page(self, output_content: str, **kwargs) -> str:
         """
         Add timeago.js as a CDN to the HTML page.
@@ -140,48 +185,3 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         output_content = output_content[:idx] + extra_css + output_content[idx:]
 
         return output_content
-
-    def on_page_markdown(
-        self, markdown: str, page: Page, config: config_options.Config, files, **kwargs
-    ) -> str:
-        """
-        Replace jinja2 tags in markdown and templates with the localized dates
-
-        The page_markdown event is called after the page's markdown is loaded
-        from file and can be used to alter the Markdown source text.
-        The meta- data has been stripped off and is available as page.meta
-        at this point.
-
-        https://www.mkdocs.org/user-guide/plugins/#on_page_markdown
-
-        Args:
-            markdown (str): Markdown source text of page as string
-            page: mkdocs.nav.Page instance
-            config: global configuration object
-            site_navigation: global navigation object
-
-        Returns:
-            str: Markdown source text of page as string
-        """
-
-        revision_dates = self.util.get_revision_date_for_file(
-            path=page.file.abs_src_path,
-            locale=self.config.get("locale", "en"),
-            time_zone=self.config.get("time_zone", "UTC"),
-            fallback_to_build_date=self.config.get("fallback_to_build_date"),
-        )
-        revision_date = revision_dates[self.config["type"]]
-
-        # timeago output is dynamic, which breaks when you print a page
-        # This ensures fallback to type "iso_date"
-        # controlled via CSS (see on_post_page() event)
-        if self.config["type"] == "timeago":
-            revision_date += revision_dates["iso_date"]
-
-        page.meta["git_revision_date_localized"] = revision_date
-        return re.sub(
-            r"\{\{\s*[page\.meta\.]*git_revision_date_localized\s*\}\}",
-            revision_date,
-            markdown,
-            flags=re.IGNORECASE,
-        )
