@@ -34,7 +34,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         Returns:
             dict: global configuration object
         """
-        self.util = Util(path=config["docs_dir"], config=self.config)
+        self.util = Util(config=self.config)
 
         # Get locale settings - might be added in future mkdocs versions
         # see: https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/24
