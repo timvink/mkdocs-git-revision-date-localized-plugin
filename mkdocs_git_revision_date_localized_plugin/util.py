@@ -1,14 +1,13 @@
-# standard library
 import logging
 import time
 from datetime import datetime
 
 from mkdocs_git_revision_date_localized_plugin.ci import raise_ci_warnings
 
-# 3rd party
 from babel.dates import format_date, get_timezone
 from git import Repo, GitCommandError, GitCommandNotFound
 
+logger = logging.getLogger("mkdocs.plugins")
 
 class Util:
     def __init__(self, path: str = ".", config={}):
@@ -21,13 +20,13 @@ class Util:
         except:
             if config.get("fallback_to_build_date"):
                 self.fallback_enabled = True
-                logging.warning(
+                logger.warning(
                     "[git-revision-date-localized-plugin] Unable to find a git directory and/or git is not installed."
                     " Option 'fallback_to_build_date' set to 'true': Falling back to build date"
                 )
                 return None
             else:
-                logging.error(
+                logger.error(
                     "[git-revision-date-localized-plugin] Unable to find a git directory and/or git is not installed."
                     " To ignore this error, set option 'fallback_to_build_date: true'"
                 )
@@ -98,13 +97,13 @@ class Util:
 
         except GitCommandError as err:
             if fallback_to_build_date:
-                logging.warning(
+                logger.warning(
                     "[git-revision-date-localized-plugin] Unable to read git logs of '%s'. Is git log readable?"
                     " Option 'fallback_to_build_date' set to 'true': Falling back to build date"
                     % path
                 )
             else:
-                logging.error(
+                logger.error(
                     "[git-revision-date-localized-plugin] Unable to read git logs of '%s'. "
                     " To ignore this error, set option 'fallback_to_build_date: true'"
                     % path
@@ -112,12 +111,12 @@ class Util:
                 raise err
         except GitCommandNotFound as err:
             if fallback_to_build_date:
-                logging.warning(
+                logger.warning(
                     "[git-revision-date-localized-plugin] Unable to perform command: 'git log'. Is git installed?"
                     " Option 'fallback_to_build_date' set to 'true': Falling back to build date"
                 )
             else:
-                logging.error(
+                logger.error(
                     "[git-revision-date-localized-plugin] Unable to perform command 'git log'. Is git installed?"
                     " To ignore this error, set option 'fallback_to_build_date: true'"
                 )
@@ -127,7 +126,7 @@ class Util:
         if not unix_timestamp:
             unix_timestamp = time.time()
             if not self.fallback_enabled:
-                logging.warning(
+                logger.warning(
                     "[git-revision-date-localized-plugin] '%s' has no git logs, using current timestamp"
                     % path
                 )
