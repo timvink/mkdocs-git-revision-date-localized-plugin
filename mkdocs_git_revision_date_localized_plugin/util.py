@@ -9,6 +9,7 @@ from git import Repo, GitCommandError, GitCommandNotFound
 
 logger = logging.getLogger("mkdocs.plugins")
 
+
 class Util:
     def __init__(self, path: str = ".", config={}):
 

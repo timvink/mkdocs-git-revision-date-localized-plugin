@@ -58,6 +58,45 @@ In your markdown files you can use the `{{ git_revision_date_localized }}` tag a
 Last update: {{ git_revision_date_localized }}
 ```
 
+### Extending existing themes
+
+You can [customize an existing theme](https://www.mkdocs.org/user-guide/styling-your-docs/#customizing-a-theme) by overriding blocks or partials and using the `page.meta.git_revision_date_localized` tag.
+
+To add a revision date to the default `mkdocs` theme by adding a `overrides/partials` folder to your `docs` folder and updating your `mkdocs.yml` file:
+
+```yml
+theme:
+    name: mkdocs
+    custom_dir: docs/overrides
+```
+
+And then adding a new file `docs/overrides/content.html` with the following content:
+
+<details>
+  <summary>content.html</summary>
+  
+  ```html
+  <!-- Overwrites content.html base mkdocs theme, taken from 
+  https://github.com/mkdocs/mkdocs/blob/master/mkdocs/themes/mkdocs/content.html -->
+
+  {% if page.meta.source %}
+      <div class="source-links">
+      {% for filename in page.meta.source %}
+          <span class="label label-primary">{{ filename }}</span>
+      {% endfor %}
+      </div>
+  {% endif %}
+
+  {{ page.content }}
+
+  {% if page.meta.git_revision_date_localized %}
+      <small>Last update: {{ page.meta.git_revision_date_localized }}</small>
+  {% endif %}
+  ```
+</details>
+
+&nbsp;
+
 ### In custom themes
 
 When writing your own [custom themes](https://www.mkdocs.org/user-guide/custom-themes/) you can use the `page.meta.git_revision_date_localized` jinja tag:

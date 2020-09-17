@@ -1,0 +1,10 @@
+site_name: test gitrevisiondatelocalized_plugin
+use_directory_urls: true
+
+theme:
+    name: mkdocs
+    custom_dir: docs/overrides
+
+plugins:
+    - search
+    - git-revision-date-localized
