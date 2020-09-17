@@ -1,41 +1,34 @@
 import logging
+import os
 import time
 from datetime import datetime
 
 from mkdocs_git_revision_date_localized_plugin.ci import raise_ci_warnings
 
 from babel.dates import format_date, get_timezone
-from git import Repo, GitCommandError, GitCommandNotFound
+from git import Repo, GitCommandError, GitCommandNotFound, InvalidGitRepositoryError, NoSuchPathError
 
 logger = logging.getLogger("mkdocs.plugins")
 
 
 class Util:
-    def __init__(self, path: str = ".", config={}):
+    def __init__(self, config={}):
 
         self.fallback_enabled = False
+        self.config = config
+        self.repo_cache = {}
 
-        try:
-            git_repo = Repo(path, search_parent_directories=True)
-            self.repo = git_repo.git
-        except:
-            if config.get("fallback_to_build_date"):
-                self.fallback_enabled = True
-                logger.warning(
-                    "[git-revision-date-localized-plugin] Unable to find a git directory and/or git is not installed."
-                    " Option 'fallback_to_build_date' set to 'true': Falling back to build date"
-                )
-                return None
-            else:
-                logger.error(
-                    "[git-revision-date-localized-plugin] Unable to find a git directory and/or git is not installed."
-                    " To ignore this error, set option 'fallback_to_build_date: true'"
-                )
-                raise
+    def _get_repo(self, path: str):
+        if not os.path.isdir(path):
+            path = os.path.dirname(path)
 
-        # Checks if user is running builds on CI
-        # and raise appropriate warnings
-        raise_ci_warnings(self.repo)
+        if path not in self.repo_cache:
+            self.repo_cache[path] = Repo(path, search_parent_directories=True).git
+            # Checks if user is running builds on CI
+            # and raise appropriate warnings
+            raise_ci_warnings(self.repo_cache[path])
+
+        return self.repo_cache[path]
 
     @staticmethod
     def _date_formats(
@@ -94,8 +87,20 @@ class Util:
             if not self.fallback_enabled:
                 # Retrieve author date in UNIX format (%at)
                 # https://git-scm.com/docs/git-log#Documentation/git-log.txt-ematem
-                unix_timestamp = self.repo.log(path, n=1, date="short", format="%at")
-
+                realpath = os.path.realpath(path)
+                unix_timestamp = self._get_repo(realpath).log(realpath, n=1, date="short", format="%at")
+        except (InvalidGitRepositoryError, NoSuchPathError) as err:
+            if fallback_to_build_date:
+                logger.warning(
+                    "[git-revision-date-localized-plugin] Unable to find a git directory and/or git is not installed."
+                    " Option 'fallback_to_build_date' set to 'true': Falling back to build date"
+                )
+            else:
+                logger.error(
+                    "[git-revision-date-localized-plugin] Unable to find a git directory and/or git is not installed."
+                    " To ignore this error, set option 'fallback_to_build_date: true'"
+                )
+                raise err
         except GitCommandError as err:
             if fallback_to_build_date:
                 logger.warning(
