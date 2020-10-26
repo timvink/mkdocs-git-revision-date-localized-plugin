@@ -3,4 +3,3 @@ pytest-cov
 codecov
 click
 mkdocs-material
-mknotebooks
