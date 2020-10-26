@@ -1,15 +1,18 @@
 # standard lib
 import logging
 import re
+import os
 
 # 3rd party
 from mkdocs.config import config_options
 from mkdocs.plugins import BasePlugin
 from mkdocs.structure.nav import Page
+from mkdocs.utils import copy_file
 
 # package modules
 from mkdocs_git_revision_date_localized_plugin.util import Util
 
+HERE = os.path.dirname(os.path.abspath(__file__))
 
 class GitRevisionDateLocalizedPlugin(BasePlugin):
     config_scheme = (
@@ -87,6 +90,13 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         # set locale also in plugin configuration
         self.config["locale"] = locale_set
 
+        # Add pointers to support files for timeago.js
+        if self.config.get("type") == "timeago":
+            config["extra_javascript"] = ["js/timeago_mkdocs_material.js"] + config["extra_javascript"]
+            config["extra_javascript"] = ["js/timeago.locales.min.js"] + config["extra_javascript"]
+            config["extra_javascript"] = ["js/timeago.min.js"] + config["extra_javascript"]
+            config["extra_css"] = ["css/timeago.css"] + config["extra_css"]
+
         return config
 
     def on_page_markdown(
@@ -122,7 +132,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
 
         # timeago output is dynamic, which breaks when you print a page
         # This ensures fallback to type "iso_date"
-        # controlled via CSS (see on_post_page() event)
+        # controlled via CSS (see on_post_build() event)
         if self.config["type"] == "timeago":
             revision_date += revision_dates["iso_date"]
 
@@ -134,65 +144,16 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             flags=re.IGNORECASE,
         )
 
-    def on_post_page(self, output_content: str, **kwargs) -> str:
-        """
-        Add timeago.js as a CDN to the HTML page.
-        The CDN with latest version timeago.js can be found on
-        https://cdnjs.com/libraries/timeago.js
 
-        The `post_template` event is called after the template is rendered,
-        but before it is written to disc and can be used to alter the output
-        of the page. If an empty string is returned, the page is skipped
-        and nothing is written to disc.
+    def on_post_build(self, config, **kwargs):
 
-        https://www.mkdocs.org/user-guide/plugins/#on_post_page
-
-        Args:
-            output_content (str): output of rendered template as string
-
-        Returns:
-            str: output of rendered template as string
-        """
-
-        if self.config.get("type") != "timeago":
-            return output_content
-
-        # Insert timeago.js dependencies
-        extra_js = """
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/timeago.js/4.0.0-beta.2/timeago.min.js"></script>
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/timeago.js/4.0.0-beta.2/timeago.locales.min.js"></script>
-          <script>
-          if (
-            typeof app !== "undefined" && 
-            typeof app.document$ !== "undefined"
-            ) {
-            app.document$.subscribe(function() {
-                var nodes = document.querySelectorAll('.timeago');
-                var locale = nodes[0].getAttribute('locale');
-                timeago.render(nodes, locale);
-            })
-         } else {
-             var nodes = document.querySelectorAll('.timeago');
-             var locale = nodes[0].getAttribute('locale');
-             timeago.render(nodes, locale);
-         }
-          </script>
-        """
-        idx = output_content.index("</body>")
-        output_content = output_content[:idx] + extra_js + output_content[idx:]
-
-        # timeago output is dynamic, which breaks when you print a page
-        # This ensures fallback to type "iso_date"
-        extra_css = """
-        <style>
-        .git-revision-date-localized-plugin-iso_date { display: none }
-        @media print {
-           .git-revision-date-localized-plugin-iso_date { display: inline } 
-           .git-revision-date-localized-plugin-timeago { display: none } 
-        }
-        </style>
-        """
-        idx = output_content.index("</head>")
-        output_content = output_content[:idx] + extra_css + output_content[idx:]
-
-        return output_content
+        # Add timeago files:
+        # Current version timeago.js: 2.0.2
+        if self.config.get("type") == "timeago":
+            files = ['js/timeago.min.js', 'js/timeago.locales.min.js',
+            'js/timeago_mkdocs_material.js', 'css/timeago.css']
+            for file in files:
+                dest_file_path = os.path.join(config["site_dir"], file)
+                src_file_path = os.path.join(HERE, file)
+                assert os.path.exists(src_file_path)
+                copy_file(src_file_path, dest_file_path)

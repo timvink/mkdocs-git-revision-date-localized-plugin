@@ -13,6 +13,7 @@ setup(
     url="https://github.com/timvink/mkdocs-git-revision-date-localized-plugin",
     author="Tim Vink",
     author_email="vinktim@gmail.com",
+    include_package_data=True,
     license="MIT",
     python_requires=">=3.5",
     classifiers=[

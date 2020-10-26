@@ -8,3 +8,12 @@ plugins:
     - search
     - git-revision-date-localized:
         type: timeago
+
+
+nav:
+    - index.md
+    - first_page.md
+    - Subpage:
+        - subpage.md
+    - second_page.md
+    - page_with_tag.md
