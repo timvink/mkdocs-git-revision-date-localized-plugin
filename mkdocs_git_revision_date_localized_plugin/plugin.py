@@ -12,7 +12,10 @@ from mkdocs.utils import copy_file
 # package modules
 from mkdocs_git_revision_date_localized_plugin.util import Util
 
+from typing import Any, Dict
+
 HERE = os.path.dirname(os.path.abspath(__file__))
+
 
 class GitRevisionDateLocalizedPlugin(BasePlugin):
     config_scheme = (
@@ -20,9 +23,10 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         ("locale", config_options.Type(str, default=None)),
         ("type", config_options.Type(str, default="date")),
         ("timezone", config_options.Type(str, default="UTC")),
+        ("excluded_page_titles", config_options.Type(list, default=[]))
     )
 
-    def on_config(self, config: config_options.Config, **kwargs) -> dict:
+    def on_config(self, config: config_options.Config, **kwargs) -> Dict[str, Any]:
         """
         Determine which locale to use.
 
@@ -121,6 +125,12 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             str: Markdown source text of page as string
         """
 
+        excluded_titles = self.config.get("excluded_page_titles", [])
+        if page.title in excluded_titles:
+            logging.debug("Excluding page " + page.url)
+            # page is excluded
+            return markdown
+
         revision_dates = self.util.get_revision_date_for_file(
             path=page.file.abs_src_path,
             locale=self.config.get("locale", "en"),
@@ -143,12 +153,14 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             flags=re.IGNORECASE,
         )
 
-
-    def on_post_build(self, config, **kwargs):
-
+    def on_post_build(self, config: Dict[str, Any], **kwargs) -> None:
+        """
+        Run on post build.
+        Adds the timeago assets to the build.
+        """
         # Add timeago files:
         if self.config.get("type") == "timeago":
-            files = ['js/timeago.min.js', 'js/timeago_mkdocs_material.js', 'css/timeago.css']
+            files = ["js/timeago.min.js", "js/timeago_mkdocs_material.js", "css/timeago.css"]
             for file in files:
                 dest_file_path = os.path.join(config["site_dir"], file)
                 src_file_path = os.path.join(HERE, file)

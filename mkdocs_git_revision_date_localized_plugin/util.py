@@ -8,6 +8,8 @@ from mkdocs_git_revision_date_localized_plugin.ci import raise_ci_warnings
 from babel.dates import format_date, get_timezone
 from git import Repo, GitCommandError, GitCommandNotFound, InvalidGitRepositoryError, NoSuchPathError
 
+from typing import Any, Dict
+
 logger = logging.getLogger("mkdocs.plugins")
 
 
@@ -33,17 +35,17 @@ class Util:
     @staticmethod
     def _date_formats(
         unix_timestamp: float, locale: str = "en", time_zone: str = "UTC"
-    ) -> dict:
+    ) -> Dict[str, Any]:
         """
         Returns different date formats / types.
 
         Args:
-            unix_timestamp (float): a timestamp in seconds since 1970
+            unix_timestamp (float): A timestamp in seconds since 1970.
             locale (str): Locale code of language to use. Defaults to 'en'.
-            time_zone (str): timezone database name (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
+            time_zone (str): Timezone database name (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 
         Returns:
-            dict: different date formats
+            dict: Different date formats.
         """
         utc_revision_date = datetime.utcfromtimestamp(int(unix_timestamp))
         loc_revision_date = utc_revision_date.replace(
@@ -52,9 +54,10 @@ class Util:
 
         return {
             "date": format_date(loc_revision_date, format="long", locale=locale),
-            "datetime": format_date(loc_revision_date, format="long", locale=locale)
-            + " "
-            + loc_revision_date.strftime("%H:%M:%S"),
+            "datetime": " ".join([
+                format_date(loc_revision_date, format="long", locale=locale),
+                loc_revision_date.strftime("%H:%M:%S"),
+            ]),
             "iso_date": loc_revision_date.strftime("%Y-%m-%d"),
             "iso_datetime": loc_revision_date.strftime("%Y-%m-%d %H:%M:%S"),
             "timeago": '<span class="timeago" datetime="%s" locale="%s"></span>'
@@ -67,17 +70,17 @@ class Util:
         locale: str = "en",
         time_zone: str = "UTC",
         fallback_to_build_date: bool = False,
-    ) -> dict:
+    ) -> Dict[str, str]:
         """
         Determine localized date variants for a given file
 
         Args:
-            path (str): Location of a markdownfile that is part of a GIT repository
+            path (str): Location of a markdown file that is part of a Git repository.
             locale (str, optional): Locale code of language to use. Defaults to 'en'.
-            timezone (str): timezone database name (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) 
+            timezone (str): Timezone database name (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 
         Returns:
-            dict: localized date variants
+            dict: Localized date variants.
         """
 
         unix_timestamp = None
