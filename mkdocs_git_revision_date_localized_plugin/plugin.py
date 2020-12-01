@@ -93,7 +93,6 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         # Add pointers to support files for timeago.js
         if self.config.get("type") == "timeago":
             config["extra_javascript"] = ["js/timeago_mkdocs_material.js"] + config["extra_javascript"]
-            config["extra_javascript"] = ["js/timeago.locales.min.js"] + config["extra_javascript"]
             config["extra_javascript"] = ["js/timeago.min.js"] + config["extra_javascript"]
             config["extra_css"] = ["css/timeago.css"] + config["extra_css"]
 
@@ -148,10 +147,8 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
     def on_post_build(self, config, **kwargs):
 
         # Add timeago files:
-        # Current version timeago.js: 2.0.2
         if self.config.get("type") == "timeago":
-            files = ['js/timeago.min.js', 'js/timeago.locales.min.js',
-            'js/timeago_mkdocs_material.js', 'css/timeago.css']
+            files = ['js/timeago.min.js', 'js/timeago_mkdocs_material.js', 'css/timeago.css']
             for file in files:
                 dest_file_path = os.path.join(config["site_dir"], file)
                 src_file_path = os.path.join(HERE, file)
