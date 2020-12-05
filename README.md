@@ -120,6 +120,8 @@ plugins:
       time_zone: Europe/Amsterdam
       locale: en
       fallback_to_build_date: false
+      exclude:
+        - index.md
 ```
 
 ### `type`
@@ -149,6 +151,20 @@ Default is `None`. Specify a two letter [ISO639](https://en.wikipedia.org/wiki/L
 ### `fallback_to_build_date`
 
 Default is `false`. If set to `true` the plugin will use the time at `mkdocs build` instead of the file's last git revision date *when git is not available*. This means the revision date can be incorrect, but this can be acceptable if you want your project to also successfully build in environments with no access to GIT.
+
+### `exclude`
+
+Default is empty. Specify a list of page source paths (one per line) that should not have a revision date included. This can be useful for example to remove the revision date from the front page. The source page is relative to your `docs/` folder. To exclude `docs/subfolder/page.md` specify in your `mkdocs.yml` a line under `exclude:` with `- subfolder/page.md`. Example:
+
+```yaml
+# mkdocs.yml
+plugins:
+  - git-revision-date-localized:
+      exclude:
+        - index.md
+        - subfolder/page.md
+        - another_page.md
+```
 
 ## Contributing
 

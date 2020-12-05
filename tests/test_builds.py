@@ -331,7 +331,7 @@ def test_material_theme_no_locale(tmp_path):
     )
 
     # In mkdocs-material, a 'last update' should appear
-    # in German because locale is set to 'de'
+    # in english because default locale is set to 'en'
     index_file = testproject_path / "site/index.html"
     contents = index_file.read_text(encoding="utf8")
     assert re.search(r"Last update\:\s[<span class].+", contents)
@@ -356,6 +356,26 @@ def test_build_with_timezone(tmp_path):
     validate_mkdocs_file(
         tmp_path, "tests/fixtures/basic_project/mkdocs_theme_timeago.yml"
     )
+
+
+def test_exclude_pages(tmp_path):
+    """
+    When using mkdocs-material theme, test correct working
+    """
+    # theme set to 'material' with 'locale' set to 'de'
+    testproject_path = validate_mkdocs_file(
+        tmp_path, "tests/fixtures/basic_project/mkdocs_exclude.yml"
+    )
+
+    # Make sure revision date does not exist in excluded pages
+    first_page = testproject_path / "site/first_page/index.html"
+    contents = first_page.read_text(encoding="utf8")
+    assert not re.search(r"Last update\:\s[<span class].+", contents)
+
+    sub_page = testproject_path / "site/subfolder/page_in_subfolder/index.html"
+    contents = sub_page.read_text(encoding="utf8")
+    assert not re.search(r"Last update\:\s[<span class].+", contents)
+
 
 
 def test_git_in_docs_dir(tmp_path):

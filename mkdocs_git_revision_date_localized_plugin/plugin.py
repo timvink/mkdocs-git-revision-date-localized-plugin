@@ -35,7 +35,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         ("locale", config_options.Type(str, default=None)),
         ("type", config_options.Type(str, default="date")),
         ("timezone", config_options.Type(str, default="UTC")),
-        ("excluded_page_titles", config_options.Type(list, default=[])),
+        ("exclude", config_options.Type(list, default=[])),
     )
 
     def on_config(self, config: config_options.Config, **kwargs) -> Dict[str, Any]:
@@ -140,10 +140,10 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         Returns:
             str: Markdown source text of page as string
         """
-        excluded_titles = self.config.get("excluded_page_titles", [])
-        if page.title in excluded_titles:
-            logging.debug("Excluding page " + page.url)
-            # page is excluded
+        # Exclude pages specified in config
+        excluded_pages = self.config.get("exclude", [])
+        if page.file.src_path in excluded_pages:
+            logging.debug("Excluding page " + page.file.src_path)
             return markdown
 
         revision_dates = self.util.get_revision_date_for_file(
