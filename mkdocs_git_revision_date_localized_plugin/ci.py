@@ -1,16 +1,20 @@
+"""
+Helper functions related to continuous integration (CI).
+
+This is because often CI runners do not have access to full git history.
+"""
+
 import os
 import logging
 
 
 def raise_ci_warnings(repo) -> None:
     """
-    Raise warnings when users use mkdocs-git-revision-date-localized-plugin
-    on CI build runners.
+    Raise warnings when users use plugin on CI build runners.
 
     Args:
         repo (GitPython.git.repo): The Git repo object.
     """
-
     if not is_shallow_clone(repo):
         return None
 
@@ -72,7 +76,7 @@ def raise_ci_warnings(repo) -> None:
 
 def commit_count(repo) -> int:
     """
-    Helper function to determine the number of commits in a repository.
+    Determine the number of commits in a repository.
 
     Args:
         repo (GitPython.Repo.git): Repository.
@@ -89,8 +93,7 @@ def commit_count(repo) -> int:
 
 def is_shallow_clone(repo) -> bool:
     """
-    Helper function to determine if repository
-    is a shallow clone.
+    Determine if repository is a shallow clone.
 
     References & Context:
     https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/10

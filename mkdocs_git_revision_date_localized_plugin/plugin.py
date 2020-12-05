@@ -1,3 +1,9 @@
+"""
+MkDocs Plugin.
+
+https://www.mkdocs.org/
+https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/
+"""
 # standard lib
 import logging
 import re
@@ -18,12 +24,18 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 
 
 class GitRevisionDateLocalizedPlugin(BasePlugin):
+    """
+    Mkdocs plugin to add revision date from Git.
+
+    See https://www.mkdocs.org/user-guide/plugins
+    """
+
     config_scheme = (
         ("fallback_to_build_date", config_options.Type(bool, default=False)),
         ("locale", config_options.Type(str, default=None)),
         ("type", config_options.Type(str, default="date")),
         ("timezone", config_options.Type(str, default="UTC")),
-        ("excluded_page_titles", config_options.Type(list, default=[]))
+        ("excluded_page_titles", config_options.Type(list, default=[])),
     )
 
     def on_config(self, config: config_options.Config, **kwargs) -> Dict[str, Any]:
@@ -96,8 +108,12 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
 
         # Add pointers to support files for timeago.js
         if self.config.get("type") == "timeago":
-            config["extra_javascript"] = ["js/timeago_mkdocs_material.js"] + config["extra_javascript"]
-            config["extra_javascript"] = ["js/timeago.min.js"] + config["extra_javascript"]
+            config["extra_javascript"] = ["js/timeago_mkdocs_material.js"] + config[
+                "extra_javascript"
+            ]
+            config["extra_javascript"] = ["js/timeago.min.js"] + config[
+                "extra_javascript"
+            ]
             config["extra_css"] = ["css/timeago.css"] + config["extra_css"]
 
         return config
@@ -106,7 +122,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         self, markdown: str, page: Page, config: config_options.Config, files, **kwargs
     ) -> str:
         """
-        Replace jinja2 tags in markdown and templates with the localized dates
+        Replace jinja2 tags in markdown and templates with the localized dates.
 
         The page_markdown event is called after the page's markdown is loaded
         from file and can be used to alter the Markdown source text.
@@ -124,7 +140,6 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         Returns:
             str: Markdown source text of page as string
         """
-
         excluded_titles = self.config.get("excluded_page_titles", [])
         if page.title in excluded_titles:
             logging.debug("Excluding page " + page.url)
@@ -156,11 +171,16 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
     def on_post_build(self, config: Dict[str, Any], **kwargs) -> None:
         """
         Run on post build.
+
         Adds the timeago assets to the build.
         """
         # Add timeago files:
         if self.config.get("type") == "timeago":
-            files = ["js/timeago.min.js", "js/timeago_mkdocs_material.js", "css/timeago.css"]
+            files = [
+                "js/timeago.min.js",
+                "js/timeago_mkdocs_material.js",
+                "css/timeago.css",
+            ]
             for file in files:
                 dest_file_path = os.path.join(config["site_dir"], file)
                 src_file_path = os.path.join(HERE, file)

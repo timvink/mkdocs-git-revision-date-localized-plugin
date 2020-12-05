@@ -1,3 +1,4 @@
+"""Utility class for mkdocs plugin."""
 import logging
 import os
 import time
@@ -6,7 +7,13 @@ from datetime import datetime
 from mkdocs_git_revision_date_localized_plugin.ci import raise_ci_warnings
 
 from babel.dates import format_date, get_timezone
-from git import Repo, GitCommandError, GitCommandNotFound, InvalidGitRepositoryError, NoSuchPathError
+from git import (
+    Repo,
+    GitCommandError,
+    GitCommandNotFound,
+    InvalidGitRepositoryError,
+    NoSuchPathError,
+)
 
 from typing import Any, Dict
 
@@ -14,8 +21,13 @@ logger = logging.getLogger("mkdocs.plugins")
 
 
 class Util:
-    def __init__(self, config={}):
+    """Utility class.
 
+    This helps find git and calculate relevant dates.
+    """
+
+    def __init__(self, config={}):
+        """Initialize utility class."""
         self.fallback_enabled = False
         self.config = config
         self.repo_cache = {}
@@ -37,7 +49,7 @@ class Util:
         unix_timestamp: float, locale: str = "en", time_zone: str = "UTC"
     ) -> Dict[str, Any]:
         """
-        Returns different date formats / types.
+        Calculate different date formats / types.
 
         Args:
             unix_timestamp (float): A timestamp in seconds since 1970.
@@ -54,10 +66,12 @@ class Util:
 
         return {
             "date": format_date(loc_revision_date, format="long", locale=locale),
-            "datetime": " ".join([
-                format_date(loc_revision_date, format="long", locale=locale),
-                loc_revision_date.strftime("%H:%M:%S"),
-            ]),
+            "datetime": " ".join(
+                [
+                    format_date(loc_revision_date, format="long", locale=locale),
+                    loc_revision_date.strftime("%H:%M:%S"),
+                ]
+            ),
             "iso_date": loc_revision_date.strftime("%Y-%m-%d"),
             "iso_datetime": loc_revision_date.strftime("%Y-%m-%d %H:%M:%S"),
             "timeago": '<span class="timeago" datetime="%s" locale="%s"></span>'
@@ -72,7 +86,7 @@ class Util:
         fallback_to_build_date: bool = False,
     ) -> Dict[str, str]:
         """
-        Determine localized date variants for a given file
+        Determine localized date variants for a given file.
 
         Args:
             path (str): Location of a markdown file that is part of a Git repository.
@@ -82,7 +96,6 @@ class Util:
         Returns:
             dict: Localized date variants.
         """
-
         unix_timestamp = None
 
         # perform git log operation
@@ -91,7 +104,9 @@ class Util:
                 # Retrieve author date in UNIX format (%at)
                 # https://git-scm.com/docs/git-log#Documentation/git-log.txt-ematem
                 realpath = os.path.realpath(path)
-                unix_timestamp = self._get_repo(realpath).log(realpath, n=1, date="short", format="%at")
+                unix_timestamp = self._get_repo(realpath).log(
+                    realpath, n=1, date="short", format="%at"
+                )
         except (InvalidGitRepositoryError, NoSuchPathError) as err:
             if fallback_to_build_date:
                 logger.warning(
