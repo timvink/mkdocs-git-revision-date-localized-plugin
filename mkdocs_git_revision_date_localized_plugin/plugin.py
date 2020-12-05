@@ -17,6 +17,7 @@ from mkdocs.utils import copy_file
 
 # package modules
 from mkdocs_git_revision_date_localized_plugin.util import Util
+from mkdocs_git_revision_date_localized_plugin.exclude import exclude
 
 from typing import Any, Dict
 
@@ -142,7 +143,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         """
         # Exclude pages specified in config
         excluded_pages = self.config.get("exclude", [])
-        if page.file.src_path in excluded_pages:
+        if exclude(page.file.src_path, excluded_pages):
             logging.debug("Excluding page " + page.file.src_path)
             return markdown
 

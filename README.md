@@ -154,7 +154,7 @@ Default is `false`. If set to `true` the plugin will use the time at `mkdocs bui
 
 ### `exclude`
 
-Default is empty. Specify a list of page source paths (one per line) that should not have a revision date included. This can be useful for example to remove the revision date from the front page. The source page is relative to your `docs/` folder. To exclude `docs/subfolder/page.md` specify in your `mkdocs.yml` a line under `exclude:` with `- subfolder/page.md`. Example:
+Default is empty. Specify a list of page source paths (one per line) that should not have a revision date included (excluded from processing by this plugin). This can be useful for example to remove the revision date from the front page. The source path of a page is relative to your `docs/` folder. You can also use [globs](https://docs.python.org/3/library/glob.html) instead of full source paths. To exclude `docs/subfolder/page.md` specify in your `mkdocs.yml` a line under `exclude:` with `- subfolder/page.md`. Some examples:
 
 ```yaml
 # mkdocs.yml
@@ -164,6 +164,7 @@ plugins:
         - index.md
         - subfolder/page.md
         - another_page.md
+        - folder/*
 ```
 
 ## Contributing
