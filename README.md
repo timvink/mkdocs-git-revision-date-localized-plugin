@@ -48,7 +48,7 @@ This plugin needs access to the last commit that touched a specific file to be a
 
 ### In supported themes
 
-- [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) offers native support for this plugin, see [setup instructions](https://squidfunk.github.io/mkdocs-material/plugins/revision-date/)
+- [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) offers native support for this plugin, see [setup instructions](https://squidfunk.github.io/mkdocs-material/setup/adding-a-git-repository/#revision-date-localized)
 
 ### In markdown pages
 
@@ -62,7 +62,7 @@ Last update: {{ git_revision_date_localized }}
 
 You can [customize an existing theme](https://www.mkdocs.org/user-guide/styling-your-docs/#customizing-a-theme) by overriding blocks or partials and using the `page.meta.git_revision_date_localized` tag.
 
-To add a revision date to the default `mkdocs` theme by adding a `overrides/partials` folder to your `docs` folder and updating your `mkdocs.yml` file:
+To add a revision date to the default `mkdocs` theme, add a `overrides/partials` folder to your `docs` folder and update your `mkdocs.yml` file:
 
 ```yml
 theme:
@@ -70,7 +70,7 @@ theme:
     custom_dir: docs/overrides
 ```
 
-And then adding a new file `docs/overrides/content.html` with the following content:
+And then add a new file `docs/overrides/content.html` with the following content:
 
 <details>
   <summary>content.html</summary>
@@ -99,7 +99,7 @@ And then adding a new file `docs/overrides/content.html` with the following cont
 
 ### In custom themes
 
-When writing your own [custom themes](https://www.mkdocs.org/user-guide/custom-themes/) you can use the `page.meta.git_revision_date_localized` jinja tag:
+When writing your own [custom themes](https://www.mkdocs.org/user-guide/custom-themes/) you can use the `page.meta.git_revision_date_localized` jinja tag, like so for example:
 
 ```django hljs
 {% if page.meta.git_revision_date_localized %}
@@ -121,7 +121,7 @@ plugins:
       locale: en
       fallback_to_build_date: false
       exclude:
-        - index.md
+          - index.md
 ```
 
 ### `type`
@@ -150,7 +150,7 @@ Default is `None`. Specify a two letter [ISO639](https://en.wikipedia.org/wiki/L
 
 ### `fallback_to_build_date`
 
-Default is `false`. If set to `true` the plugin will use the time at `mkdocs build` instead of the file's last git revision date *when git is not available*. This means the revision date can be incorrect, but this can be acceptable if you want your project to also successfully build in environments with no access to GIT.
+Default is `false`. If set to `true` the plugin will use the time at `mkdocs build` instead of the file's last git revision date *when git is not available*. This means the revision date will be incorrect, but this can be acceptable if you want your project to also successfully build in environments with no access to GIT.
 
 ### `exclude`
 
