@@ -1,13 +1,20 @@
 from setuptools import find_packages, setup
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+file = open("README.md", "r")
+LONG_DESCRIPTION = file.read()
+file.close()
+
+file = open("requirements.txt", "r")
+DEPENDENCIES = file.readlines()
+file.close()
+
+del file
 
 setup(
     name="mkdocs-git-revision-date-localized-plugin",
     version="0.7.4",
     description="Mkdocs plugin that enables displaying the localized date of the last git modification of a markdown file.",
-    long_description=long_description,
+    long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     keywords="mkdocs git date timeago babel plugin",
     url="https://github.com/timvink/mkdocs-git-revision-date-localized-plugin",
@@ -21,7 +28,7 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    install_requires=["mkdocs>=1.0", "GitPython", "babel>=2.7.0"],
+    install_requires=DEPENDENCIES,
     packages=find_packages(),
     entry_points={
         "mkdocs.plugins": [

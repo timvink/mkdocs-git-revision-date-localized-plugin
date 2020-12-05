@@ -1,5 +1,5 @@
 """
-Tests running builds on different fresh mkdocs projects
+Tests running builds on different fresh mkdocs projects.
 
 Note that pytest offers a `tmp_path` fixture that we use here.
 You can reproduce locally with:
@@ -196,8 +196,8 @@ def validate_build(testproject_path, plugin_config: dict = {}):
     repo = Util(str(testproject_path / "docs"))
     date_formats = repo.get_revision_date_for_file(
         path=str(testproject_path / "docs/page_with_tag.md"),
-        locale=plugin_config.get("locale"),
-        fallback_to_build_date=plugin_config.get("fallback_to_build_date"),
+        locale=plugin_config.get("locale"),  # type: ignore
+        fallback_to_build_date=plugin_config.get("fallback_to_build_date"),  # type: ignore
     )
 
     searches = [x in contents for x in date_formats.values()]
@@ -360,7 +360,7 @@ def test_build_with_timezone(tmp_path):
 
 def test_git_in_docs_dir(tmp_path):
     """
-    In https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/pull/31 
+    In https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/pull/31
     a use case is described where `.git` dir lives in `docs/`
     """
 
@@ -434,10 +434,10 @@ def test_low_fetch_depth(tmp_path, caplog):
     os.environ["GITLAB_CI"] = "1"
     result = build_docs_setup(cloned_folder)
     assert result.exit_code == 0
-    assert "Running on a gitlab runner" in caplog.text
+    assert "Running on a GitLab runner" in caplog.text
 
     del os.environ["GITLAB_CI"]
     os.environ["GITHUB_ACTIONS"] = "1"
     result = build_docs_setup(cloned_folder)
     assert result.exit_code == 0
-    assert "Running on github actions might" in caplog.text
+    assert "Running on GitHub Actions might" in caplog.text

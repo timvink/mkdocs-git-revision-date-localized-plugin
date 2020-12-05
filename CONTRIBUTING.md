@@ -11,9 +11,12 @@ Thanks for considering to contribute to this project! Some guidelines:
 
 There are multiple mkdocs plugins that use information from the local git repo. 
 
-In order to simplify user experience and maintenance, I intend to merge functionality in this plugin with [mkdocs-git-authors-plugin](https://github.com/timvink/mkdocs-git-authors-plugin). See https://github.com/timvink/mkdocs-git-authors-plugin/issues/16 for a similar roadmap issue with more details.
+In order to simplify user experience and maintenance,
+I intend to merge functionality in this plugin with [mkdocs-git-authors-plugin](https://github.com/timvink/mkdocs-git-authors-plugin).
+See https://github.com/timvink/mkdocs-git-authors-plugin/issues/16 for a similar roadmap issue with more details.
 
-That means not extending the functionality of this plugin, but rather aiming to create a simple, stable release that can go into 'maintenance mode'. If users want more information extracted from GIT, they can go to [mkdocs-git-authors-plugin](https://github.com/timvink/mkdocs-git-authors-plugin).
+That means not extending the functionality of this plugin, but rather aiming to create a simple, stable release that can go into 'maintenance mode'.
+If users want more information extracted from Git, they can go to [mkdocs-git-authors-plugin](https://github.com/timvink/mkdocs-git-authors-plugin).
 
 ## Unit Tests
 
@@ -27,7 +30,7 @@ pytest --cov=mkdocs_git_revision_date_localized_plugin --cov-report term-missing
 
 If it makes sense, writing tests for your PRs is always appreciated and will help get them merged.
 
-In addition, this project uses [pyflakes](https://github.com/PyCQA/pyflakes) for static code checking:
+In addition, this project uses [flake8](https://github.com/PyCQA/flake8) for static code checking:
 
 ```python
 pip install pyflakes
@@ -36,7 +39,8 @@ pyflakes tests/ mkdocs_git_revision_date_localized_plugin/
 
 ## Manual testing
 
-To quickly serve a test website with your latest changes to the plugin use the sites in our tests suite. For example:
+To quickly serve a test website with your latest changes to the plugin use the sites in our tests suite.
+For example:
 
 ```python
 pip install -r tests/test_requirements.txt
@@ -46,6 +50,7 @@ mkdocs serve -f tests/fixtures/basic_project/mkdocs.yml
 
 ## Code Style
 
-Make sure your code *roughly* follows [PEP-8](https://www.python.org/dev/peps/pep-0008/) and keeps things consistent with the rest of the code.
+Make sure your code *roughly* follows [PEP-8](https://www.python.org/dev/peps/pep-0008/)
+and keeps things consistent with the rest of the code.
 
-We use google-style docstrings.
+We use Google-style docstrings.
