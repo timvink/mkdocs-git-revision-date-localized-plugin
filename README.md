@@ -117,7 +117,7 @@ You can customize the plugin by setting options in `mkdocs.yml`. For example:
 plugins:
   - git-revision-date-localized:
       type: timeago
-      time_zone: Europe/Amsterdam
+      timezone: Europe/Amsterdam
       locale: en
       fallback_to_build_date: false
       exclude:
