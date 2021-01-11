@@ -136,7 +136,7 @@ Default is `date`. To change the date format, set the `type` parameter to one of
 20 hours ago                # type: timeago
 ```
 
-### `time_zone`
+### `timezone`
 
 Default is `UTC`. Specify a time zone database name ([reference](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)). This option is especially relevant when using `type: datetime` and `type: iso_datetime`. Note that when using [timeago](http://timeago.yarp.com/) (with `type: timeago`) any difference in time zones between server and client will be handled automatically.
 
