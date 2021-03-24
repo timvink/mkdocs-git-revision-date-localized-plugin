@@ -175,23 +175,26 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         )
 
         # Creation date
-        creation_dates = self.util.get_creation_date_for_file(
-            commit_timestamp_list=commit_timestamp_list,
-            locale=self.config.get("locale", "en"),
-            time_zone=self.config.get("time_zone", "UTC"),
-        )
-        creation_date = creation_dates[self.config["type"]]
+        if self.config.get("enable_creation_date"):
+            creation_dates = self.util.get_creation_date_for_file(
+                commit_timestamp_list=commit_timestamp_list,
+                locale=self.config.get("locale", "en"),
+                time_zone=self.config.get("time_zone", "UTC"),
+            )
+            creation_date = creation_dates[self.config["type"]]
 
-        if self.config["type"] == "timeago":
-            creation_date += creation_dates["iso_date"]
+            if self.config["type"] == "timeago":
+                creation_date += creation_dates["iso_date"]
 
-        page.meta["git_creation_date_localized"] = creation_date
-        return re.sub(
-            r"\{\{\s*[page\.meta\.]*git_creation_date_localized\s*\}\}",
-            creation_date,
-            markdown,
-            flags=re.IGNORECASE,
-        )
+            page.meta["git_creation_date_localized"] = creation_date
+            markdown = re.sub(
+                r"\{\{\s*[page\.meta\.]*git_creation_date_localized\s*\}\}",
+                creation_date,
+                markdown,
+                flags=re.IGNORECASE,
+            )
+
+        return markdown
 
     def on_post_build(self, config: Dict[str, Any], **kwargs) -> None:
         """
