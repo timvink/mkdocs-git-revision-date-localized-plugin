@@ -9,13 +9,14 @@ from mkdocs_git_revision_date_localized_plugin.ci import raise_ci_warnings
 from babel.dates import format_date, get_timezone
 from git import (
     Repo,
+    Git,
     GitCommandError,
     GitCommandNotFound,
     InvalidGitRepositoryError,
     NoSuchPathError,
 )
 
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 logger = logging.getLogger("mkdocs.plugins")
 
@@ -32,7 +33,7 @@ class Util:
         self.config = config
         self.repo_cache = {}
 
-    def _get_repo(self, path: str):
+    def _get_repo(self, path: str) -> Git:
         if not os.path.isdir(path):
             path = os.path.dirname(path)
 
@@ -78,25 +79,22 @@ class Util:
             % (loc_revision_date.isoformat(), locale),
         }
 
-    def get_revision_date_for_file(
-        self,
-        path: str,
-        locale: str = "en",
-        time_zone: str = "UTC",
-        fallback_to_build_date: bool = False,
-    ) -> Dict[str, str]:
+    def get_git_commit_timestamps(
+            self,
+            path: str,
+            fallback_to_build_date: bool = False,
+    ) -> List[int]:
         """
-        Determine localized date variants for a given file.
+        Get a list of commit dates in unix timestamp, starts with the most recent commit.
 
         Args:
             path (str): Location of a markdown file that is part of a Git repository.
-            locale (str, optional): Locale code of language to use. Defaults to 'en'.
-            timezone (str): Timezone database name (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 
         Returns:
-            dict: Localized date variants.
+            list: commit dates in unix timestamp, starts with the most recent commit.
         """
-        unix_timestamp = None
+
+        commit_timestamp_list = []
 
         # perform git log operation
         try:
@@ -104,9 +102,10 @@ class Util:
                 # Retrieve author date in UNIX format (%at)
                 # https://git-scm.com/docs/git-log#Documentation/git-log.txt-ematem
                 realpath = os.path.realpath(path)
-                unix_timestamp = self._get_repo(realpath).log(
-                    realpath, n=1, date="short", format="%at"
-                )
+                commit_timestamp_list = self._get_repo(realpath).log(
+                    realpath, date="short", format="%at"
+                ).split()
+                commit_timestamp_list = list(map(int, commit_timestamp_list))
         except (InvalidGitRepositoryError, NoSuchPathError) as err:
             if fallback_to_build_date:
                 logger.warning(
@@ -147,16 +146,36 @@ class Util:
                 raise err
 
         # create timestamp
-        if not unix_timestamp:
-            unix_timestamp = time.time()
+        if not len(commit_timestamp_list):
+            commit_timestamp_list = [int(time.time())]
             if not self.fallback_enabled:
                 logger.warning(
                     "[git-revision-date-localized-plugin] '%s' has no git logs, using current timestamp"
                     % path
                 )
 
+        return commit_timestamp_list
+
+    def get_revision_date_for_file(
+        self,
+        commit_timestamp_list: List,
+        locale: str = "en",
+        time_zone: str = "UTC",
+    ) -> Dict[str, str]:
+        """
+        Determine localized date variants for a given file.
+
+        Args:
+            commit_timestamp_list (List): List of commit dates in unix timestamp, starts with the most recent commit.
+            locale (str, optional): Locale code of language to use. Defaults to 'en'.
+            time_zone (str): Timezone database name (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
+
+        Returns:
+            dict: Localized date variants.
+        """
+
         date_formats = self._date_formats(
-            unix_timestamp=unix_timestamp, time_zone=time_zone, locale=locale
+            unix_timestamp=commit_timestamp_list[0], time_zone=time_zone, locale=locale
         )
 
         # Wrap in <span> for styling
@@ -164,6 +183,37 @@ class Util:
             date_formats[date_type] = (
                 '<span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-%s">%s</span>'
                 % (date_type, date_string)
+            )
+
+        return date_formats
+
+    def get_creation_date_for_file(
+            self,
+            commit_timestamp_list: List,
+            locale: str = "en",
+            time_zone: str = "UTC",
+    ) -> Dict[str, str]:
+        """
+        Determine localized date variants for a given file.
+
+        Args:
+            commit_timestamp_list (List): List of commit dates in unix timestamp, starts with the most recent commit.
+            locale (str, optional): Locale code of language to use. Defaults to 'en'.
+            time_zone (str): Timezone database name (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
+
+        Returns:
+            dict: Localized date variants.
+        """
+
+        date_formats = self._date_formats(
+            unix_timestamp=commit_timestamp_list[-1], time_zone=time_zone, locale=locale
+        )
+
+        # Wrap in <span> for styling
+        for date_type, date_string in date_formats.items():
+            date_formats[date_type] = (
+                    '<span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-%s">%s</span>'
+                    % (date_type, date_string)
             )
 
         return date_formats

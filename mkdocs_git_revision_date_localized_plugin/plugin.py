@@ -147,11 +147,16 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             logging.debug("Excluding page " + page.file.src_path)
             return markdown
 
-        revision_dates = self.util.get_revision_date_for_file(
+        commit_timestamp_list = self.util.get_git_commit_timestamps(
             path=page.file.abs_src_path,
+            fallback_to_build_date=self.config.get("fallback_to_build_date"),
+        )
+
+        # revision date
+        revision_dates = self.util.get_revision_date_for_file(
+            commit_timestamp_list=commit_timestamp_list,
             locale=self.config.get("locale", "en"),
             time_zone=self.config.get("time_zone", "UTC"),
-            fallback_to_build_date=self.config.get("fallback_to_build_date"),
         )
         revision_date = revision_dates[self.config["type"]]
 
@@ -162,9 +167,28 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             revision_date += revision_dates["iso_date"]
 
         page.meta["git_revision_date_localized"] = revision_date
-        return re.sub(
+        markdown = re.sub(
             r"\{\{\s*[page\.meta\.]*git_revision_date_localized\s*\}\}",
             revision_date,
+            markdown,
+            flags=re.IGNORECASE,
+        )
+
+        # Creation date
+        creation_dates = self.util.get_creation_date_for_file(
+            commit_timestamp_list=commit_timestamp_list,
+            locale=self.config.get("locale", "en"),
+            time_zone=self.config.get("time_zone", "UTC"),
+        )
+        creation_date = creation_dates[self.config["type"]]
+
+        if self.config["type"] == "timeago":
+            creation_date += creation_dates["iso_date"]
+
+        page.meta["git_creation_date_localized"] = creation_date
+        return re.sub(
+            r"\{\{\s*[page\.meta\.]*git_creation_date_localized\s*\}\}",
+            creation_date,
             markdown,
             flags=re.IGNORECASE,
         )
