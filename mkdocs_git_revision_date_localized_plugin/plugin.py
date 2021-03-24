@@ -37,6 +37,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         ("type", config_options.Type(str, default="date")),
         ("timezone", config_options.Type(str, default="UTC")),
         ("exclude", config_options.Type(list, default=[])),
+        ("enable_creation_date", config_options.Type(bool, default=False)),
     )
 
     def on_config(self, config: config_options.Config, **kwargs) -> Dict[str, Any]:
@@ -174,6 +175,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             flags=re.IGNORECASE,
         )
 
+        # todo don't get full log when not enabled
         # Creation date
         if self.config.get("enable_creation_date"):
             creation_dates = self.util.get_creation_date_for_file(
