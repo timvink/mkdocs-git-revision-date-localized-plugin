@@ -39,7 +39,7 @@ This plugin needs access to the last commit that touched a specific file to be a
   <summary>Change your CI settings</summary>
   
   - github actions: set `fetch_depth` to `0` ([docs](https://github.com/actions/checkout))
-  - gitlab runners: set `GIT_DEPTH` to `1000` ([docs](https://docs.gitlab.com/ee/user/project/pipelines/settings.html#git-shallow-clone))
+  - gitlab runners: set `GIT_DEPTH` to `0` ([docs](https://docs.gitlab.com/ee/user/project/pipelines/settings.html#git-shallow-clone))
   - bitbucket pipelines: set `clone: depth: full` ([docs](https://support.atlassian.com/bitbucket-cloud/docs/configure-bitbucket-pipelinesyml/))
 </details>
 
