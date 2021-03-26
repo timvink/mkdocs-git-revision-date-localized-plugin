@@ -148,14 +148,13 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             logging.debug("Excluding page " + page.file.src_path)
             return markdown
 
-        commit_timestamp_list = self.util.get_git_commit_timestamps(
-            path=page.file.abs_src_path,
-            fallback_to_build_date=self.config.get("fallback_to_build_date"),
-        )
-
         # revision date
         revision_dates = self.util.get_revision_date_for_file(
-            commit_timestamp_list=commit_timestamp_list,
+            commit_timestamp=self.util.get_git_commit_timestamp(
+                path=page.file.abs_src_path,
+                is_first_commit=False,
+                fallback_to_build_date=self.config.get("fallback_to_build_date"),
+            ),
             locale=self.config.get("locale", "en"),
             time_zone=self.config.get("time_zone", "UTC"),
         )
@@ -175,11 +174,14 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             flags=re.IGNORECASE,
         )
 
-        # todo don't get full log when not enabled
         # Creation date
         if self.config.get("enable_creation_date"):
             creation_dates = self.util.get_creation_date_for_file(
-                commit_timestamp_list=commit_timestamp_list,
+                commit_timestamp=self.util.get_git_commit_timestamp(
+                    path=page.file.abs_src_path,
+                    is_first_commit=True,
+                    fallback_to_build_date=self.config.get("fallback_to_build_date"),
+                ),
                 locale=self.config.get("locale", "en"),
                 time_zone=self.config.get("time_zone", "UTC"),
             )

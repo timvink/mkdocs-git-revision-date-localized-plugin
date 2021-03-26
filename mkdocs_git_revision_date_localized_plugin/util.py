@@ -79,22 +79,25 @@ class Util:
             % (loc_revision_date.isoformat(), locale),
         }
 
-    def get_git_commit_timestamps(
+    def get_git_commit_timestamp(
             self,
             path: str,
+            is_first_commit: bool,
             fallback_to_build_date: bool = False,
-    ) -> List[int]:
+    ) -> int:
         """
         Get a list of commit dates in unix timestamp, starts with the most recent commit.
 
         Args:
+            is_first_commit (bool): if true, get the timestamp of the first commit,
+                                    else, get that of the most recent commit.
             path (str): Location of a markdown file that is part of a Git repository.
 
         Returns:
             list: commit dates in unix timestamp, starts with the most recent commit.
         """
 
-        commit_timestamp_list = []
+        commit_timestamp = None
 
         # perform git log operation
         try:
@@ -102,10 +105,15 @@ class Util:
                 # Retrieve author date in UNIX format (%at)
                 # https://git-scm.com/docs/git-log#Documentation/git-log.txt-ematem
                 realpath = os.path.realpath(path)
-                commit_timestamp_list = self._get_repo(realpath).log(
-                    realpath, date="short", format="%at"
-                ).split()
-                commit_timestamp_list = list(map(int, commit_timestamp_list))
+                git = self._get_repo(realpath)
+                if is_first_commit:
+                    commit_timestamp = int(git.log(
+                        realpath, date="short", format="%at", diff_filter="A"
+                    ))
+                else:
+                    commit_timestamp = int(git.log(
+                        realpath, date="short", format="%at", n=1
+                    ))
         except (InvalidGitRepositoryError, NoSuchPathError) as err:
             if fallback_to_build_date:
                 logger.warning(
@@ -146,19 +154,19 @@ class Util:
                 raise err
 
         # create timestamp
-        if not len(commit_timestamp_list):
-            commit_timestamp_list = [int(time.time())]
+        if commit_timestamp is None:
+            commit_timestamp = int(time.time())
             if not self.fallback_enabled:
                 logger.warning(
                     "[git-revision-date-localized-plugin] '%s' has no git logs, using current timestamp"
                     % path
                 )
 
-        return commit_timestamp_list
+        return commit_timestamp
 
     def get_revision_date_for_file(
         self,
-        commit_timestamp_list: List,
+        commit_timestamp: int,
         locale: str = "en",
         time_zone: str = "UTC",
     ) -> Dict[str, str]:
@@ -166,7 +174,7 @@ class Util:
         Determine localized date variants for a given file.
 
         Args:
-            commit_timestamp_list (List): List of commit dates in unix timestamp, starts with the most recent commit.
+            commit_timestamp (int): most recent commit date in unix timestamp.
             locale (str, optional): Locale code of language to use. Defaults to 'en'.
             time_zone (str): Timezone database name (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 
@@ -175,7 +183,7 @@ class Util:
         """
 
         date_formats = self._date_formats(
-            unix_timestamp=commit_timestamp_list[0], time_zone=time_zone, locale=locale
+            unix_timestamp=commit_timestamp, time_zone=time_zone, locale=locale
         )
 
         # Wrap in <span> for styling
@@ -188,16 +196,16 @@ class Util:
         return date_formats
 
     def get_creation_date_for_file(
-            self,
-            commit_timestamp_list: List,
-            locale: str = "en",
-            time_zone: str = "UTC",
+        self,
+        commit_timestamp: int,
+        locale: str = "en",
+        time_zone: str = "UTC",
     ) -> Dict[str, str]:
         """
         Determine localized date variants for a given file.
 
         Args:
-            commit_timestamp_list (List): List of commit dates in unix timestamp, starts with the most recent commit.
+            commit_timestamp (int): the first commit date in unix timestamp.
             locale (str, optional): Locale code of language to use. Defaults to 'en'.
             time_zone (str): Timezone database name (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 
@@ -206,7 +214,7 @@ class Util:
         """
 
         date_formats = self._date_formats(
-            unix_timestamp=commit_timestamp_list[-1], time_zone=time_zone, locale=locale
+            unix_timestamp=commit_timestamp, time_zone=time_zone, locale=locale
         )
 
         # Wrap in <span> for styling
