@@ -97,7 +97,7 @@ class Util:
             list: commit dates in unix timestamp, starts with the most recent commit.
         """
 
-        commit_timestamp = None
+        commit_timestamp = ""
 
         # perform git log operation
         try:
@@ -107,13 +107,13 @@ class Util:
                 realpath = os.path.realpath(path)
                 git = self._get_repo(realpath)
                 if is_first_commit:
-                    commit_timestamp = int(git.log(
+                    commit_timestamp = git.log(
                         realpath, date="short", format="%at", diff_filter="A"
-                    ))
+                    )
                 else:
-                    commit_timestamp = int(git.log(
+                    commit_timestamp = git.log(
                         realpath, date="short", format="%at", n=1
-                    ))
+                    )
         except (InvalidGitRepositoryError, NoSuchPathError) as err:
             if fallback_to_build_date:
                 logger.warning(
@@ -154,15 +154,15 @@ class Util:
                 raise err
 
         # create timestamp
-        if commit_timestamp is None:
-            commit_timestamp = int(time.time())
+        if commit_timestamp == "":
+            commit_timestamp = time.time()
             if not self.fallback_enabled:
                 logger.warning(
                     "[git-revision-date-localized-plugin] '%s' has no git logs, using current timestamp"
                     % path
                 )
 
-        return commit_timestamp
+        return int(commit_timestamp)
 
     def get_revision_date_for_file(
         self,

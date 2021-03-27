@@ -195,9 +195,12 @@ def validate_build(testproject_path, plugin_config: dict = {}):
 
     repo = Util(str(testproject_path / "docs"))
     date_formats = repo.get_revision_date_for_file(
-        path=str(testproject_path / "docs/page_with_tag.md"),
+        commit_timestamp=repo.get_git_commit_timestamp(
+            path=str(testproject_path / "docs/page_with_tag.md"),
+            is_first_commit=False,
+            fallback_to_build_date=plugin_config.get("fallback_to_build_date"),
+        ),
         locale=plugin_config.get("locale"),  # type: ignore
-        fallback_to_build_date=plugin_config.get("fallback_to_build_date"),  # type: ignore
     )
 
     searches = [x in contents for x in date_formats.values()]
