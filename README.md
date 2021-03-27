@@ -39,7 +39,7 @@ This plugin needs access to the last commit that touched a specific file to be a
   <summary>Change your CI settings</summary>
   
   - github actions: set `fetch_depth` to `0` ([docs](https://github.com/actions/checkout))
-  - gitlab runners: set `GIT_DEPTH` to `1000` ([docs](https://docs.gitlab.com/ee/user/project/pipelines/settings.html#git-shallow-clone))
+  - gitlab runners: set `GIT_DEPTH` to `0` ([docs](https://docs.gitlab.com/ee/user/project/pipelines/settings.html#git-shallow-clone))
   - bitbucket pipelines: set `clone: depth: full` ([docs](https://support.atlassian.com/bitbucket-cloud/docs/configure-bitbucket-pipelinesyml/))
 </details>
 
@@ -117,7 +117,7 @@ You can customize the plugin by setting options in `mkdocs.yml`. For example:
 plugins:
   - git-revision-date-localized:
       type: timeago
-      time_zone: Europe/Amsterdam
+      timezone: Europe/Amsterdam
       locale: en
       fallback_to_build_date: false
       exclude:
@@ -136,7 +136,7 @@ Default is `date`. To change the date format, set the `type` parameter to one of
 20 hours ago                # type: timeago
 ```
 
-### `time_zone`
+### `timezone`
 
 Default is `UTC`. Specify a time zone database name ([reference](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)). This option is especially relevant when using `type: datetime` and `type: iso_datetime`. Note that when using [timeago](http://timeago.yarp.com/) (with `type: timeago`) any difference in time zones between server and client will be handled automatically.
 
