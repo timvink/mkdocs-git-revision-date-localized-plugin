@@ -120,6 +120,9 @@ def setup_commit_history(testproject_path):
     os.chdir(testproject_path)
 
     try:
+        repo.git.add("docs/page_with_tag.md")
+        repo.git.commit(message="add homepage", author=author, date="1500854705 -0700")
+
         repo.git.add("mkdocs.yml")
         repo.git.commit(message="add mkdocs", author=author)
 
@@ -139,8 +142,12 @@ def setup_commit_history(testproject_path):
         repo.git.commit(message="second page", author=author)
         repo.git.add("docs/index.md")
         repo.git.commit(message="homepage", author=author)
+
+        file_name = os.path.join(testproject_path, "docs/page_with_tag.md")
+        with open(file_name, "a") as the_file:
+            the_file.write("awa\n")
         repo.git.add("docs/page_with_tag.md")
-        repo.git.commit(message="homepage", author=author)
+        repo.git.commit(message="update homepage", author=author)
         os.chdir(cwd)
     except:
         os.chdir(cwd)
@@ -204,7 +211,22 @@ def validate_build(testproject_path, plugin_config: dict = {}):
     )
 
     searches = [x in contents for x in date_formats.values()]
-    assert any(searches), "No correct date formats output was found"
+    assert any(searches), "No correct revision date formats output was found"
+
+    if plugin_config.get("enable_creation_date"):
+        commit_timestamp=repo.get_git_commit_timestamp(
+            path=str(testproject_path / "docs/page_with_tag.md"),
+            is_first_commit=True,
+            fallback_to_build_date=plugin_config.get("fallback_to_build_date"),
+        )
+        assert commit_timestamp == 1500854705
+        date_formats = repo.get_revision_date_for_file(
+            commit_timestamp=commit_timestamp,
+            locale=plugin_config.get("locale"),  # type: ignore
+        )
+
+        searches = [x in contents for x in date_formats.values()]
+        assert any(searches), "No correct creation date formats output was found"
 
 
 def validate_mkdocs_file(temp_path: str, mkdocs_yml_file: str):
@@ -271,6 +293,11 @@ def test_git_not_available(tmp_path, recwarn):
 def test_build_no_options(tmp_path):
     # Enable plugin with no extra options set
     validate_mkdocs_file(tmp_path, "tests/fixtures/basic_project/mkdocs.yml")
+
+
+def test_build_creation_date(tmp_path):
+    # Enable plugin with no extra options set
+    validate_mkdocs_file(tmp_path, "tests/fixtures/basic_project/mkdocs_creation_date.yml")
 
 
 def test_build_locale_plugin(tmp_path):
