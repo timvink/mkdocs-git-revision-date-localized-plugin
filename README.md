@@ -120,6 +120,7 @@ plugins:
       timezone: Europe/Amsterdam
       locale: en
       fallback_to_build_date: false
+      enable_creation_date: true
       exclude:
           - index.md
 ```
@@ -151,6 +152,10 @@ Default is `None`. Specify a two letter [ISO639](https://en.wikipedia.org/wiki/L
 ### `fallback_to_build_date`
 
 Default is `false`. If set to `true` the plugin will use the time at `mkdocs build` instead of the file's last git revision date *when git is not available*. This means the revision date will be incorrect, but this can be acceptable if you want your project to also successfully build in environments with no access to GIT.
+
+### `enable_creation_date`
+
+Default is `false`. If set to `true`, you will be able to use `{{git_creation_date_localized}}` in markdown files and `page.meta.git_creation_date_localized` in page templates.
 
 ### `exclude`
 
