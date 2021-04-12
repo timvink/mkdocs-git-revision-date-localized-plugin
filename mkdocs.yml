@@ -1,0 +1,43 @@
+site_name: "mkdocs-git-revision-date-localized-plugin"
+site_description: "Mkdocs plugin that enables displaying the localized date of the last git modification of a markdown file."
+edit_uri: ''
+copyright: 'Copyright &copy; 2021'
+repo_url: https://github.com/timvink/mkdocs-git-revision-date-localized-plugin
+
+nav:
+  - index.md
+  - usage.md
+  - options.md
+
+theme:
+    name: material
+    custom_dir: docs/overrides
+    icon:
+        logo: material/calendar-outline
+        repo: fontawesome/brands/github
+
+plugins:
+  - search
+  - git-revision-date-localized:
+      type: timeago
+      timezone: Europe/Amsterdam
+      locale: en
+      fallback_to_build_date: false
+      enable_creation_date: true
+
+markdown_extensions:
+    - meta
+    - admonition
+    - pymdownx.keys
+    - pymdownx.highlight
+    - pymdownx.inlinehilite
+    - pymdownx.snippets
+    - pymdownx.superfences
+    - pymdownx.details
+    - pymdownx.tabbed
+    - pymdownx.emoji:
+          emoji_index: !!python/name:materialx.emoji.twemoji
+          emoji_generator: !!python/name:materialx.emoji.to_svg
+          options:
+              custom_icons:
+                  - site/overrides/.icons
