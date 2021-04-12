@@ -1,0 +1,21 @@
+site_name: test gitrevisiondatelocalized_plugin
+use_directory_urls: true
+
+theme:
+    name: 'material'
+    custom_dir: docs/overrides_material_theme
+
+plugins:
+    - search
+    - git-revision-date-localized:
+        type: timeago
+        enable_creation_date: true
+
+
+nav:
+    - index.md
+    - first_page.md
+    - Subpage:
+        - subpage.md
+    - second_page.md
+    - page_with_tag.md

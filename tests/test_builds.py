@@ -200,14 +200,12 @@ def validate_build(testproject_path, plugin_config: dict = {}):
     contents = page_with_tag.read_text(encoding="utf8")
     assert re.search(r"renders as\:\s[<span>|\w].+", contents)
 
-    repo = Util(str(testproject_path / "docs"))
-    date_formats = repo.get_revision_date_for_file(
+    repo = Util(config=plugin_config)
+    date_formats = repo.get_date_formats_for_timestamp(
         commit_timestamp=repo.get_git_commit_timestamp(
             path=str(testproject_path / "docs/page_with_tag.md"),
             is_first_commit=False,
-            fallback_to_build_date=plugin_config.get("fallback_to_build_date"),
-        ),
-        locale=plugin_config.get("locale"),  # type: ignore
+        )
     )
 
     searches = [x in contents for x in date_formats.values()]
@@ -217,12 +215,10 @@ def validate_build(testproject_path, plugin_config: dict = {}):
         commit_timestamp=repo.get_git_commit_timestamp(
             path=str(testproject_path / "docs/page_with_tag.md"),
             is_first_commit=True,
-            fallback_to_build_date=plugin_config.get("fallback_to_build_date"),
         )
         assert commit_timestamp == 1500854705
-        date_formats = repo.get_revision_date_for_file(
+        date_formats = repo.get_date_formats_for_timestamp(
             commit_timestamp=commit_timestamp,
-            locale=plugin_config.get("locale"),  # type: ignore
         )
 
         searches = [x in contents for x in date_formats.values()]

@@ -29,7 +29,6 @@ class Util:
 
     def __init__(self, config={}):
         """Initialize utility class."""
-        self.fallback_enabled = False
         self.config = config
         self.repo_cache = {}
 
@@ -82,8 +81,7 @@ class Util:
     def get_git_commit_timestamp(
             self,
             path: str,
-            is_first_commit: bool,
-            fallback_to_build_date: bool = False,
+            is_first_commit: bool = False
     ) -> int:
         """
         Get a list of commit dates in unix timestamp, starts with the most recent commit.
@@ -92,34 +90,36 @@ class Util:
             is_first_commit (bool): if true, get the timestamp of the first commit,
                                     else, get that of the most recent commit.
             path (str): Location of a markdown file that is part of a Git repository.
+            is_first_commit (bool): retrieve commit timestamp when file was created.
 
         Returns:
-            list: commit dates in unix timestamp, starts with the most recent commit.
+            int: commit date in unix timestamp, starts with the most recent commit.
         """
-
         commit_timestamp = ""
 
         # perform git log operation
         try:
-            if not self.fallback_enabled:
-                # Retrieve author date in UNIX format (%at)
-                # https://git-scm.com/docs/git-log#Documentation/git-log.txt-ematem
-                realpath = os.path.realpath(path)
-                git = self._get_repo(realpath)
-                if is_first_commit:
-                    commit_timestamp = git.log(
-                        realpath, date="short", format="%at", diff_filter="A"
-                    )
-                else:
-                    commit_timestamp = git.log(
-                        realpath, date="short", format="%at", n=1
-                    )
+            # Retrieve author date in UNIX format (%at)
+            # https://git-scm.com/docs/git-log#Documentation/git-log.txt-ematem
+            # https://git-scm.com/docs/git-log#Documentation/git-log.txt---diff-filterACDMRTUXB82308203
+            realpath = os.path.realpath(path)
+            git = self._get_repo(realpath)
+            if is_first_commit:
+                # diff_filter="A" will select the commit that created the file
+                commit_timestamp = git.log(
+                    realpath, date="short", format="%at", diff_filter="A"
+                )
+            else:
+                commit_timestamp = git.log(
+                    realpath, date="short", format="%at", n=1
+                )
         except (InvalidGitRepositoryError, NoSuchPathError) as err:
-            if fallback_to_build_date:
+            if self.config.get('fallback_to_build_date'):
                 logger.warning(
                     "[git-revision-date-localized-plugin] Unable to find a git directory and/or git is not installed."
                     " Option 'fallback_to_build_date' set to 'true': Falling back to build date"
                 )
+                commit_timestamp = time.time()
             else:
                 logger.error(
                     "[git-revision-date-localized-plugin] Unable to find a git directory and/or git is not installed."
@@ -127,12 +127,13 @@ class Util:
                 )
                 raise err
         except GitCommandError as err:
-            if fallback_to_build_date:
+            if self.config.get('fallback_to_build_date'):
                 logger.warning(
                     "[git-revision-date-localized-plugin] Unable to read git logs of '%s'. Is git log readable?"
                     " Option 'fallback_to_build_date' set to 'true': Falling back to build date"
                     % path
                 )
+                commit_timestamp = time.time()
             else:
                 logger.error(
                     "[git-revision-date-localized-plugin] Unable to read git logs of '%s'. "
@@ -141,11 +142,12 @@ class Util:
                 )
                 raise err
         except GitCommandNotFound as err:
-            if fallback_to_build_date:
+            if self.config.get('fallback_to_build_date'):
                 logger.warning(
                     "[git-revision-date-localized-plugin] Unable to perform command: 'git log'. Is git installed?"
                     " Option 'fallback_to_build_date' set to 'true': Falling back to build date"
                 )
+                commit_timestamp = time.time()
             else:
                 logger.error(
                     "[git-revision-date-localized-plugin] Unable to perform command 'git log'. Is git installed?"
@@ -156,19 +158,16 @@ class Util:
         # create timestamp
         if commit_timestamp == "":
             commit_timestamp = time.time()
-            if not self.fallback_enabled:
-                logger.warning(
-                    "[git-revision-date-localized-plugin] '%s' has no git logs, using current timestamp"
-                    % path
-                )
+            logger.warning(
+                "[git-revision-date-localized-plugin] '%s' has no git logs, using current timestamp"
+                % path
+            )
 
         return int(commit_timestamp)
 
-    def get_revision_date_for_file(
+    def get_date_formats_for_timestamp(
         self,
         commit_timestamp: int,
-        locale: str = "en",
-        time_zone: str = "UTC",
     ) -> Dict[str, str]:
         """
         Determine localized date variants for a given file.
@@ -183,7 +182,9 @@ class Util:
         """
 
         date_formats = self._date_formats(
-            unix_timestamp=commit_timestamp, time_zone=time_zone, locale=locale
+            unix_timestamp=commit_timestamp, 
+            time_zone=self.config.get("time_zone"),
+            locale=self.config.get("locale")
         )
 
         # Wrap in <span> for styling
@@ -195,33 +196,3 @@ class Util:
 
         return date_formats
 
-    def get_creation_date_for_file(
-        self,
-        commit_timestamp: int,
-        locale: str = "en",
-        time_zone: str = "UTC",
-    ) -> Dict[str, str]:
-        """
-        Determine localized date variants for a given file.
-
-        Args:
-            commit_timestamp (int): the first commit date in unix timestamp.
-            locale (str, optional): Locale code of language to use. Defaults to 'en'.
-            time_zone (str): Timezone database name (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
-
-        Returns:
-            dict: Localized date variants.
-        """
-
-        date_formats = self._date_formats(
-            unix_timestamp=commit_timestamp, time_zone=time_zone, locale=locale
-        )
-
-        # Wrap in <span> for styling
-        for date_type, date_string in date_formats.items():
-            date_formats[date_type] = (
-                    '<span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-%s">%s</span>'
-                    % (date_type, date_string)
-            )
-
-        return date_formats

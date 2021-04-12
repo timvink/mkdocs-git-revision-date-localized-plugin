@@ -3,7 +3,7 @@ use_directory_urls: true
 
 theme:
     name: mkdocs
-    custom_dir: docs/overrides
+    custom_dir: docs/overrides_mkdocs_theme
 
 plugins:
     - search

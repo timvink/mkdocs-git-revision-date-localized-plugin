@@ -149,14 +149,11 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             return markdown
 
         # revision date
-        revision_dates = self.util.get_revision_date_for_file(
+        revision_dates = self.util.get_date_formats_for_timestamp(
             commit_timestamp=self.util.get_git_commit_timestamp(
                 path=page.file.abs_src_path,
                 is_first_commit=False,
-                fallback_to_build_date=self.config.get("fallback_to_build_date"),
-            ),
-            locale=self.config.get("locale", "en"),
-            time_zone=self.config.get("time_zone", "UTC"),
+            )
         )
         revision_date = revision_dates[self.config["type"]]
 
@@ -166,7 +163,9 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         if self.config["type"] == "timeago":
             revision_date += revision_dates["iso_date"]
 
+        # Add to page meta information
         page.meta["git_revision_date_localized"] = revision_date
+        # Replace any occurances in markdown page
         markdown = re.sub(
             r"\{\{\s*git_revision_date_localized\s*\}\}",
             revision_date,
@@ -176,17 +175,17 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
 
         # Creation date
         if self.config.get("enable_creation_date"):
-            creation_dates = self.util.get_creation_date_for_file(
+            creation_dates = self.util.get_date_formats_for_timestamp(
                 commit_timestamp=self.util.get_git_commit_timestamp(
                     path=page.file.abs_src_path,
                     is_first_commit=True,
-                    fallback_to_build_date=self.config.get("fallback_to_build_date"),
-                ),
-                locale=self.config.get("locale", "en"),
-                time_zone=self.config.get("time_zone", "UTC"),
+                )
             )
             creation_date = creation_dates[self.config["type"]]
 
+            # timeago output is dynamic, which breaks when you print a page
+            # This ensures fallback to type "iso_date"
+            # controlled via CSS (see on_post_build() event)
             if self.config["type"] == "timeago":
                 creation_date += creation_dates["iso_date"]
 
