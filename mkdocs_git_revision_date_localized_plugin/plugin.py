@@ -168,7 +168,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
 
         page.meta["git_revision_date_localized"] = revision_date
         markdown = re.sub(
-            r"\{\{\s*[page\.meta\.]*git_revision_date_localized\s*\}\}",
+            r"\{\{\s*git_revision_date_localized\s*\}\}",
             revision_date,
             markdown,
             flags=re.IGNORECASE,
@@ -192,7 +192,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
 
             page.meta["git_creation_date_localized"] = creation_date
             markdown = re.sub(
-                r"\{\{\s*[page\.meta\.]*git_creation_date_localized\s*\}\}",
+                r"\{\{\s*git_creation_date_localized\s*\}\}",
                 creation_date,
                 markdown,
                 flags=re.IGNORECASE,
