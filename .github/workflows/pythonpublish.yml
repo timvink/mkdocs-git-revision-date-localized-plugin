@@ -8,9 +8,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Set up Python
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: '3.x'
     - name: Install dependencies
@@ -22,7 +22,8 @@ jobs:
         git config --global user.name "Github Action"
         git config --global user.email "githubaction@gmail.com"
         pip install -r tests/test_requirements.txt
-        pip install -e .
+        pip install mkdocs-material
+        pip install .
         pytest
     - name: Build and publish
       env:
@@ -31,3 +32,7 @@ jobs:
       run: |
         python setup.py sdist bdist_wheel
         twine upload dist/*
+
+    - name: Deploy mkdocs site
+      run: | 
+        mkdocs gh-deploy --force
