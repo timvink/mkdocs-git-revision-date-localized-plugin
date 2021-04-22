@@ -6,12 +6,14 @@ repo_url: https://github.com/timvink/mkdocs-git-revision-date-localized-plugin
 
 nav:
   - index.md
-  - usage.md
+  - getting-started.md
+  - How to:
+      - howto/custom-styling.md
+      - howto/override-a-theme.md
   - options.md
 
 theme:
     name: material
-    custom_dir: docs/overrides
     icon:
         logo: material/calendar-outline
         repo: fontawesome/brands/github

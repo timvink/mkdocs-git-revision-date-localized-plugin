@@ -16,7 +16,7 @@ plugins:
 
 ## `type`
 
-Default is `date`. To change the date format, set the `type` parameter to one of `date`, `datetime`, `iso_date`, `iso_datetime` or `timeago`. Example outputs:
+Default is `date`. The format of the date to be displayed. Valid values are `date`, `datetime`, `iso_date`, `iso_datetime` and `timeago`. Example outputs:
 
 ```
 28 November, 2019           # type: date (default)
@@ -51,17 +51,11 @@ hace 2 semanas                # `locale: es` with `type: timeago`
 
 ## `fallback_to_build_date`
 
-Default is `false`. If set to `true` the plugin will use the time at `mkdocs build` instead of the file's last git revision date *when git is not available*. This means the revision date will be incorrect, but this can be acceptable if you want your project to also successfully build in environments with no access to GIT.
+Default is `false`. Enables falling back to the time when `mkdocs build` was executed *when git is not available*. This means the revision date will be incorrect, but this can be acceptable if you want your project to also successfully build in environments with no access to GIT.
 
 ## `enable_creation_date`
 
-Default is `false`. If set to `true`, you will be able to use <code>\{\{ git_creation_date_localized }}</code> in markdown files and `page.meta.git_creation_date_localized` in page templates.
-
-!!! Warning "not yet supported by Cmkdocs-material"
-
-    This feature was recently added, and native support for it has yet to be decided & implemented. See [!50](https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/pull/50) for updates.
-    You can add support manually as described in [usage](usage.md#mkdocs-material-theme).
-
+Default is `false`. Enables adding a *Created* date at the bottom of each page on [supported themes](getting-started.md#supported-themes). Also enables use of <code>\{\{ git_creation_date_localized }}</code> in markdown files and `page.meta.git_creation_date_localized` in page templates.
 
 ## `exclude`
 
