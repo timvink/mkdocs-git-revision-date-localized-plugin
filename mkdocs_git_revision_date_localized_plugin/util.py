@@ -112,7 +112,8 @@ class Util:
                 # A file can be created multiple times, through a file renamed. 
                 # Commits are ordered with most recent commit first
                 # Get the oldest commit only
-                commit_timestamp = commit_timestamp.split()[-1]
+                if commit_timestamp != "":
+                    commit_timestamp = commit_timestamp.split()[-1]
             else:
                 commit_timestamp = git.log(
                     realpath, date="short", format="%at", n=1
