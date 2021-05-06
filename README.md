@@ -14,6 +14,11 @@
 
 (*Example when used together with the [mkdocs-material](https://github.com/squidfunk/mkdocs-material) theme*)
 
+Other MkDocs plugins that use information from git:
+
+- [mkdocs-git-authors-plugin](https://github.com/timvink/mkdocs-git-authors-plugin) for displaying the authors from git
+- [mkdocs-git-committers-plugin](https://github.com/byrnereese/mkdocs-git-committers-plugin) for displaying authors' github user profiles
+
 ## Setup
 
 Install the plugin using `pip3` with the following command:
