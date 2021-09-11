@@ -1,0 +1,11 @@
+site_name: test gitrevisiondatelocalized_plugin
+use_directory_urls: true
+
+theme:
+    name: 'material'
+    locale: nl
+
+plugins:
+    - search
+    - git-revision-date-localized:
+        enabled: !ENV [ENABLED_GIT_REVISION_DATE, False]
