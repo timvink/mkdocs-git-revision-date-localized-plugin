@@ -38,6 +38,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         ("timezone", config_options.Type(str, default="UTC")),
         ("exclude", config_options.Type(list, default=[])),
         ("enable_creation_date", config_options.Type(bool, default=False)),
+        ("enabled", config_options.Type(bool, default=True)),
     )
 
     def on_config(self, config: config_options.Config, **kwargs) -> Dict[str, Any]:
@@ -55,6 +56,9 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         Returns:
             dict: global configuration object
         """
+        if not self.config.get('enabled'):
+            return config
+        
         self.util = Util(config=self.config)
 
         # Get locale settings - might be added in future mkdocs versions
@@ -142,6 +146,9 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         Returns:
             str: Markdown source text of page as string
         """
+        if not self.config.get('enabled'):
+            return markdown
+
         # Exclude pages specified in config
         excluded_pages = self.config.get("exclude", [])
         if exclude(page.file.src_path, excluded_pages):
@@ -206,7 +213,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         Adds the timeago assets to the build.
         """
         # Add timeago files:
-        if self.config.get("type") == "timeago":
+        if self.config.get("type") == "timeago" and self.config.get('enabled'):
             files = [
                 "js/timeago.min.js",
                 "js/timeago_mkdocs_material.js",

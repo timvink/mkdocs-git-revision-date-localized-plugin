@@ -51,14 +51,15 @@ def get_plugin_config_from_mkdocs(mkdocs_path) -> dict:
     cfg = plugin_loaded.on_config(cfg_mkdocs)
     logging.info("Fixture configuration loaded: " + str(cfg))
 
-    assert (
-        plugin_loaded.config.get("locale") is not None
-    ), "Locale should never be None after plugin is loaded"
+    if plugin_loaded.config.get("enabled"):
+        assert (
+            plugin_loaded.config.get("locale") is not None
+        ), "Locale should never be None after plugin is loaded"
 
-    logging.info(
-        "Locale '%s' determined from %s"
-        % (plugin_loaded.config.get("locale"), mkdocs_path)
-    )
+        logging.info(
+            "Locale '%s' determined from %s"
+            % (plugin_loaded.config.get("locale"), mkdocs_path)
+        )
     return plugin_loaded.config
 
 
@@ -196,6 +197,9 @@ def validate_build(testproject_path, plugin_config: dict = {}):
 
     # Make sure with markdown tag has valid
     # git revision date tag
+    if not plugin_config.get('enabled'):
+        return 
+    
     page_with_tag = testproject_path / "site/page_with_tag/index.html"
     contents = page_with_tag.read_text(encoding="utf8")
     assert re.search(r"renders as\:\s[<span>|\w].+", contents)
@@ -345,6 +349,23 @@ def test_material_theme_locale(tmp_path):
     index_file = testproject_path / "site/index.html"
     contents = index_file.read_text(encoding="utf8")
     assert re.search(r"Last update\:\s[<span class].+", contents)
+
+def test_material_theme_locale_disabled(tmp_path):
+    """
+    When using mkdocs-material theme, test correct working
+    """
+    # theme set to 'material' with 'locale' set to 'de'
+    testproject_path = validate_mkdocs_file(
+        tmp_path, "tests/fixtures/basic_project/mkdocs_theme_locale_disabled.yml"
+    )
+
+    # In mkdocs-material, a 'last update' should appear
+    # in english instead of German because you should use 'language' and not locale.
+    # The date will be in german though
+    index_file = testproject_path / "site/index.html"
+    contents = index_file.read_text(encoding="utf8")
+    assert re.search(r"Last update\:\s[<span class].+", contents) is None
+
 
 
 def test_material_theme_no_locale(tmp_path):
