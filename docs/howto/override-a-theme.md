@@ -87,3 +87,21 @@ When writing your own [custom themes](https://www.mkdocs.org/user-guide/custom-t
   Last update: {{ page.meta.git_revision_date_localized }}
 {% endif %}
 ```
+
+As a developer you might want access to more raw date formats that also do not have the `<span>` elements. You can also use:
+
+- `page.meta.git_revision_date_localized`
+- `page.meta.git_revision_date_localized_raw_date`
+- `page.meta.git_revision_date_localized_raw_datetime`
+- `page.meta.git_revision_date_localized_raw_iso_date`
+- `page.meta.git_revision_date_localized_raw_iso_datetime`
+- `page.meta.git_revision_date_localized_raw_timeago`
+
+And if you've enable creation date in the config:
+
+- `page.meta.git_creation_date_localized`
+- `page.meta.git_creation_date_localized_raw_date`
+- `page.meta.git_creation_date_localized_raw_datetime`
+- `page.meta.git_creation_date_localized_raw_iso_date`
+- `page.meta.git_creation_date_localized_raw_iso_datetime`
+- `page.meta.git_creation_date_localized_raw_timeago`

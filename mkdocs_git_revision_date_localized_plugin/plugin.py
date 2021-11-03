@@ -204,6 +204,31 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
                 flags=re.IGNORECASE,
             )
 
+        # Developers might want access to the raw date strings
+        # Let's expose them also
+        revision_dates = self.util._date_formats(
+            unix_timestamp=self.util.get_git_commit_timestamp(
+                path=page.file.abs_src_path,
+                is_first_commit=False,
+            ),
+            time_zone=self.config.get("time_zone"),
+            locale=self.config.get("locale")
+        )
+        for date_type, date_string in revision_dates.items():
+            page.meta["git_revision_date_localized_raw_%s" % date_type] = date_string
+
+        if self.config.get("enable_creation_date"):
+            creation_dates = self.util._date_formats(
+                unix_timestamp=self.util.get_git_commit_timestamp(
+                    path=page.file.abs_src_path,
+                    is_first_commit=False,
+                ),
+                time_zone=self.config.get("time_zone"),
+                locale=self.config.get("locale")
+            )
+            for date_type, date_string in creation_dates.items():
+                page.meta["git_creation_date_localized_raw_%s" % date_type] = date_string
+
         return markdown
 
     def on_post_build(self, config: Dict[str, Any], **kwargs) -> None:
