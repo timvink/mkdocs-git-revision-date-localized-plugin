@@ -155,13 +155,14 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             logging.debug("Excluding page " + page.file.src_path)
             return markdown
 
-        # revision date
-        revision_dates = self.util.get_date_formats_for_timestamp(
-            commit_timestamp=self.util.get_git_commit_timestamp(
+        # Retrieve git commit timestamp
+        last_revision_timestamp = self.util.get_git_commit_timestamp(
                 path=page.file.abs_src_path,
                 is_first_commit=False,
-            )
         )
+
+        # Last revision date
+        revision_dates = self.util.get_date_formats_for_timestamp(last_revision_timestamp)
         revision_date = revision_dates[self.config["type"]]
 
         # timeago output is dynamic, which breaks when you print a page
@@ -170,8 +171,13 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         if self.config["type"] == "timeago":
             revision_date += revision_dates["iso_date"]
 
-        # Add to page meta information
+        # Add to page meta information, for developers
+        # Include variants without the CSS <span> elements (raw date strings)
         page.meta["git_revision_date_localized"] = revision_date
+        revision_dates_raw = self.util.get_date_formats_for_timestamp(last_revision_timestamp, add_spans=False)
+        for date_type, date_string in revision_dates_raw.items():
+            page.meta["git_revision_date_localized_raw_%s" % date_type] = date_string
+
         # Replace any occurances in markdown page
         markdown = re.sub(
             r"\{\{\s*git_revision_date_localized\s*\}\}",
@@ -180,54 +186,41 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             flags=re.IGNORECASE,
         )
 
-        # Creation date
-        if self.config.get("enable_creation_date"):
-            creation_dates = self.util.get_date_formats_for_timestamp(
-                commit_timestamp=self.util.get_git_commit_timestamp(
-                    path=page.file.abs_src_path,
-                    is_first_commit=True,
-                )
-            )
-            creation_date = creation_dates[self.config["type"]]
-
-            # timeago output is dynamic, which breaks when you print a page
-            # This ensures fallback to type "iso_date"
-            # controlled via CSS (see on_post_build() event)
-            if self.config["type"] == "timeago":
-                creation_date += creation_dates["iso_date"]
-
-            page.meta["git_creation_date_localized"] = creation_date
-            markdown = re.sub(
-                r"\{\{\s*git_creation_date_localized\s*\}\}",
-                creation_date,
-                markdown,
-                flags=re.IGNORECASE,
-            )
-
-        # Developers might want access to the raw date strings
-        # Let's expose them also
-        revision_dates = self.util._date_formats(
-            unix_timestamp=self.util.get_git_commit_timestamp(
-                path=page.file.abs_src_path,
-                is_first_commit=False,
-            ),
-            time_zone=self.config.get("time_zone"),
-            locale=self.config.get("locale")
+        # If creation date not enabled, return markdown
+        # This is for speed: prevents another `git log` operation each file
+        if not self.config.get("enable_creation_date"):
+            return markdown
+    
+        # Retrieve git commit timestamp
+        first_revision_timestamp = self.util.get_git_commit_timestamp(
+            path=page.file.abs_src_path,
+            is_first_commit=True,
         )
-        for date_type, date_string in revision_dates.items():
-            page.meta["git_revision_date_localized_raw_%s" % date_type] = date_string
 
-        if self.config.get("enable_creation_date"):
-            creation_dates = self.util._date_formats(
-                unix_timestamp=self.util.get_git_commit_timestamp(
-                    path=page.file.abs_src_path,
-                    is_first_commit=False,
-                ),
-                time_zone=self.config.get("time_zone"),
-                locale=self.config.get("locale")
-            )
-            for date_type, date_string in creation_dates.items():
-                page.meta["git_creation_date_localized_raw_%s" % date_type] = date_string
+        # Creation date formats
+        creation_dates = self.util.get_date_formats_for_timestamp(first_revision_timestamp)
+        creation_date = creation_dates[self.config["type"]]
+
+        # timeago output is dynamic, which breaks when you print a page
+        # This ensures fallback to type "iso_date"
+        # controlled via CSS (see on_post_build() event)
+        if self.config["type"] == "timeago":
+            creation_date += creation_dates["iso_date"]
+
+        # Add to page meta information, for developers
+        # Include variants without the CSS <span> elements (raw date strings)
+        page.meta["git_creation_date_localized"] = creation_date
+        creation_dates_raw = self.util.get_date_formats_for_timestamp(first_revision_timestamp, add_spans=False)
+        for date_type, date_string in creation_dates_raw.items():
+            page.meta["git_creation_date_localized_raw_%s" % date_type] = date_string
+
+        # Replace any occurances in markdown page
+        markdown = re.sub(
+            r"\{\{\s*git_creation_date_localized\s*\}\}",
+            creation_date,
+            markdown,
+            flags=re.IGNORECASE,
+        )
 
         return markdown
 

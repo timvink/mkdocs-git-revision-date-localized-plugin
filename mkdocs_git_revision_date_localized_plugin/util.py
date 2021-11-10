@@ -2,7 +2,7 @@
 import logging
 import os
 import time
-from datetime import datetime
+from datetime import date, datetime
 
 from mkdocs_git_revision_date_localized_plugin.ci import raise_ci_warnings
 
@@ -173,9 +173,10 @@ class Util:
     def get_date_formats_for_timestamp(
         self,
         commit_timestamp: int,
+        add_spans: bool = True
     ) -> Dict[str, str]:
         """
-        Determine localized date variants for a given file.
+        Determine localized date variants for a given timestamp.
 
         Args:
             commit_timestamp (int): most recent commit date in unix timestamp.
@@ -185,19 +186,25 @@ class Util:
         Returns:
             dict: Localized date variants.
         """
-
         date_formats = self._date_formats(
             unix_timestamp=commit_timestamp, 
             time_zone=self.config.get("time_zone"),
             locale=self.config.get("locale")
         )
+        if add_spans:
+            date_formats = self.add_spans(date_formats)
 
-        # Wrap in <span> for styling
+        return date_formats
+
+
+    @staticmethod
+    def add_spans(date_formats: Dict[str, str]) -> Dict[str, str]:
+        """
+        Wraps the date string in <span> elements with CSS identifiers.
+        """
         for date_type, date_string in date_formats.items():
             date_formats[date_type] = (
                 '<span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-%s">%s</span>'
                 % (date_type, date_string)
             )
-
         return date_formats
-
