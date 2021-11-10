@@ -2,7 +2,7 @@
 import logging
 import os
 import time
-from datetime import date, datetime
+from datetime import datetime
 
 from mkdocs_git_revision_date_localized_plugin.ci import raise_ci_warnings
 
