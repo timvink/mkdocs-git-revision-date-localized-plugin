@@ -1,0 +1,36 @@
+name: Scheduled unit tests
+# Controls when the action will run.
+# Every week "At 07:17 on Sunday."
+# See https://crontab.guru/#17_7_*_*_7
+
+# This way we know for sure package will keep working with
+# potential new downstream updates
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 7 * * 7"
+
+jobs:
+  run:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+
+    - name: Setup Python
+      uses: actions/setup-python@master
+      with:
+        python-version: 3.9
+
+    - name: Install dependencies
+      run: |
+        pip3 install --upgrade pip
+        pip3 install --upgrade setuptools
+        pip3 install --upgrade wheel
+        pip3 install -r tests/test_requirements.txt
+        pip3 install .
+
+    - name: Run unit tests
+      run: |
+        pytest
+  
