@@ -32,5 +32,7 @@ jobs:
 
     - name: Run unit tests
       run: |
+        git config --global user.name "Github Action"
+        git config --global user.email "githubaction@gmail.com"
         pytest
   
