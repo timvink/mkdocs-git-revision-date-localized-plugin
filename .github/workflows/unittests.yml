@@ -25,7 +25,7 @@ jobs:
         pip3 install --upgrade wheel
         pip3 install pyflakes
         pip3 install -r tests/test_requirements.txt
-        pip3 install -e .
+        pip3 install .
 
     - name: Static code checking with pyflakes
       run: |
