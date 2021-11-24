@@ -121,3 +121,12 @@ And if you've enable creation date in the config:
 - `page.meta.git_creation_date_localized_raw_iso_date`
 - `page.meta.git_creation_date_localized_raw_iso_datetime`
 - `page.meta.git_creation_date_localized_raw_timeago`
+
+And finally there are variants that contain the latest revision date of your entire site. This is the last commit on any file in the `docs/` directory, which is added to the meta information of every page.
+
+- `page.meta.git_site_revision_date_localized`
+- `page.meta.git_site_revision_date_localized_raw_datetime`
+- `page.meta.git_site_revision_date_localized_raw_iso_date`
+- `page.meta.git_site_revision_date_localized_raw_date`
+- `page.meta.git_site_revision_date_localized_raw_iso_datetime`
+- `page.meta.git_site_revision_date_localized_raw_timeago`

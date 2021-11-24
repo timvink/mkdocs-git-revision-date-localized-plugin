@@ -37,5 +37,10 @@
     {% elif page.meta.revision_date %}
       {{ label }}: {{ page.meta.revision_date }}
     {% endif %}
+
+    {% if page.meta.git_site_revision_date_localized %}
+    <br />Site last updated: {{ page.meta.git_site_revision_date_localized }}
+    {% endif %}
+    
   </small>
 </div>

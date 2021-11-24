@@ -104,6 +104,7 @@ class Util:
             # https://git-scm.com/docs/git-log#Documentation/git-log.txt---diff-filterACDMRTUXB82308203
             realpath = os.path.realpath(path)
             git = self._get_repo(realpath)
+
             if is_first_commit:
                 # diff_filter="A" will select the commit that created the file
                 commit_timestamp = git.log(
@@ -115,6 +116,7 @@ class Util:
                 if commit_timestamp != "":
                     commit_timestamp = commit_timestamp.split()[-1]
             else:
+                # Latest commit touching a specific file
                 commit_timestamp = git.log(
                     realpath, date="short", format="%at", n=1
                 )
