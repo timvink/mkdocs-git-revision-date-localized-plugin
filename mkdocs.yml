@@ -6,7 +6,7 @@ repo_url: https://github.com/timvink/mkdocs-git-revision-date-localized-plugin
 
 nav:
   - index.md
-  - getting-started.md
+  - available-variables.md
   - How to:
       - howto/custom-styling.md
       - howto/override-a-theme.md
@@ -14,12 +14,18 @@ nav:
 
 theme:
     name: material
+    custom_dir: docs/overrides
     icon:
         logo: material/calendar-outline
         repo: fontawesome/brands/github
+    features:
+        - content.tabs.link
 
 plugins:
   - search
+  - git-authors:
+        exclude:
+            - index.md
   - git-revision-date-localized:
       type: timeago
       timezone: Europe/Amsterdam
@@ -36,7 +42,8 @@ markdown_extensions:
     - pymdownx.snippets
     - pymdownx.superfences
     - pymdownx.details
-    - pymdownx.tabbed
+    - pymdownx.tabbed:
+        alternate_style: true 
     - pymdownx.emoji:
           emoji_index: !!python/name:materialx.emoji.twemoji
           emoji_generator: !!python/name:materialx.emoji.to_svg

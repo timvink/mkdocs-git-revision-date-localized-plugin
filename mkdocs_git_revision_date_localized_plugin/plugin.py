@@ -61,6 +61,11 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         
         self.util = Util(config=self.config)
 
+        # Save last commit timestamp for entire site
+        self.last_site_revision_timestamp = self.util.get_git_commit_timestamp(
+            config.get('docs_dir')
+        )
+
         # Get locale settings - might be added in future mkdocs versions
         # see: https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/24
         mkdocs_locale = config.get("locale", None)
@@ -221,6 +226,17 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             markdown,
             flags=re.IGNORECASE,
         )
+
+        # Finally,
+        # Also add site last updated information, for developers
+        site_dates = self.util.get_date_formats_for_timestamp(self.last_site_revision_timestamp)
+        site_date = site_dates[self.config["type"]]
+        if self.config["type"] == "timeago":
+            site_date += site_dates["iso_date"]
+        page.meta["git_site_revision_date_localized"] = site_date
+        site_dates_raw = self.util.get_date_formats_for_timestamp(self.last_site_revision_timestamp, add_spans=False)
+        for date_type, date_string in site_dates_raw.items():
+            page.meta["git_site_revision_date_localized_raw_%s" % date_type] = date_string
 
         return markdown
 
