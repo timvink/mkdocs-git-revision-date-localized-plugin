@@ -2,24 +2,26 @@
 
 You can customize the plugin by setting options in `mkdocs.yml`. For example:
 
-```yaml
-plugins:
-  - git-revision-date-localized:
-      type: timeago
-      timezone: Europe/Amsterdam
-      locale: en
-      fallback_to_build_date: false
-      enable_creation_date: true
-      exclude:
-          - index.md
-      enabled: true
-```
+=== ":octicons-file-code-16: mkdocs.yml"
+
+  ```yaml
+  plugins:
+    - git-revision-date-localized:
+        type: timeago
+        timezone: Europe/Amsterdam
+        locale: en
+        fallback_to_build_date: false
+        enable_creation_date: true
+        exclude:
+            - index.md
+        enabled: true
+  ```
 
 ## `type`
 
 Default is `date`. The format of the date to be displayed. Valid values are `date`, `datetime`, `iso_date`, `iso_datetime` and `timeago`. Example outputs:
 
-```
+```yaml
 28 November, 2019           # type: date (default)
 28 November, 2019 13:57:28  # type: datetime
 2019-11-28                  # type: iso_date
@@ -41,7 +43,7 @@ Default is `None`. Specify a two letter [ISO639](https://en.wikipedia.org/wiki/L
 
 Example outputs:
 
-```
+```yaml
 27 April, 2021                # `locale: en` with `type: date` (default)
 27 April, 2021 13:11:28       # `locale: en` with `type: datetime`
 2 weeks ago                   # `locale: en` with `type: timeago`
@@ -56,33 +58,35 @@ Default is `false`. Enables falling back to the time when `mkdocs build` was exe
 
 ## `enable_creation_date`
 
-Default is `false`. Enables adding a *Created* date at the bottom of each page on [supported themes](getting-started.md#supported-themes). Also enables use of <code>\{\{ git_creation_date_localized }}</code> in markdown files and `page.meta.git_creation_date_localized` in page templates.
+Default is `false` (because it has a small effect on build time). Enables adding a *Created* date at the bottom of each page on [supported themes](getting-started.md#supported-themes). Also enables use of <code>\{\{ git_creation_date_localized }}</code> in markdown files and `page.meta.git_creation_date_localized` in page templates.
 
 ## `exclude`
 
 Default is empty. Specify a list of page source paths (one per line) that should not have a revision date included (excluded from processing by this plugin). This can be useful for example to remove the revision date from the front page. The source path of a page is relative to your `docs/` folder. You can also use [globs](https://docs.python.org/3/library/glob.html) instead of full source paths. To exclude `docs/subfolder/page.md` specify in your `mkdocs.yml` a line under `exclude:` with `- subfolder/page.md`. Some examples:
 
-```yaml
-# mkdocs.yml
-plugins:
-  - git-revision-date-localized:
-      exclude:
-        - index.md
-        - subfolder/page.md
-        - another_page.md
-        - folder/*
-```
+=== ":octicons-file-code-16: mkdocs.yml"
+
+  ```yaml
+  plugins:
+    - git-revision-date-localized:
+        exclude:
+          - index.md
+          - subfolder/page.md
+          - another_page.md
+          - folder/*
+  ```
 
 ## `enabled`
 
 Default is `true`. Enables you to deactivate this plugin. A possible use case is local development where you might want faster build times and/or do not have git available. It's recommended to use this option with an environment variable together with a default fallback (introduced in `mkdocs` v1.2.1, see [docs](https://www.mkdocs.org/user-guide/configuration/#environment-variables)). Example:
 
-```yaml
-# mkdocs.yml
-plugins:
-  - git-revision-date-localized:
-      enabled: !ENV [ENABLED_GIT_REVISION_DATE, True]
-```
+=== ":octicons-file-code-16: mkdocs.yml"
+
+  ```yaml
+  plugins:
+    - git-revision-date-localized:
+        enabled: !ENV [ENABLED_GIT_REVISION_DATE, True]
+  ```
 
 Which enables you do disable the plugin locally using:
 
