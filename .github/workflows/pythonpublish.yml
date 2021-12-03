@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch_depth: '0'
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
@@ -35,4 +37,5 @@ jobs:
 
     - name: Deploy mkdocs site
       run: | 
+        pip install mkdocs-git-authors-plugin
         mkdocs gh-deploy --force

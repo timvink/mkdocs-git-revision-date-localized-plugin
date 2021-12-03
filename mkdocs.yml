@@ -14,12 +14,16 @@ nav:
 
 theme:
     name: material
+    custom_dir: docs/overrides
     icon:
         logo: material/calendar-outline
         repo: fontawesome/brands/github
 
 plugins:
   - search
+  - git-authors:
+        exclude:
+            - index.md
   - git-revision-date-localized:
       type: timeago
       timezone: Europe/Amsterdam
