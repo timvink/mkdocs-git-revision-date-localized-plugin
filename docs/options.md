@@ -58,7 +58,7 @@ Default is `false`. Enables falling back to the time when `mkdocs build` was exe
 
 ## `enable_creation_date`
 
-Default is `false` (because it has a small effect on build time). Enables adding a *Created* date at the bottom of each page on [supported themes](getting-started.md#supported-themes). Also enables use of <code>\{\{ git_creation_date_localized }}</code> in markdown files and `page.meta.git_creation_date_localized` in page templates.
+Default is `false` (because it has a small effect on build time). Enables a *Created* date variables, see [available-variables.md]. This will also add a created date at the bottom of each page in `mkdocs-material` as it has native support (see [overriding a theme](howto/override-a-theme.md)).
 
 ## `exclude`
 
