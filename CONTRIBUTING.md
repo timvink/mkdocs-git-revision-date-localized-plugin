@@ -7,17 +7,6 @@ Thanks for considering to contribute to this project! Some guidelines:
 - This package tries to be as simple as possible for the user (hide any complexity from the user). New options are only added when there is clear value to the majority of users.
 - When issues or pull requests are not going to be resolved or merged, they should be closed as soon as possible. This is kinder than deciding this after a long period. Our issue tracker should reflect work to be done.
 
-## Vision
-
-There are multiple mkdocs plugins that use information from the local git repo. 
-
-In order to simplify user experience and maintenance,
-I intend to merge functionality in this plugin with [mkdocs-git-authors-plugin](https://github.com/timvink/mkdocs-git-authors-plugin).
-See https://github.com/timvink/mkdocs-git-authors-plugin/issues/16 for a similar roadmap issue with more details.
-
-That means not extending the functionality of this plugin, but rather aiming to create a simple, stable release that can go into 'maintenance mode'.
-If users want more information extracted from Git, they can go to [mkdocs-git-authors-plugin](https://github.com/timvink/mkdocs-git-authors-plugin).
-
 ## Unit Tests
 
 Make sure to install an editable version before running the tests:
