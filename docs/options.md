@@ -88,7 +88,7 @@ Default is `true`. Enables you to deactivate this plugin. A possible use case is
         enabled: !ENV [ENABLED_GIT_REVISION_DATE, True]
   ```
 
-Which enables you do disable the plugin locally using:
+Which enables you to disable the plugin locally using:
 
 ```bash
 export ENABLED_GIT_REVISION_DATE=false
