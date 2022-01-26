@@ -59,18 +59,27 @@ If you want, you can customize further by [extending the mkdocs-material theme](
     ```html
     {% import "partials/language.html" as lang with context %}
 
-    <!-- Last updated date -->
-    {% set label = lang.t("source.file.date.updated") %}
+    <!-- taken from 
+    https://github.com/squidfunk/mkdocs-material/blob/master/src/partials/source-file.html -->
+    
     <hr />
-    <div class="md-source-date">
+    <div class="md-source-file">
     <small>
 
         <!-- mkdocs-git-revision-date-localized-plugin -->
         {% if page.meta.git_revision_date_localized %}
-        {{ label }}: {{ page.meta.git_revision_date_localized }}
-
+        {{ lang.t("source.file.date.updated") }}:
+        {{ page.meta.git_revision_date_localized }}
         {% if page.meta.git_creation_date_localized %}
-            <br />{{ lang.t("source.file.date.created") }}: {{ page.meta.git_creation_date_localized }} 
+            <br />
+            {{ lang.t("source.file.date.created") }}:
+            {{ page.meta.git_creation_date_localized }}
+        {% endif %}
+
+        <!-- mkdocs-git-revision-date-plugin -->
+        {% elif page.meta.revision_date %}
+        {{ lang.t("source.file.date.updated") }}:
+        {{ page.meta.revision_date }}
         {% endif %}
     </small>
     </div>
