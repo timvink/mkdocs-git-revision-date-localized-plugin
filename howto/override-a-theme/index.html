@@ -486,18 +486,27 @@ Then you can extend the base <code>mkdocs</code> theme by adding a new file <cod
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code>{% import &quot;partials/language.html&quot; as lang with context %}
 
-<span class="c">&lt;!-- Last updated date --&gt;</span>
-{% set label = lang.t(&quot;source.file.date.updated&quot;) %}
+<span class="c">&lt;!-- taken from </span>
+<span class="c">https://github.com/squidfunk/mkdocs-material/blob/master/src/partials/source-file.html --&gt;</span>
+
 <span class="p">&lt;</span><span class="nt">hr</span> <span class="p">/&gt;</span>
-<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;md-source-date&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;md-source-file&quot;</span><span class="p">&gt;</span>
 <span class="p">&lt;</span><span class="nt">small</span><span class="p">&gt;</span>
 
     <span class="c">&lt;!-- mkdocs-git-revision-date-localized-plugin --&gt;</span>
     {% if page.meta.git_revision_date_localized %}
-    {{ label }}: {{ page.meta.git_revision_date_localized }}
-
+    {{ lang.t(&quot;source.file.date.updated&quot;) }}:
+    {{ page.meta.git_revision_date_localized }}
     {% if page.meta.git_creation_date_localized %}
-        <span class="p">&lt;</span><span class="nt">br</span> <span class="p">/&gt;</span>{{ lang.t(&quot;source.file.date.created&quot;) }}: {{ page.meta.git_creation_date_localized }} 
+        <span class="p">&lt;</span><span class="nt">br</span> <span class="p">/&gt;</span>
+        {{ lang.t(&quot;source.file.date.created&quot;) }}:
+        {{ page.meta.git_creation_date_localized }}
+    {% endif %}
+
+    <span class="c">&lt;!-- mkdocs-git-revision-date-plugin --&gt;</span>
+    {% elif page.meta.revision_date %}
+    {{ lang.t(&quot;source.file.date.updated&quot;) }}:
+    {{ page.meta.revision_date }}
     {% endif %}
 <span class="p">&lt;/</span><span class="nt">small</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
@@ -511,7 +520,7 @@ Then you can extend the base <code>mkdocs</code> theme by adding a new file <cod
   <small>
     
       Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago"><span class="timeago" datetime="2021-12-03T22:37:43+01:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date">2021-12-03</span>
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago"><span class="timeago" datetime="2022-01-26T08:54:37+01:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date">2022-01-26</span>
       
         <br>
         Created:
