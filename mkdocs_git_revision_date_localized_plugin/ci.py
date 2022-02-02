@@ -46,6 +46,19 @@ def raise_ci_warnings(repo) -> None:
                 """
         )
 
+    # Azure Devops Pipeline
+    # Does not limit fetch-depth by default
+    elif int(os.getenv("Agent.Source.Git.ShallowFetchDepth", 10e99)) < n_commits:
+        logging.warning(
+            """
+                [git-revision-date-localized-plugin] Running on Azure pipelines with limited
+                fetch-depth might lead to wrong git revision dates due to a shallow git fetch depth.
+
+                Remove any Shallow Fetch settings
+                (see https://docs.microsoft.com/en-us/azure/devops/pipelines/repos/pipeline-options-for-git?view=azure-devops#shallow-fetch).
+                """
+        )
+
     # Bitbucket pipelines
     elif os.getenv("CI") is not None and n_commits < 50:
         # Default is fetch-depth of 50 for bitbucket pipelines
@@ -60,18 +73,6 @@ def raise_ci_warnings(repo) -> None:
                 """
         )
 
-    # Azure Devops Pipeline
-    # Does not limit fetch-depth by default
-    elif int(os.getenv("Agent.Source.Git.ShallowFetchDepth", 10e99)) < n_commits:
-        logging.warning(
-            """
-                [git-revision-date-localized-plugin] Running on Azure pipelines with limited
-                fetch-depth might lead to wrong git revision dates due to a shallow git fetch depth.
-
-                Remove any Shallow Fetch settings
-                (see https://docs.microsoft.com/en-us/azure/devops/pipelines/repos/pipeline-options-for-git?view=azure-devops#shallow-fetch).
-                """
-        )
 
 
 def commit_count(repo) -> int:
