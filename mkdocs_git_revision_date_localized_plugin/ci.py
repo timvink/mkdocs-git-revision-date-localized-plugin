@@ -34,7 +34,7 @@ def raise_ci_warnings(repo) -> None:
         )
 
     # Github Actions
-    if os.getenv("GITHUB_ACTIONS") is not None and n_commits == 1:
+    elif os.getenv("GITHUB_ACTIONS") is not None and n_commits == 1:
         # Default is fetch-depth of 1 for github actions
         logging.warning(
             """
@@ -47,7 +47,7 @@ def raise_ci_warnings(repo) -> None:
         )
 
     # Bitbucket pipelines
-    if os.getenv("CI") is not None and n_commits < 50:
+    elif os.getenv("CI") is not None and n_commits < 50:
         # Default is fetch-depth of 50 for bitbucket pipelines
         logging.warning(
             """
@@ -62,7 +62,7 @@ def raise_ci_warnings(repo) -> None:
 
     # Azure Devops Pipeline
     # Does not limit fetch-depth by default
-    if int(os.getenv("Agent.Source.Git.ShallowFetchDepth", 10e99)) < n_commits:
+    elif int(os.getenv("Agent.Source.Git.ShallowFetchDepth", 10e99)) < n_commits:
         logging.warning(
             """
                 [git-revision-date-localized-plugin] Running on Azure pipelines with limited
