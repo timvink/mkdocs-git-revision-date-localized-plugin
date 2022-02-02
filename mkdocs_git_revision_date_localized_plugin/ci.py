@@ -28,7 +28,7 @@ def raise_ci_warnings(repo) -> None:
                 [git-revision-date-localized-plugin] Running on a GitLab runner might lead to wrong
                 Git revision dates due to a shallow git fetch depth.
 
-                Make sure to set GIT_DEPTH to 1000 in your .gitlab-ci.yml file
+                Make sure to set GIT_DEPTH to 0 in your .gitlab-ci.yml file
                 (see https://docs.gitlab.com/ee/user/project/pipelines/settings.html#git-shallow-clone).
                 """
         )
