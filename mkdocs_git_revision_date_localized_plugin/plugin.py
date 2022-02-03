@@ -191,6 +191,25 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             flags=re.IGNORECASE,
         )
 
+        # Also add site last updated information, for developers
+        site_dates = self.util.get_date_formats_for_timestamp(self.last_site_revision_timestamp)
+        site_date = site_dates[self.config["type"]]
+        if self.config["type"] == "timeago":
+            site_date += site_dates["iso_date"]
+        page.meta["git_site_revision_date_localized"] = site_date
+        site_dates_raw = self.util.get_date_formats_for_timestamp(self.last_site_revision_timestamp, add_spans=False)
+        for date_type, date_string in site_dates_raw.items():
+            page.meta["git_site_revision_date_localized_raw_%s" % date_type] = date_string
+
+        # Replace any occurances in markdown page
+        markdown = re.sub(
+            r"\{\{\s*git_site_revision_date_localized\s*\}\}",
+            site_date,
+            markdown,
+            flags=re.IGNORECASE,
+        )
+
+
         # If creation date not enabled, return markdown
         # This is for speed: prevents another `git log` operation each file
         if not self.config.get("enable_creation_date"):
@@ -226,17 +245,6 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             markdown,
             flags=re.IGNORECASE,
         )
-
-        # Finally,
-        # Also add site last updated information, for developers
-        site_dates = self.util.get_date_formats_for_timestamp(self.last_site_revision_timestamp)
-        site_date = site_dates[self.config["type"]]
-        if self.config["type"] == "timeago":
-            site_date += site_dates["iso_date"]
-        page.meta["git_site_revision_date_localized"] = site_date
-        site_dates_raw = self.util.get_date_formats_for_timestamp(self.last_site_revision_timestamp, add_spans=False)
-        for date_type, date_string in site_dates_raw.items():
-            page.meta["git_site_revision_date_localized_raw_%s" % date_type] = date_string
 
         return markdown
 
