@@ -15,6 +15,7 @@ import logging
 import os
 import re
 import shutil
+from contextlib import contextmanager
 
 # MkDocs
 from mkdocs.__main__ import build_command
@@ -39,6 +40,27 @@ logging.basicConfig(level=logging.INFO)
 # ##################################
 # ########## Helpers ###############
 # ##################################
+
+@contextmanager
+def working_directory(path):
+    """
+    Temporarily change working directory.
+    A context manager which changes the working directory to the given
+    path, and then changes it back to its previous value on exit.
+    Usage:
+    ```python
+    # Do something in original directory
+    with working_directory('/my/new/path'):
+        # Do something in new directory
+    # Back to old directory
+    ```
+    """
+    prev_cwd = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(prev_cwd)
 
 
 def get_plugin_config_from_mkdocs(mkdocs_path) -> dict:
@@ -116,43 +138,38 @@ def setup_commit_history(testproject_path):
     repo = git.Repo.init(testproject_path, bare=False)
     author = "Test Person <testtest@gmail.com>"
 
-    # Change the working directory
-    cwd = os.getcwd()
-    os.chdir(testproject_path)
+    with working_directory(testproject_path):
 
-    try:
+        # page_with_tags contains tags we replace and test
         repo.git.add("docs/page_with_tag.md")
-        repo.git.commit(message="add homepage", author=author, date="1500854705 -0700")
-
-        repo.git.add("mkdocs.yml")
-        repo.git.commit(message="add mkdocs", author=author)
-
-        repo.git.add("docs/first_page.md")
-        repo.git.commit(message="first page", author=author)
-        file_name = os.path.join(testproject_path, "docs/first_page.md")
-        with open(file_name, "w+") as the_file:
-            the_file.write("Hello\n")
-        repo.git.add("docs/first_page.md")
-        repo.git.commit(message="first page update 1", author=author)
-        with open(file_name, "w") as the_file:
-            the_file.write("# First Test Page Edited\n\nSome Lorem text")
-        repo.git.add("docs/first_page.md")
-        repo.git.commit(message="first page update 2", author=author)
-
-        repo.git.add("docs/second_page.md")
-        repo.git.commit(message="second page", author=author)
-        repo.git.add("docs/index.md")
-        repo.git.commit(message="homepage", author=author)
+        repo.git.commit(message="add homepage", author=author, date="1500854705 -0700") # Mon Jul 24 2017 00:05:05 GMT+0000
 
         file_name = os.path.join(testproject_path, "docs/page_with_tag.md")
         with open(file_name, "a") as the_file:
             the_file.write("awa\n")
         repo.git.add("docs/page_with_tag.md")
-        repo.git.commit(message="update homepage", author=author)
-        os.chdir(cwd)
-    except:
-        os.chdir(cwd)
-        raise
+        repo.git.commit(message="update homepage", author=author, date="1642911026") # 	Sun Jan 23 2022 04:10:26 GMT+0000
+
+        repo.git.add("docs/first_page.md")
+        repo.git.commit(message="first page", author=author, date="1500854705") # Mon Jul 24 2017 00:05:05 GMT+0000
+        file_name = os.path.join(testproject_path, "docs/first_page.md")
+        with open(file_name, "w+") as the_file:
+            the_file.write("Hello\n")
+        repo.git.add("docs/first_page.md")
+        repo.git.commit(message="first page update 1", author=author, date="1519964705") # 	Fri Mar 02 2018 04:25:05 GMT+0000
+        with open(file_name, "w") as the_file:
+            the_file.write("# First Test Page Edited\n\nSome Lorem text")
+        repo.git.add("docs/first_page.md")
+        repo.git.commit(message="first page update 2", author=author, date="1643911026") # 	Thu Feb 03 2022 17:57:06 GMT+0000
+
+        repo.git.add("mkdocs.yml")
+        repo.git.commit(message="add mkdocs", author=author, date="1500854705 -0700") # Mon Jul 24 2017 00:05:05 GMT+0000
+        repo.git.add("docs/second_page.md")
+        repo.git.commit(message="second page", author=author, date="1643911026") # 	Thu Feb 03 2022 17:57:06 GMT+0000
+        repo.git.add("docs/index.md")
+        repo.git.commit(message="homepage", author=author, date="1643911026") # 	Thu Feb 03 2022 17:57:06 GMT+0000
+
+
 
     return repo
 
@@ -267,6 +284,35 @@ def test_date_formats():
         "iso_datetime": "2020-02-22 18:52:09",
         "timeago": '<span class="timeago" datetime="2020-02-22T18:52:09+00:00" locale="en"></span>',
     }
+
+
+
+
+@pytest.mark.parametrize("mkdocs_file", [
+    "basic_project/mkdocs.yml",
+    "basic_project/mkdocs_creation_date.yml"])
+def test_tags_are_replaced(tmp_path, mkdocs_file):
+    """
+    Make sure the {{ }} tags are replaced properly.
+    """
+    testproject_path = setup_clean_mkdocs_folder(
+        mkdocs_yml_path=f"tests/fixtures/{mkdocs_file}", output_path=tmp_path
+    )
+    setup_commit_history(testproject_path)
+    result = build_docs_setup(testproject_path)
+    assert result.exit_code == 0, "'mkdocs build' command failed"
+
+    tags_file = testproject_path / "site/page_with_tag/index.html"
+    contents = tags_file.read_text(encoding="utf8")
+    # Assert {{ git_revision_date_localized }} is replaced
+    assert re.search(r"January 23, 2022\<\/span.+", contents)
+
+    # Assert {{ git_site_revision_date_localized }} is replaced
+    assert re.search(r"February 3, 2022\<\/span.+", contents)
+
+    # Note {{ git_creation_date_localized }} is only replaced when configured in the config
+    if mkdocs_file == "basic_project/mkdocs_creation_date.yml":
+        assert re.search(r"July 24, 2017\<\/span.+", contents)
 
 
 def test_git_not_available(tmp_path, recwarn):
