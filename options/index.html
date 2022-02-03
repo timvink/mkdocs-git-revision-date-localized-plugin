@@ -11,7 +11,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.0.5">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.9">
     
     
       
@@ -19,10 +19,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.a617204b.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.2b4465f4.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.9204c3b2.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.e6a45f82.min.css">
         
       
     
@@ -58,7 +58,7 @@
   
     
     
-      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)</script>
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -509,24 +509,24 @@
 <div class="tabbed-block"></div>
 </div>
 </div>
-<div class="highlight"><pre><span></span><code><span class="nt">plugins</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">git-revision-date-localized</span><span class="p">:</span>
-      <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">timeago</span>
-      <span class="nt">timezone</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Europe/Amsterdam</span>
-      <span class="nt">locale</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">en</span>
-      <span class="nt">fallback_to_build_date</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
-      <span class="nt">enable_creation_date</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-      <span class="nt">exclude</span><span class="p">:</span>
-          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">index.md</span>
-      <span class="nt">enabled</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+<div class="highlight"><pre><span></span><code><span class="nt">plugins</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">git-revision-date-localized</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timeago</span><span class="w"></span>
+<span class="w">      </span><span class="nt">timezone</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Europe/Amsterdam</span><span class="w"></span>
+<span class="w">      </span><span class="nt">locale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">en</span><span class="w"></span>
+<span class="w">      </span><span class="nt">fallback_to_build_date</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
+<span class="w">      </span><span class="nt">enable_creation_date</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="w">      </span><span class="nt">exclude</span><span class="p">:</span><span class="w"></span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">index.md</span><span class="w"></span>
+<span class="w">      </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
 </code></pre></div>
 <h2 id="type"><code>type</code></h2>
 <p>Default is <code>date</code>. The format of the date to be displayed. Valid values are <code>date</code>, <code>datetime</code>, <code>iso_date</code>, <code>iso_datetime</code> and <code>timeago</code>. Example outputs:</p>
-<div class="highlight"><pre><span></span><code><span class="l l-Scalar l-Scalar-Plain">28 November, 2019</span>           <span class="c1"># type: date (default)</span>
-<span class="l l-Scalar l-Scalar-Plain">28 November, 2019 13:57:28</span>  <span class="c1"># type: datetime</span>
-<span class="l l-Scalar l-Scalar-Plain">2019-11-28</span>                  <span class="c1"># type: iso_date</span>
-<span class="l l-Scalar l-Scalar-Plain">2019-11-28 13:57:26</span>         <span class="c1"># type: iso_datetime</span>
-<span class="l l-Scalar l-Scalar-Plain">20 hours ago</span>                <span class="c1"># type: timeago</span>
+<div class="highlight"><pre><span></span><code><span class="l l-Scalar l-Scalar-Plain">28 November, 2019</span><span class="w">           </span><span class="c1"># type: date (default)</span><span class="w"></span>
+<span class="l l-Scalar l-Scalar-Plain">28 November, 2019 13:57:28</span><span class="w">  </span><span class="c1"># type: datetime</span><span class="w"></span>
+<span class="l l-Scalar l-Scalar-Plain">2019-11-28</span><span class="w">                  </span><span class="c1"># type: iso_date</span><span class="w"></span>
+<span class="l l-Scalar l-Scalar-Plain">2019-11-28 13:57:26</span><span class="w">         </span><span class="c1"># type: iso_datetime</span><span class="w"></span>
+<span class="l l-Scalar l-Scalar-Plain">20 hours ago</span><span class="w">                </span><span class="c1"># type: timeago</span><span class="w"></span>
 </code></pre></div>
 <h2 id="timezone"><code>timezone</code></h2>
 <p>Default is <code>UTC</code>. Specify a time zone database name (<a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones">reference</a>). This option is especially relevant when using <code>type: datetime</code> and <code>type: iso_datetime</code>. Note that when using <a href="http://timeago.yarp.com/">timeago</a> (with <code>type: timeago</code>) any difference in time zones between server and client will be handled automatically.</p>
@@ -538,12 +538,12 @@
 <li>When used in combination with <code>type: timeago</code> then <a href="https://github.com/hustcc/timeago.js">timeago.js</a> is added to your website, which supports <a href="https://github.com/hustcc/timeago.js/tree/master/src/lang">these locales</a>. If you specify a locale not supported by timeago.js, the fallback is English (<code>en</code>)</li>
 </ul>
 <p>Example outputs:</p>
-<div class="highlight"><pre><span></span><code><span class="l l-Scalar l-Scalar-Plain">27 April, 2021</span>                <span class="c1"># `locale: en` with `type: date` (default)</span>
-<span class="l l-Scalar l-Scalar-Plain">27 April, 2021 13:11:28</span>       <span class="c1"># `locale: en` with `type: datetime`</span>
-<span class="l l-Scalar l-Scalar-Plain">2 weeks ago</span>                   <span class="c1"># `locale: en` with `type: timeago`</span>
-<span class="l l-Scalar l-Scalar-Plain">27 de marzo de 2021</span>           <span class="c1"># `locale: es` with `type: date`</span>
-<span class="l l-Scalar l-Scalar-Plain">27 de marzo de 2021 13:57:28</span>  <span class="c1"># `locale: es` with `type: datetime`</span>
-<span class="l l-Scalar l-Scalar-Plain">hace 2 semanas</span>                <span class="c1"># `locale: es` with `type: timeago`</span>
+<div class="highlight"><pre><span></span><code><span class="l l-Scalar l-Scalar-Plain">27 April, 2021</span><span class="w">                </span><span class="c1"># `locale: en` with `type: date` (default)</span><span class="w"></span>
+<span class="l l-Scalar l-Scalar-Plain">27 April, 2021 13:11:28</span><span class="w">       </span><span class="c1"># `locale: en` with `type: datetime`</span><span class="w"></span>
+<span class="l l-Scalar l-Scalar-Plain">2 weeks ago</span><span class="w">                   </span><span class="c1"># `locale: en` with `type: timeago`</span><span class="w"></span>
+<span class="l l-Scalar l-Scalar-Plain">27 de marzo de 2021</span><span class="w">           </span><span class="c1"># `locale: es` with `type: date`</span><span class="w"></span>
+<span class="l l-Scalar l-Scalar-Plain">27 de marzo de 2021 13:57:28</span><span class="w">  </span><span class="c1"># `locale: es` with `type: datetime`</span><span class="w"></span>
+<span class="l l-Scalar l-Scalar-Plain">hace 2 semanas</span><span class="w">                </span><span class="c1"># `locale: es` with `type: timeago`</span><span class="w"></span>
 </code></pre></div>
 <h2 id="fallback_to_build_date"><code>fallback_to_build_date</code></h2>
 <p>Default is <code>false</code>. Enables falling back to the time when <code>mkdocs build</code> was executed <em>when git is not available</em>. This means the revision date will be incorrect, but this can be acceptable if you want your project to also successfully build in environments with no access to GIT.</p>
@@ -556,13 +556,13 @@
 <div class="tabbed-block"></div>
 </div>
 </div>
-<div class="highlight"><pre><span></span><code><span class="nt">plugins</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">git-revision-date-localized</span><span class="p">:</span>
-      <span class="nt">exclude</span><span class="p">:</span>
-        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">index.md</span>
-        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">subfolder/page.md</span>
-        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">another_page.md</span>
-        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">folder/*</span>
+<div class="highlight"><pre><span></span><code><span class="nt">plugins</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">git-revision-date-localized</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">exclude</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">index.md</span><span class="w"></span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">subfolder/page.md</span><span class="w"></span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">another_page.md</span><span class="w"></span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">folder/*</span><span class="w"></span>
 </code></pre></div>
 <h2 id="enabled"><code>enabled</code></h2>
 <p>Default is <code>true</code>. Enables you to deactivate this plugin. A possible use case is local development where you might want faster build times and/or do not have git available. It's recommended to use this option with an environment variable together with a default fallback (introduced in <code>mkdocs</code> v1.2.1, see <a href="https://www.mkdocs.org/user-guide/configuration/#environment-variables">docs</a>). Example:</p>
@@ -571,9 +571,9 @@
 <div class="tabbed-block"></div>
 </div>
 </div>
-<div class="highlight"><pre><span></span><code><span class="nt">plugins</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">git-revision-date-localized</span><span class="p">:</span>
-      <span class="nt">enabled</span><span class="p">:</span> <span class="kt">!ENV</span> <span class="p p-Indicator">[</span><span class="nv">ENABLED_GIT_REVISION_DATE</span><span class="p p-Indicator">,</span> <span class="nv">True</span><span class="p p-Indicator">]</span>
+<div class="highlight"><pre><span></span><code><span class="nt">plugins</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">git-revision-date-localized</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kt">!ENV</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">ENABLED_GIT_REVISION_DATE</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">True</span><span class="p p-Indicator">]</span><span class="w"></span>
 </code></pre></div>
 <p>Which enables you to disable the plugin locally using:</p>
 <div class="highlight"><pre><span></span><code><span class="nb">export</span> <span class="nv">ENABLED_GIT_REVISION_DATE</span><span class="o">=</span><span class="nb">false</span>
@@ -585,11 +585,11 @@ mkdocs serve
   <small>
     
       Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago"><span class="timeago" datetime="2022-01-05T20:04:43+01:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date">2022-01-05</span>
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago"><span class="timeago" datetime="2022-01-05T19:04:43+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date">2022-01-05</span>
       
         <br>
         Created:
-        <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago"><span class="timeago" datetime="2021-04-12T15:22:56+02:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date">2021-04-12</span>
+        <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago"><span class="timeago" datetime="2021-04-12T13:22:56+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date">2021-04-12</span>
       
     
   </small>
@@ -657,10 +657,10 @@ mkdocs serve
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.cefbb252.min.js"}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.22074ed6.min.js"}</script>
     
     
-      <script src="../assets/javascripts/bundle.a5f8ea78.min.js"></script>
+      <script src="../assets/javascripts/bundle.960e086b.min.js"></script>
       
         <script src="../js/timeago.min.js"></script>
       
