@@ -44,8 +44,8 @@ Default is `None`. Specify a two letter [ISO639](https://en.wikipedia.org/wiki/L
 Example outputs:
 
 ```yaml
-27 April, 2021                # `locale: en` with `type: date` (default)
-27 April, 2021 13:11:28       # `locale: en` with `type: datetime`
+April 27, 2021                # `locale: en` with `type: date` (default)
+April 27, 2021 13:11:28       # `locale: en` with `type: datetime`
 2 weeks ago                   # `locale: en` with `type: timeago`
 27 de marzo de 2021           # `locale: es` with `type: date`
 27 de marzo de 2021 13:57:28  # `locale: es` with `type: datetime`
