@@ -59,6 +59,9 @@ class Util:
         Returns:
             dict: Different date formats.
         """
+        assert time_zone is not None
+        assert locale is not None
+        
         utc_revision_date = datetime.utcfromtimestamp(int(unix_timestamp))
         loc_revision_date = utc_revision_date.replace(
             tzinfo=get_timezone("UTC")
@@ -108,7 +111,7 @@ class Util:
             if is_first_commit:
                 # diff_filter="A" will select the commit that created the file
                 commit_timestamp = git.log(
-                    realpath, date="short", format="%at", diff_filter="A"
+                    realpath, date="unix", format="%at", diff_filter="A"
                 )
                 # A file can be created multiple times, through a file renamed. 
                 # Commits are ordered with most recent commit first
@@ -118,7 +121,7 @@ class Util:
             else:
                 # Latest commit touching a specific file
                 commit_timestamp = git.log(
-                    realpath, date="short", format="%at", n=1
+                    realpath, date="unix", format="%at", n=1
                 )
         except (InvalidGitRepositoryError, NoSuchPathError) as err:
             if self.config.get('fallback_to_build_date'):
@@ -190,7 +193,7 @@ class Util:
         """
         date_formats = self._date_formats(
             unix_timestamp=commit_timestamp, 
-            time_zone=self.config.get("time_zone"),
+            time_zone=self.config.get("timezone"),
             locale=self.config.get("locale")
         )
         if add_spans:
