@@ -22,8 +22,8 @@ You can customize the plugin by setting options in `mkdocs.yml`. For example:
 Default is `date`. The format of the date to be displayed. Valid values are `date`, `datetime`, `iso_date`, `iso_datetime` and `timeago`. Example outputs:
 
 ```yaml
-28 November, 2019           # type: date (default)
-28 November, 2019 13:57:28  # type: datetime
+November 28, 2019           # type: date (default)
+November 28, 2019 13:57:28  # type: datetime
 2019-11-28                  # type: iso_date
 2019-11-28 13:57:26         # type: iso_datetime
 20 hours ago                # type: timeago
@@ -44,8 +44,8 @@ Default is `None`. Specify a two letter [ISO639](https://en.wikipedia.org/wiki/L
 Example outputs:
 
 ```yaml
-27 April, 2021                # `locale: en` with `type: date` (default)
-27 April, 2021 13:11:28       # `locale: en` with `type: datetime`
+April 27, 2021                # `locale: en` with `type: date` (default)
+April 27, 2021 13:11:28       # `locale: en` with `type: datetime`
 2 weeks ago                   # `locale: en` with `type: timeago`
 27 de marzo de 2021           # `locale: es` with `type: date`
 27 de marzo de 2021 13:57:28  # `locale: es` with `type: datetime`
