@@ -142,7 +142,7 @@ def setup_commit_history(testproject_path):
 
         # page_with_tags contains tags we replace and test
         repo.git.add("docs/page_with_tag.md")
-        repo.git.commit(message="add homepage", author=author, date="1500854705 -0700") # Mon Jul 24 2017 00:05:05 GMT+0000
+        repo.git.commit(message="add homepage", author=author, date="1500854705") # Mon Jul 24 2017 00:05:05 GMT+0000
 
         file_name = os.path.join(testproject_path, "docs/page_with_tag.md")
         with open(file_name, "a") as the_file:
@@ -270,6 +270,33 @@ def validate_mkdocs_file(temp_path: str, mkdocs_yml_file: str):
     return testproject_path
 
 
+
+MKDOCS_FILES = [
+    'basic_project/mkdocs_theme_no_locale.yml', 
+    'basic_project/mkdocs.yml', 
+    'basic_project/mkdocs_theme_timeago_locale.yml',
+    'basic_project/mkdocs_datetime.yml',
+    'basic_project/mkdocs_plugin_locale.yml',
+    'basic_project/mkdocs_with_override.yml',
+    'basic_project/mkdocs_theme_language.yml',
+    'basic_project/mkdocs_creation_date.yml',
+    'basic_project/mkdocs_theme_locale_disabled.yml',
+    'basic_project/mkdocs_timeago_locale.yml',
+    'basic_project/mkdocs_timeago.yml',
+    'basic_project/mkdocs_theme_timeago.yml',
+    'basic_project/mkdocs_fallback_to_build_date.yml',
+    'basic_project/mkdocs_theme_locale.yml',
+    'basic_project/mkdocs_locale.yml',
+    'basic_project/mkdocs_theme_timeago_override.yml',
+    'basic_project/mkdocs_theme_timeago_instant.yml',
+    'basic_project/mkdocs_exclude.yml'
+]
+
+INVALID_MKDOCS_FILES = [
+    'basic_project/mkdocs_unknown_type.yml',
+]
+
+
 # ##################################
 # ########### Tests ################
 # ##################################
@@ -286,11 +313,7 @@ def test_date_formats():
     }
 
 
-
-
-@pytest.mark.parametrize("mkdocs_file", [
-    "basic_project/mkdocs.yml",
-    "basic_project/mkdocs_creation_date.yml"])
+@pytest.mark.parametrize("mkdocs_file", MKDOCS_FILES, ids=lambda x: f"mkdocs file: {x}")
 def test_tags_are_replaced(tmp_path, mkdocs_file):
     """
     Make sure the {{ }} tags are replaced properly.
@@ -302,17 +325,56 @@ def test_tags_are_replaced(tmp_path, mkdocs_file):
     result = build_docs_setup(testproject_path)
     assert result.exit_code == 0, "'mkdocs build' command failed"
 
+    plugin_config=get_plugin_config_from_mkdocs(str(testproject_path / "mkdocs.yml"))
     tags_file = testproject_path / "site/page_with_tag/index.html"
     contents = tags_file.read_text(encoding="utf8")
-    # Assert {{ git_revision_date_localized }} is replaced
-    assert re.search(r"January 23, 2022\<\/span.+", contents)
 
+    # validate the build
+    validate_build(
+        testproject_path, plugin_config=plugin_config
+    )
+
+    if plugin_config.get("enabled") == False:
+        return True
+
+    if plugin_config.get("type") == "timeago":
+       pytest.skip("Not necessary to test the JS library")
+    
+    
+    # the revision date was in 'setup_commit_history' was set to 1642911026 (Sun Jan 23 2022 04:10:26 GMT+0000)
+    # Assert {{ git_revision_date_localized }} is replaced
+    date_formats_revision_date = Util()._date_formats(1642911026, 
+        locale=plugin_config.get("locale"),
+        time_zone=plugin_config.get("timezone"))
+    for k, v in date_formats_revision_date.items():
+        assert v is not None
+    date = date_formats_revision_date.get(plugin_config.get('type'))
+    assert re.search(rf"{date}\<\/span.+", contents)
+
+    # The last site revision was set in setup_commit_history to 1643911026 (Thu Feb 03 2022 17:57:06 GMT+0000)
     # Assert {{ git_site_revision_date_localized }} is replaced
-    assert re.search(r"February 3, 2022\<\/span.+", contents)
+    date_formats_revision_date = Util()._date_formats(1643911026, 
+        locale=plugin_config.get("locale"),
+        time_zone=plugin_config.get("timezone"))
+    for k, v in date_formats_revision_date.items():
+        assert v is not None
+    date = date_formats_revision_date.get(plugin_config.get('type')) 
+    assert re.search(rf"{date}\<\/span.+", contents)
 
     # Note {{ git_creation_date_localized }} is only replaced when configured in the config
-    if mkdocs_file == "basic_project/mkdocs_creation_date.yml":
-        assert re.search(r"July 24, 2017\<\/span.+", contents)
+    if plugin_config.get("enable_creation_date"):
+        # The creation of page_with_tag.md was set in setup_commit_history to 1500854705 ( Mon Jul 24 2017 00:05:05 GMT+0000 )
+        date_formats_revision_date = Util()._date_formats(1500854705, 
+            locale=plugin_config.get("locale"),
+            time_zone=plugin_config.get("timezone"))
+        for k, v in date_formats_revision_date.items():
+            assert v is not None
+        date = date_formats_revision_date.get(plugin_config.get('type')) 
+        assert re.search(rf"{date}\<\/span.+", contents)
+
+
+
+
 
 
 def test_git_not_available(tmp_path, recwarn):
@@ -336,32 +398,6 @@ def test_git_not_available(tmp_path, recwarn):
     assert result.exit_code == 0
 
 
-def test_build_no_options(tmp_path):
-    # Enable plugin with no extra options set
-    validate_mkdocs_file(tmp_path, "tests/fixtures/basic_project/mkdocs.yml")
-
-
-def test_build_creation_date(tmp_path):
-    # Enable plugin with no extra options set
-    validate_mkdocs_file(tmp_path, "tests/fixtures/basic_project/mkdocs_creation_date.yml")
-
-
-def test_build_locale_plugin(tmp_path):
-    # Enable plugin with plugin locale set to 'nl'
-    validate_mkdocs_file(
-        tmp_path, "tests/fixtures/basic_project/mkdocs_plugin_locale.yml"
-    )
-
-
-def test_build_locale_mkdocs(tmp_path):
-    # Enable plugin with mkdocs locale set to 'fr'
-    validate_mkdocs_file(tmp_path, "tests/fixtures/basic_project/mkdocs_locale.yml")
-
-
-def test_build_material_theme_timeago(tmp_path):
-    validate_mkdocs_file(
-        tmp_path, "tests/fixtures/basic_project/mkdocs_theme_timeago.yml"
-    )
 
 
 def test_build_material_theme(tmp_path):
@@ -396,6 +432,7 @@ def test_material_theme_locale(tmp_path):
     contents = index_file.read_text(encoding="utf8")
     assert re.search(r"Last update\:\s[<span class].+", contents)
 
+
 def test_material_theme_locale_disabled(tmp_path):
     """
     When using mkdocs-material theme, test correct working
@@ -411,7 +448,6 @@ def test_material_theme_locale_disabled(tmp_path):
     index_file = testproject_path / "site/index.html"
     contents = index_file.read_text(encoding="utf8")
     assert re.search(r"Last update\:\s[<span class].+", contents) is None
-
 
 
 def test_material_theme_no_locale(tmp_path):
@@ -430,13 +466,6 @@ def test_material_theme_no_locale(tmp_path):
     assert re.search(r"Last update\:\s[<span class].+", contents)
 
 
-def test_type_timeago(tmp_path):
-    validate_mkdocs_file(tmp_path, "tests/fixtures/basic_project/mkdocs_timeago.yml")
-
-
-def test_type_datetime(tmp_path):
-    validate_mkdocs_file(tmp_path, "tests/fixtures/basic_project/mkdocs_datetime.yml")
-
 
 def test_type_unknown(tmp_path):
     with pytest.raises(AssertionError):
@@ -445,10 +474,6 @@ def test_type_unknown(tmp_path):
         )
 
 
-def test_build_with_timezone(tmp_path):
-    validate_mkdocs_file(
-        tmp_path, "tests/fixtures/basic_project/mkdocs_theme_timeago.yml"
-    )
 
 
 def test_exclude_pages(tmp_path):
