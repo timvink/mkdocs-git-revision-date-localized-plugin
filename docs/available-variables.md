@@ -51,7 +51,7 @@ And if you've enabled creation date in the config:
 
 !!! warning "timeago.js dependency"
 
-    The `*_timeago` variables require the [timeago.js](https://timeago.org/) dependency. This is automatically injected when the [option](optiond.md) `type: timeago` is set. Alternatively, you can add [timeago.js](https://timeago.org/) using the [`extra_javascript`](https://www.mkdocs.org/user-guide/configuration/#extra_javascript) option of MkDocs:
+    The `*_timeago` variables require the [timeago.js](https://timeago.org/) dependency. This is automatically injected when the [option](options.md) `type: timeago` is set. Alternatively, you can add [timeago.js](https://timeago.org/) using the [`extra_javascript`](https://www.mkdocs.org/user-guide/configuration/#extra_javascript) option of MkDocs:
 
     ```yaml
     # mkdocs.yml
