@@ -8,6 +8,7 @@ You can customize the plugin by setting options in `mkdocs.yml`. For example:
   plugins:
     - git-revision-date-localized:
         type: timeago
+        custom_format: "%d. %B %Y"
         timezone: Europe/Amsterdam
         locale: en
         fallback_to_build_date: false
@@ -19,7 +20,7 @@ You can customize the plugin by setting options in `mkdocs.yml`. For example:
 
 ## `type`
 
-Default is `date`. The format of the date to be displayed. Valid values are `date`, `datetime`, `iso_date`, `iso_datetime` and `timeago`. Example outputs:
+Default is `date`. The format of the date to be displayed. Valid values are `date`, `datetime`, `iso_date`, `iso_datetime`, `timeago` and `custom`. Example outputs:
 
 ```yaml
 November 28, 2019           # type: date (default)
@@ -27,7 +28,12 @@ November 28, 2019 13:57:28  # type: datetime
 2019-11-28                  # type: iso_date
 2019-11-28 13:57:26         # type: iso_datetime
 20 hours ago                # type: timeago
+28. November 2019           # type: custom
 ```
+
+## `custom_format`
+
+Default is `%d. %B %Y`. The date format used when `type: custom`. Passed to python's `strftime`, see the [cheatsheat](https://strftime.org/) for details.
 
 ## `timezone`
 
