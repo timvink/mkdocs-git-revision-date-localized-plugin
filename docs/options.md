@@ -33,13 +33,18 @@ November 28, 2019 13:57:28  # type: datetime
 
 Default is `UTC`. Specify a time zone database name ([reference](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)). This option is especially relevant when using `type: datetime` and `type: iso_datetime`. Note that when using [timeago](http://timeago.yarp.com/) (with `type: timeago`) any difference in time zones between server and client will be handled automatically.
 
+=== ":octicons-file-code-16: mkdocs.yml"
+
+  ```yaml
+  plugins:
+    - git-revision-date-localized:
+        timezone: Europe/Amsterdam
+  ```
+
+
 ## `locale`
 
-Default is `None`. Specify a two letter [ISO639](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code to display dates in your preferred language.
-
-- When not set, this plugin will look for `locale` or `language` options set in your theme. If also not set, the fallback is English (`en`)
-- When used in combination with `type: date` or `type: datetime`, translation is done using [babel](https://github.com/python-babel/babel) which supports [these locales](http://www.unicode.org/cldr/charts/latest/supplemental/territory_language_information.html)
-- When used in combination with `type: timeago` then [timeago.js](https://github.com/hustcc/timeago.js) is added to your website, which supports [these locales](https://github.com/hustcc/timeago.js/tree/master/src/lang). If you specify a locale not supported by timeago.js, the fallback is English (`en`)
+Default is `None`. Specify a two letter [ISO639](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code to display dates in your preferred language. Note this plugin supports many different ways to [specify the locale](howto/specify-locale.md), but if not specified anywhere the fallback is English (`en`).
 
 Example outputs:
 
@@ -52,13 +57,39 @@ April 27, 2021 13:11:28       # `locale: en` with `type: datetime`
 hace 2 semanas                # `locale: es` with `type: timeago`
 ```
 
+=== ":octicons-file-code-16: mkdocs.yml"
+
+  ```yaml
+  plugins:
+    - git-revision-date-localized:
+        locale: en
+  ```
+
+
 ## `fallback_to_build_date`
 
 Default is `false`. Enables falling back to the time when `mkdocs build` was executed *when git is not available*. This means the revision date will be incorrect, but this can be acceptable if you want your project to also successfully build in environments with no access to GIT.
 
+=== ":octicons-file-code-16: mkdocs.yml"
+
+  ```yaml
+  plugins:
+    - git-revision-date-localized:
+        fallback_to_build_date: true
+  ```
+
+
 ## `enable_creation_date`
 
 Default is `false` (because it has a small effect on build time). Enables a *Created* date variables, see [available-variables.md]. This will also add a created date at the bottom of each page in `mkdocs-material` as it has native support (see [overriding a theme](howto/override-a-theme.md)).
+
+=== ":octicons-file-code-16: mkdocs.yml"
+
+  ```yaml
+  plugins:
+    - git-revision-date-localized:
+        enable_creation_date: true
+  ```
 
 ## `exclude`
 
