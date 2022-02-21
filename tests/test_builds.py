@@ -28,6 +28,7 @@ from click.testing import CliRunner
 
 # package module
 from mkdocs_git_revision_date_localized_plugin.util import Util
+from mkdocs_git_revision_date_localized_plugin.ci import commit_count
 
 # ##################################
 # ######## Globals #################
@@ -339,7 +340,13 @@ def test_tags_are_replaced(tmp_path, mkdocs_file):
 
     if plugin_config.get("type") == "timeago":
        pytest.skip("Not necessary to test the JS library")
-    
+
+    # Make sure count_commits() works
+    # We created 8 commits in setup_commit_history()
+    with working_directory(testproject_path):
+        u = Util()
+        assert commit_count(u._get_repo("docs/page_with_tag.md")) == 8
+
     
     # the revision date was in 'setup_commit_history' was set to 1642911026 (Sun Jan 23 2022 04:10:26 GMT+0000)
     # Assert {{ git_revision_date_localized }} is replaced
