@@ -1,0 +1,47 @@
+site_name: MkDocs static i18n plugin demo
+site_url: https://ultrabug.github.io/mkdocs-static-i18n
+repo_url: https://github.com/ultrabug/mkdocs-static-i18n
+
+theme:
+  name: material
+  font: false
+  icon:
+    logo: material/file-document-multiple
+  palette:
+    primary: blue
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/ultrabug/mkdocs-static-i18n
+      name: mkdocs-static-i18n on Github
+
+markdown_extensions:
+  - admonition
+
+## NOTE:
+# here git-revision-date-localized is specified before i18n
+# that means we cannot access page.locale attribute set by i18n
+# because MkDocs triggers event in plugin order specified.
+plugins:
+  - search
+  - git-revision-date-localized
+  - i18n:
+      default_language: !ENV [DEFAULT_LANGUAGE, "en"]
+      default_language_only: !ENV [DEFAULT_LANGUAGE_ONLY, false]
+      languages:
+        default:
+          name: Default (en)
+          build: true
+        en:
+          name: English
+          build: true
+          site_name: "MkDocs static i18n plugin demo (en)"
+        fr:
+          name: Français
+          build: true
+          site_name: "Démo du plugin MkDocs static i18n (fr)"
+      nav_translations:
+        fr:
+          Topic1: Sujet1
+          Topic2: Sujet2

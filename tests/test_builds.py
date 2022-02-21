@@ -112,7 +112,11 @@ def setup_clean_mkdocs_folder(mkdocs_yml_path, output_path):
         shutil.rmtree(str(testproject_path))
 
     # Copy correct mkdocs.yml file and our test 'docs/'
-    shutil.copytree("tests/fixtures/basic_project/docs", str(testproject_path / "docs"))
+    if "i18n" in mkdocs_yml_path:
+        shutil.copytree("tests/fixtures/i18n/docs", str(testproject_path / "docs"))
+    else:
+        shutil.copytree("tests/fixtures/basic_project/docs", str(testproject_path / "docs"))
+    
     shutil.copyfile(mkdocs_yml_path, str(testproject_path / "mkdocs.yml"))
 
     return testproject_path
@@ -226,7 +230,9 @@ def validate_build(testproject_path, plugin_config: dict = {}):
         commit_timestamp=repo.get_git_commit_timestamp(
             path=str(testproject_path / "docs/page_with_tag.md"),
             is_first_commit=False,
-        )
+        ),
+        locale=plugin_config['locale'],
+        add_spans=True,
     )
 
     searches = [x in contents for x in date_formats.values()]
@@ -240,6 +246,8 @@ def validate_build(testproject_path, plugin_config: dict = {}):
         assert commit_timestamp == 1500854705
         date_formats = repo.get_date_formats_for_timestamp(
             commit_timestamp=commit_timestamp,
+            locale=plugin_config['locale'],
+            add_spans=True,
         )
 
         searches = [x in contents for x in date_formats.values()]
@@ -289,11 +297,14 @@ MKDOCS_FILES = [
     'basic_project/mkdocs_locale.yml',
     'basic_project/mkdocs_theme_timeago_override.yml',
     'basic_project/mkdocs_theme_timeago_instant.yml',
-    'basic_project/mkdocs_exclude.yml'
+    'basic_project/mkdocs_exclude.yml',
+    'basic_project/mkdocs_meta.yml',
+    # 'i18n/mkdocs.yml'
 ]
 
 INVALID_MKDOCS_FILES = [
-    'basic_project/mkdocs_unknown_type.yml',
+    ('basic_project/mkdocs_unknown_type.yml', "AssertionError"),
+    ('i18n/mkdocs_wrong_order.yml', "should be defined after the i18n plugin in your mkdocs.yml"),
 ]
 
 
@@ -467,11 +478,31 @@ def test_material_theme_no_locale(tmp_path):
 
 
 
-def test_type_unknown(tmp_path):
-    with pytest.raises(AssertionError):
-        validate_mkdocs_file(
-            tmp_path, "tests/fixtures/basic_project/mkdocs_unknown_type.yml"
-        )
+@pytest.mark.parametrize("mkdocs_file, error", INVALID_MKDOCS_FILES)
+def test_type_unknown(mkdocs_file, error, tmp_path):
+    """
+    Make sure invalid mkdocs.yml specification raise the correct errors.
+    """
+    testproject_path = setup_clean_mkdocs_folder(
+        mkdocs_yml_path=f"tests/fixtures/{ mkdocs_file }", # mkdocs_file, # tmp_path, , 
+        output_path=tmp_path
+    )
+    # Setup git commit history
+    assert not os.path.exists(str(testproject_path / ".git"))
+    testproject_path = str(testproject_path)
+
+    repo = git.Repo.init(testproject_path, bare=False)
+    author = "Test Person <testtest@gmail.com>"
+
+    with working_directory(testproject_path):
+        # page_with_tags contains tags we replace and test
+        repo.git.add(".")
+        repo.git.commit(message="add all", author=author, date="1500854705") # Mon Jul 24 2017 00:05:05 GMT+0000
+
+    result = build_docs_setup(testproject_path)
+    assert result.exit_code == 1
+
+    assert error in result.stdout or error in str(result.exc_info[0])
 
 
 
@@ -579,3 +610,4 @@ def test_low_fetch_depth(tmp_path, caplog):
     result = build_docs_setup(cloned_folder)
     assert result.exit_code == 0
     assert "Running on GitHub Actions might" in caplog.text
+
