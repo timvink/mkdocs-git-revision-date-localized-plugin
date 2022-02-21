@@ -85,3 +85,4 @@ If you want, you can customize further by [extending the mkdocs-material theme](
     </div>
     ```
 
+[mkdocs-material](https://squidfunk.github.io/mkdocs-material/) also supports [custom translations](https://squidfunk.github.io/mkdocs-material/setup/changing-the-language/#custom-translations) that you can use to specify alternative translations for `source.file.date.updated` ("Last updated") and `source.file.date.created` ("Created"). 
