@@ -38,10 +38,23 @@ To allow for more flexibility when overriding a theme there are also variables f
 - `page.meta.git_site_revision_date_localized_raw_iso_datetime`
 - `page.meta.git_site_revision_date_localized_raw_timeago`
 
-And if you've enable creation date in the config:
+And if you've enabled creation date in the config:
 
 - `page.meta.git_creation_date_localized_raw_date`
 - `page.meta.git_creation_date_localized_raw_datetime`
 - `page.meta.git_creation_date_localized_raw_iso_date`
 - `page.meta.git_creation_date_localized_raw_iso_datetime`
 - `page.meta.git_creation_date_localized_raw_timeago`
+
+!!! warning "timeago.js dependency"
+
+    The `*_timeago` variables require the [timeago.js](https://timeago.org/) dependency. This is automatically injected when the [option](optiond.md) `type: timeago` is set. Alternatively, you can add [timeago.js](https://timeago.org/) using the [`extra_javascript`](https://www.mkdocs.org/user-guide/configuration/#extra_javascript) option of MkDocs:
+
+    ```yaml
+    # mkdocs.yml
+    extra_javascript:
+        - js/timeago.min.js
+        - js/timeago_mkdocs_material.js
+    ```
+
+    You can download both these [files from GitHub](https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/tree/master/mkdocs_git_revision_date_localized_plugin/js).
