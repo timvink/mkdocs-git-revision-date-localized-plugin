@@ -15,7 +15,7 @@
     
     
       
-        <title>Customize a theme - mkdocs-git-revision-date-localized-plugin</title>
+        <title>Specify a locale - mkdocs-git-revision-date-localized-plugin</title>
       
     
     
@@ -66,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#customize-a-theme" class="md-skip">
+        <a href="#specify-a-locale" class="md-skip">
           Skip to content
         </a>
       
@@ -99,7 +99,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Customize a theme
+              Specify a locale
             
           </span>
         </div>
@@ -287,11 +287,80 @@
               
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../specify-locale/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Specify a locale
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Specify a locale
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-page-locale-set-by-the-i18n-plugin" class="md-nav__link">
+    1. Page locale set by the i18n plugin
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-page-locale-set-by-metadata" class="md-nav__link">
+    2. Page locale set by metadata
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-site-locale-set-by-your-theme" class="md-nav__link">
+    3. Site locale set by your theme
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-site-locale-set-by-this-plugin" class="md-nav__link">
+    4. Site locale set by this plugin
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-fallback-locale" class="md-nav__link">
+    5. Fallback locale
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -315,59 +384,11 @@
               
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Customize a theme
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../override-a-theme/" class="md-nav__link">
         Customize a theme
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#example-default-mkdocs-theme" class="md-nav__link">
-    Example: default mkdocs theme
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#example-mkdocs-material-theme" class="md-nav__link">
-    Example: mkdocs-material theme
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -421,15 +442,36 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example-default-mkdocs-theme" class="md-nav__link">
-    Example: default mkdocs theme
+  <a href="#1-page-locale-set-by-the-i18n-plugin" class="md-nav__link">
+    1. Page locale set by the i18n plugin
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#example-mkdocs-material-theme" class="md-nav__link">
-    Example: mkdocs-material theme
+  <a href="#2-page-locale-set-by-metadata" class="md-nav__link">
+    2. Page locale set by metadata
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-site-locale-set-by-your-theme" class="md-nav__link">
+    3. Site locale set by your theme
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-site-locale-set-by-this-plugin" class="md-nav__link">
+    4. Site locale set by this plugin
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-fallback-locale" class="md-nav__link">
+    5. Fallback locale
   </a>
   
 </li>
@@ -448,98 +490,70 @@
   
                 
 
-<h1 id="customize-a-theme">Customize a theme</h1>
-<p>You can <a href="https://www.mkdocs.org/user-guide/styling-your-docs/#customizing-a-theme">customize an existing theme</a> by overriding blocks or partials. You might want to do this because your theme is not natively supported, or you would like more control on the formatting. Below are two examples to help get you started.</p>
-<h2 id="example-default-mkdocs-theme">Example: default <code>mkdocs</code> theme</h2>
-<p>To add a revision date to the default <code>mkdocs</code> theme, add a <code>overrides/partials</code> folder to your <code>docs</code> folder and update your <code>mkdocs.yml</code> file. 
-Then you can extend the base <code>mkdocs</code> theme by adding a new file <code>docs/overrides/content.html</code>:</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 1.75C4 .784 4.784 0 5.75 0h5.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v8.586A1.75 1.75 0 0 1 14.25 15h-9a.75.75 0 0 1 0-1.5h9a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 10 4.25V1.5H5.75a.25.25 0 0 0-.25.25v2.5a.75.75 0 0 1-1.5 0v-2.5zm7.5-.188V4.25c0 .138.112.25.25.25h2.688a.252.252 0 0 0-.011-.013l-2.914-2.914a.272.272 0 0 0-.013-.011zM5.72 6.72a.75.75 0 0 0 0 1.06l1.47 1.47-1.47 1.47a.75.75 0 1 0 1.06 1.06l2-2a.75.75 0 0 0 0-1.06l-2-2a.75.75 0 0 0-1.06 0zM3.28 7.78a.75.75 0 0 0-1.06-1.06l-2 2a.75.75 0 0 0 0 1.06l2 2a.75.75 0 0 0 1.06-1.06L1.81 9.25l1.47-1.47z"/></svg></span> mkdocs.yml</label><label for="__tabbed_1_2"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 1.75C4 .784 4.784 0 5.75 0h5.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v8.586A1.75 1.75 0 0 1 14.25 15h-9a.75.75 0 0 1 0-1.5h9a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 10 4.25V1.5H5.75a.25.25 0 0 0-.25.25v2.5a.75.75 0 0 1-1.5 0v-2.5zm7.5-.188V4.25c0 .138.112.25.25.25h2.688a.252.252 0 0 0-.011-.013l-2.914-2.914a.272.272 0 0 0-.013-.011zM5.72 6.72a.75.75 0 0 0 0 1.06l1.47 1.47-1.47 1.47a.75.75 0 1 0 1.06 1.06l2-2a.75.75 0 0 0 0-1.06l-2-2a.75.75 0 0 0-1.06 0zM3.28 7.78a.75.75 0 0 0-1.06-1.06l-2 2a.75.75 0 0 0 0 1.06l2 2a.75.75 0 0 0 1.06-1.06L1.81 9.25l1.47-1.47z"/></svg></span> docs/overrides/content.html</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="nt">theme</span><span class="p">:</span>
-    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">mkdocs</span>
-    <span class="nt">custom_dir</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">docs/overrides</span>
+<h1 id="specify-a-locale">Specify a locale</h1>
+<p><code>locale</code> is a two letter <a href="https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes">ISO639</a> language code that <code>git-revision-date-localized</code> uses to display dates in your preferred language.</p>
+<p>For example:</p>
+<div class="highlight"><pre><span></span><code><span class="l l-Scalar l-Scalar-Plain">April 27, 2021</span>                <span class="c1"># `locale: en` with `type: date` (default)</span>
+<span class="l l-Scalar l-Scalar-Plain">April 27, 2021 13:11:28</span>       <span class="c1"># `locale: en` with `type: datetime`</span>
+<span class="l l-Scalar l-Scalar-Plain">2 weeks ago</span>                   <span class="c1"># `locale: en` with `type: timeago`</span>
+<span class="l l-Scalar l-Scalar-Plain">27 de marzo de 2021</span>           <span class="c1"># `locale: es` with `type: date`</span>
+<span class="l l-Scalar l-Scalar-Plain">27 de marzo de 2021 13:57:28</span>  <span class="c1"># `locale: es` with `type: datetime`</span>
+<span class="l l-Scalar l-Scalar-Plain">hace 2 semanas</span>                <span class="c1"># `locale: es` with `type: timeago`</span>
 </code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="c">&lt;!-- Overwrites content.html base mkdocs theme, taken from </span>
-<span class="c">https://github.com/mkdocs/mkdocs/blob/master/mkdocs/themes/mkdocs/content.html --&gt;</span>
-
-{% if page.meta.source %}
-    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;source-links&quot;</span><span class="p">&gt;</span>
-    {% for filename in page.meta.source %}
-        <span class="p">&lt;</span><span class="nt">span</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;label label-primary&quot;</span><span class="p">&gt;</span>{{ filename }}<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
-    {% endfor %}
-    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-{% endif %}
-
-{{ page.content }}
-
-<span class="c">&lt;!-- This section adds support for localized revision dates --&gt;</span>
-{% if page.meta.git_revision_date_localized %}
-    <span class="p">&lt;</span><span class="nt">small</span><span class="p">&gt;</span>Last update: {{ page.meta.git_revision_date_localized }}<span class="p">&lt;/</span><span class="nt">small</span><span class="p">&gt;</span>
-{% endif %}
-{% if page.meta.git_created_date_localized %}
-    <span class="p">&lt;</span><span class="nt">small</span><span class="p">&gt;</span>Created: {{ page.meta.git_created_date_localized }}<span class="p">&lt;/</span><span class="nt">small</span><span class="p">&gt;</span>
-{% endif %}
+<p>You can set the <code>locale</code> in different locations, both for your entire site and on a per-page basis. If specified multiple times <code>git-revision-date-localized</code> will use the <code>locale</code> that is most specific to a page.</p>
+<p>Here's the order of priority:</p>
+<h2 id="1-page-locale-set-by-the-i18n-plugin">1. Page locale set by the <code>i18n</code> plugin</h2>
+<p>The <a href="https://github.com/ultrabug/mkdocs-static-i18n">mkdocs-static-i18n</a> plugin helps you support multiple language versions of your site. When enabled, <code>i18n</code> will add a <code>locale</code> attribute to each markdown page that <code>git-revision-date-localized</code> will use.</p>
+<h2 id="2-page-locale-set-by-metadata">2. Page locale set by metadata</h2>
+<p>The <a href="https://python-markdown.github.io/extensions/meta_data/">Metadata</a> adds the ability to attach arbitrary key-value pairs to a document via front matter written in YAML syntax before the Markdown. Enable it via mkdocs.yml:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># mkdocs.yml</span>
+<span class="nt">markdown_extensions</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">meta</span>
 </code></pre></div>
-</div>
-</div>
-</div>
-<h2 id="example-mkdocs-material-theme">Example: <code>mkdocs-material</code> theme</h2>
-<p><a href="https://squidfunk.github.io/mkdocs-material/">mkdocs-material</a> has built-in support for <code>git_revision_date_localized</code> and <code>git_created_date_localized</code>. You can see that when viewing their <a href="https://github.com/squidfunk/mkdocs-material/blob/master/src/partials/source-file.html"><code>source-file.html</code></a> partial. </p>
-<p>If you want, you can customize further by <a href="https://squidfunk.github.io/mkdocs-material/customization/#extending-the-theme">extending the mkdocs-material theme</a> and overriding the <code>source-file.html</code> partial as follows:</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 1.75C4 .784 4.784 0 5.75 0h5.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v8.586A1.75 1.75 0 0 1 14.25 15h-9a.75.75 0 0 1 0-1.5h9a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 10 4.25V1.5H5.75a.25.25 0 0 0-.25.25v2.5a.75.75 0 0 1-1.5 0v-2.5zm7.5-.188V4.25c0 .138.112.25.25.25h2.688a.252.252 0 0 0-.011-.013l-2.914-2.914a.272.272 0 0 0-.013-.011zM5.72 6.72a.75.75 0 0 0 0 1.06l1.47 1.47-1.47 1.47a.75.75 0 1 0 1.06 1.06l2-2a.75.75 0 0 0 0-1.06l-2-2a.75.75 0 0 0-1.06 0zM3.28 7.78a.75.75 0 0 0-1.06-1.06l-2 2a.75.75 0 0 0 0 1.06l2 2a.75.75 0 0 0 1.06-1.06L1.81 9.25l1.47-1.47z"/></svg></span> mkdocs.yml</label><label for="__tabbed_2_2"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 1.75C4 .784 4.784 0 5.75 0h5.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v8.586A1.75 1.75 0 0 1 14.25 15h-9a.75.75 0 0 1 0-1.5h9a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 10 4.25V1.5H5.75a.25.25 0 0 0-.25.25v2.5a.75.75 0 0 1-1.5 0v-2.5zm7.5-.188V4.25c0 .138.112.25.25.25h2.688a.252.252 0 0 0-.011-.013l-2.914-2.914a.272.272 0 0 0-.013-.011zM5.72 6.72a.75.75 0 0 0 0 1.06l1.47 1.47-1.47 1.47a.75.75 0 1 0 1.06 1.06l2-2a.75.75 0 0 0 0-1.06l-2-2a.75.75 0 0 0-1.06 0zM3.28 7.78a.75.75 0 0 0-1.06-1.06l-2 2a.75.75 0 0 0 0 1.06l2 2a.75.75 0 0 0 1.06-1.06L1.81 9.25l1.47-1.47z"/></svg></span> docs/overrides/partials/source-file.html</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="nt">theme</span><span class="p">:</span>
-    <span class="nt">name</span><span class="p">:</span> <span class="s">&#39;material&#39;</span>
-    <span class="nt">custom_dir</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">docs/overrides</span>
+<p>If set <code>git-revision-date-localized</code> will use the <code>locale</code> key in a markdown page's frontmatter, for example:</p>
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">locale: en</span>
+<span class="gu">---</span>
+
+<span class="gh"># Page title</span>
 </code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code>{% import &quot;partials/language.html&quot; as lang with context %}
-
-<span class="c">&lt;!-- taken from </span>
-<span class="c">https://github.com/squidfunk/mkdocs-material/blob/master/src/partials/source-file.html --&gt;</span>
-
-<span class="p">&lt;</span><span class="nt">hr</span> <span class="p">/&gt;</span>
-<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;md-source-file&quot;</span><span class="p">&gt;</span>
-<span class="p">&lt;</span><span class="nt">small</span><span class="p">&gt;</span>
-
-    <span class="c">&lt;!-- mkdocs-git-revision-date-localized-plugin --&gt;</span>
-    {% if page.meta.git_revision_date_localized %}
-    {{ lang.t(&quot;source.file.date.updated&quot;) }}:
-    {{ page.meta.git_revision_date_localized }}
-    {% if page.meta.git_creation_date_localized %}
-        <span class="p">&lt;</span><span class="nt">br</span> <span class="p">/&gt;</span>
-        {{ lang.t(&quot;source.file.date.created&quot;) }}:
-        {{ page.meta.git_creation_date_localized }}
-    {% endif %}
-
-    <span class="c">&lt;!-- mkdocs-git-revision-date-plugin --&gt;</span>
-    {% elif page.meta.revision_date %}
-    {{ lang.t(&quot;source.file.date.updated&quot;) }}:
-    {{ page.meta.revision_date }}
-    {% endif %}
-<span class="p">&lt;/</span><span class="nt">small</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<h2 id="3-site-locale-set-by-your-theme">3. Site locale set by your theme</h2>
+<p>Some <a href="https://github.com/mkdocs/mkdocs/wiki/MkDocs-Themes">MkDocs Themes</a> support <a href="https://www.mkdocs.org/user-guide/localizing-your-theme/">localization</a> by setting a <code>locale</code> or <code>language</code> option. See for example the <a href="https://squidfunk.github.io/mkdocs-material/setup/changing-the-language/">Changing the language</a> section of <a href="https://squidfunk.github.io/mkdocs-material/">Material for MkDocs</a>.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># mkdocs.yml</span>
+<span class="nt">theme</span><span class="p">:</span>
+  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">en</span>
 </code></pre></div>
+<h2 id="4-site-locale-set-by-this-plugin">4. Site locale set by this plugin</h2>
+<p>Of course <code>locale</code> is an <a href="../../options/">option</a> for this plugin also.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">plugins</span><span class="p">:</span>
+<span class="p p-Indicator">-</span> <span class="nt">git-revision-date-localized</span><span class="p">:</span>
+    <span class="nt">locale</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">en</span>
+</code></pre></div>
+<h2 id="5-fallback-locale">5. Fallback locale</h2>
+<p>If no <code>locale</code> is specified anywhere, the fallback is English (<code>en</code>).</p>
+<div class="admonition info">
+<p class="admonition-title">Supported locales</p>
+<ul>
+<li>
+<p>When used in combination with <code>type: date</code> or <code>type: datetime</code>, translation is done using <a href="https://github.com/python-babel/babel">babel</a> which supports <a href="http://www.unicode.org/cldr/charts/latest/supplemental/territory_language_information.html">these locales</a></p>
+</li>
+<li>
+<p>When used in combination with <code>type: timeago</code> then <a href="https://github.com/hustcc/timeago.js">timeago.js</a> is added to your website, which supports <a href="https://github.com/hustcc/timeago.js/tree/master/src/lang">these locales</a>. If you specify a locale not supported by timeago.js, the fallback is English (<code>en</code>)</p>
+</li>
+</ul>
 </div>
-</div>
-</div>
-<p><a href="https://squidfunk.github.io/mkdocs-material/">mkdocs-material</a> also supports <a href="https://squidfunk.github.io/mkdocs-material/setup/changing-the-language/#custom-translations">custom translations</a> that you can use to specify alternative translations for <code>source.file.date.updated</code> ("Last updated") and <code>source.file.date.created</code> ("Created"). </p>
 
   <hr>
 <div class="md-source-file">
   <small>
     
       Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago"><span class="timeago" datetime="2022-02-21T09:03:50+01:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date">2022-02-21</span>
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago"><span class="timeago" datetime="2022-02-21T08:59:26+01:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date">2022-02-21</span>
       
         <br>
         Created:
-        <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago"><span class="timeago" datetime="2021-04-22T11:48:19+02:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date">2021-04-22</span>
+        <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago"><span class="timeago" datetime="2022-02-21T08:59:26+01:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date">2022-02-21</span>
       
     
   </small>
@@ -566,7 +580,7 @@ Then you can extend the base <code>mkdocs</code> theme by adding a new file <cod
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
         
-        <a href="../custom-styling/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Apply custom styling" rel="prev">
+        <a href="../../available-variables/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Available variables" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -575,20 +589,20 @@ Then you can extend the base <code>mkdocs</code> theme by adding a new file <cod
               <span class="md-footer__direction">
                 Previous
               </span>
-              Apply custom styling
+              Available variables
             </div>
           </div>
         </a>
       
       
         
-        <a href="../../options/" class="md-footer__link md-footer__link--next" aria-label="Next: Options" rel="next">
+        <a href="../custom-styling/" class="md-footer__link md-footer__link--next" aria-label="Next: Apply custom styling" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Options
+              Apply custom styling
             </div>
           </div>
           <div class="md-footer__button md-icon">

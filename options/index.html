@@ -11,7 +11,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.10">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.0.5">
     
     
       
@@ -19,10 +19,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.d6be258b.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.a617204b.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.e6a45f82.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.9204c3b2.min.css">
         
       
     
@@ -58,7 +58,7 @@
   
     
     
-      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -287,6 +287,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../howto/specify-locale/" class="md-nav__link">
+        Specify a locale
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../howto/custom-styling/" class="md-nav__link">
         Apply custom styling
       </a>
@@ -359,6 +373,13 @@
         <li class="md-nav__item">
   <a href="#type" class="md-nav__link">
     type
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom_format" class="md-nav__link">
+    custom_format
   </a>
   
 </li>
@@ -447,6 +468,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#custom_format" class="md-nav__link">
+    custom_format
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#timezone" class="md-nav__link">
     timezone
   </a>
@@ -509,71 +537,106 @@
 <div class="tabbed-block"></div>
 </div>
 </div>
-<div class="highlight"><pre><span></span><code><span class="nt">plugins</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">git-revision-date-localized</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timeago</span><span class="w"></span>
-<span class="w">      </span><span class="nt">timezone</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Europe/Amsterdam</span><span class="w"></span>
-<span class="w">      </span><span class="nt">locale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">en</span><span class="w"></span>
-<span class="w">      </span><span class="nt">fallback_to_build_date</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
-<span class="w">      </span><span class="nt">enable_creation_date</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
-<span class="w">      </span><span class="nt">exclude</span><span class="p">:</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">index.md</span><span class="w"></span>
-<span class="w">      </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="nt">plugins</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="nt">git-revision-date-localized</span><span class="p">:</span>
+      <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">timeago</span>
+      <span class="nt">custom_format</span><span class="p">:</span> <span class="s">&quot;%d.</span><span class="nv"> </span><span class="s">%B</span><span class="nv"> </span><span class="s">%Y&quot;</span>
+      <span class="nt">timezone</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Europe/Amsterdam</span>
+      <span class="nt">locale</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">en</span>
+      <span class="nt">fallback_to_build_date</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+      <span class="nt">enable_creation_date</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+      <span class="nt">exclude</span><span class="p">:</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">index.md</span>
+      <span class="nt">enabled</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
 <h2 id="type"><code>type</code></h2>
-<p>Default is <code>date</code>. The format of the date to be displayed. Valid values are <code>date</code>, <code>datetime</code>, <code>iso_date</code>, <code>iso_datetime</code> and <code>timeago</code>. Example outputs:</p>
-<div class="highlight"><pre><span></span><code><span class="l l-Scalar l-Scalar-Plain">November 28, 2019</span><span class="w">           </span><span class="c1"># type: date (default)</span><span class="w"></span>
-<span class="l l-Scalar l-Scalar-Plain">November 28, 2019 13:57:28</span><span class="w">  </span><span class="c1"># type: datetime</span><span class="w"></span>
-<span class="l l-Scalar l-Scalar-Plain">2019-11-28</span><span class="w">                  </span><span class="c1"># type: iso_date</span><span class="w"></span>
-<span class="l l-Scalar l-Scalar-Plain">2019-11-28 13:57:26</span><span class="w">         </span><span class="c1"># type: iso_datetime</span><span class="w"></span>
-<span class="l l-Scalar l-Scalar-Plain">20 hours ago</span><span class="w">                </span><span class="c1"># type: timeago</span><span class="w"></span>
+<p>Default is <code>date</code>. The format of the date to be displayed. Valid values are <code>date</code>, <code>datetime</code>, <code>iso_date</code>, <code>iso_datetime</code>, <code>timeago</code> and <code>custom</code>. Example outputs:</p>
+<div class="highlight"><pre><span></span><code><span class="l l-Scalar l-Scalar-Plain">November 28, 2019</span>           <span class="c1"># type: date (default)</span>
+<span class="l l-Scalar l-Scalar-Plain">November 28, 2019 13:57:28</span>  <span class="c1"># type: datetime</span>
+<span class="l l-Scalar l-Scalar-Plain">2019-11-28</span>                  <span class="c1"># type: iso_date</span>
+<span class="l l-Scalar l-Scalar-Plain">2019-11-28 13:57:26</span>         <span class="c1"># type: iso_datetime</span>
+<span class="l l-Scalar l-Scalar-Plain">20 hours ago</span>                <span class="c1"># type: timeago</span>
+<span class="l l-Scalar l-Scalar-Plain">28. November 2019</span>           <span class="c1"># type: custom</span>
 </code></pre></div>
+<h2 id="custom_format"><code>custom_format</code></h2>
+<p>Default is <code>%d. %B %Y</code>. The date format used when <code>type: custom</code>. Passed to python's <code>strftime</code>, see the <a href="https://strftime.org/">cheatsheat</a> for details.</p>
 <h2 id="timezone"><code>timezone</code></h2>
 <p>Default is <code>UTC</code>. Specify a time zone database name (<a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones">reference</a>). This option is especially relevant when using <code>type: datetime</code> and <code>type: iso_datetime</code>. Note that when using <a href="http://timeago.yarp.com/">timeago</a> (with <code>type: timeago</code>) any difference in time zones between server and client will be handled automatically.</p>
-<h2 id="locale"><code>locale</code></h2>
-<p>Default is <code>None</code>. Specify a two letter <a href="https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes">ISO639</a> language code to display dates in your preferred language.</p>
-<ul>
-<li>When not set, this plugin will look for <code>locale</code> or <code>language</code> options set in your theme. If also not set, the fallback is English (<code>en</code>)</li>
-<li>When used in combination with <code>type: date</code> or <code>type: datetime</code>, translation is done using <a href="https://github.com/python-babel/babel">babel</a> which supports <a href="http://www.unicode.org/cldr/charts/latest/supplemental/territory_language_information.html">these locales</a></li>
-<li>When used in combination with <code>type: timeago</code> then <a href="https://github.com/hustcc/timeago.js">timeago.js</a> is added to your website, which supports <a href="https://github.com/hustcc/timeago.js/tree/master/src/lang">these locales</a>. If you specify a locale not supported by timeago.js, the fallback is English (<code>en</code>)</li>
-</ul>
-<p>Example outputs:</p>
-<div class="highlight"><pre><span></span><code><span class="l l-Scalar l-Scalar-Plain">April 27, 2021</span><span class="w">                </span><span class="c1"># `locale: en` with `type: date` (default)</span><span class="w"></span>
-<span class="l l-Scalar l-Scalar-Plain">April 27, 2021 13:11:28</span><span class="w">       </span><span class="c1"># `locale: en` with `type: datetime`</span><span class="w"></span>
-<span class="l l-Scalar l-Scalar-Plain">2 weeks ago</span><span class="w">                   </span><span class="c1"># `locale: en` with `type: timeago`</span><span class="w"></span>
-<span class="l l-Scalar l-Scalar-Plain">27 de marzo de 2021</span><span class="w">           </span><span class="c1"># `locale: es` with `type: date`</span><span class="w"></span>
-<span class="l l-Scalar l-Scalar-Plain">27 de marzo de 2021 13:57:28</span><span class="w">  </span><span class="c1"># `locale: es` with `type: datetime`</span><span class="w"></span>
-<span class="l l-Scalar l-Scalar-Plain">hace 2 semanas</span><span class="w">                </span><span class="c1"># `locale: es` with `type: timeago`</span><span class="w"></span>
-</code></pre></div>
-<h2 id="fallback_to_build_date"><code>fallback_to_build_date</code></h2>
-<p>Default is <code>false</code>. Enables falling back to the time when <code>mkdocs build</code> was executed <em>when git is not available</em>. This means the revision date will be incorrect, but this can be acceptable if you want your project to also successfully build in environments with no access to GIT.</p>
-<h2 id="enable_creation_date"><code>enable_creation_date</code></h2>
-<p>Default is <code>false</code> (because it has a small effect on build time). Enables a <em>Created</em> date variables, see [available-variables.md]. This will also add a created date at the bottom of each page in <code>mkdocs-material</code> as it has native support (see <a href="../howto/override-a-theme/">overriding a theme</a>).</p>
-<h2 id="exclude"><code>exclude</code></h2>
-<p>Default is empty. Specify a list of page source paths (one per line) that should not have a revision date included (excluded from processing by this plugin). This can be useful for example to remove the revision date from the front page. The source path of a page is relative to your <code>docs/</code> folder. You can also use <a href="https://docs.python.org/3/library/glob.html">globs</a> instead of full source paths. To exclude <code>docs/subfolder/page.md</code> specify in your <code>mkdocs.yml</code> a line under <code>exclude:</code> with <code>- subfolder/page.md</code>. Some examples:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="2:1"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 1.75C4 .784 4.784 0 5.75 0h5.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v8.586A1.75 1.75 0 0 1 14.25 15h-9a.75.75 0 0 1 0-1.5h9a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 10 4.25V1.5H5.75a.25.25 0 0 0-.25.25v2.5a.75.75 0 0 1-1.5 0v-2.5zm7.5-.188V4.25c0 .138.112.25.25.25h2.688a.252.252 0 0 0-.011-.013l-2.914-2.914a.272.272 0 0 0-.013-.011zM5.72 6.72a.75.75 0 0 0 0 1.06l1.47 1.47-1.47 1.47a.75.75 0 1 0 1.06 1.06l2-2a.75.75 0 0 0 0-1.06l-2-2a.75.75 0 0 0-1.06 0zM3.28 7.78a.75.75 0 0 0-1.06-1.06l-2 2a.75.75 0 0 0 0 1.06l2 2a.75.75 0 0 0 1.06-1.06L1.81 9.25l1.47-1.47z"/></svg></span> mkdocs.yml</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block"></div>
 </div>
 </div>
-<div class="highlight"><pre><span></span><code><span class="nt">plugins</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">git-revision-date-localized</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">exclude</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">index.md</span><span class="w"></span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">subfolder/page.md</span><span class="w"></span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">another_page.md</span><span class="w"></span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">folder/*</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="nt">plugins</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="nt">git-revision-date-localized</span><span class="p">:</span>
+      <span class="nt">timezone</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Europe/Amsterdam</span>
 </code></pre></div>
-<h2 id="enabled"><code>enabled</code></h2>
-<p>Default is <code>true</code>. Enables you to deactivate this plugin. A possible use case is local development where you might want faster build times and/or do not have git available. It's recommended to use this option with an environment variable together with a default fallback (introduced in <code>mkdocs</code> v1.2.1, see <a href="https://www.mkdocs.org/user-guide/configuration/#environment-variables">docs</a>). Example:</p>
+<h2 id="locale"><code>locale</code></h2>
+<p>Default is <code>None</code>. Specify a two letter <a href="https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes">ISO639</a> language code to display dates in your preferred language. Note this plugin supports many different ways to <a href="../howto/specify-locale/">specify the locale</a>, but if not specified anywhere the fallback is English (<code>en</code>).</p>
+<p>Example outputs:</p>
+<div class="highlight"><pre><span></span><code><span class="l l-Scalar l-Scalar-Plain">April 27, 2021</span>                <span class="c1"># `locale: en` with `type: date` (default)</span>
+<span class="l l-Scalar l-Scalar-Plain">April 27, 2021 13:11:28</span>       <span class="c1"># `locale: en` with `type: datetime`</span>
+<span class="l l-Scalar l-Scalar-Plain">2 weeks ago</span>                   <span class="c1"># `locale: en` with `type: timeago`</span>
+<span class="l l-Scalar l-Scalar-Plain">27 de marzo de 2021</span>           <span class="c1"># `locale: es` with `type: date`</span>
+<span class="l l-Scalar l-Scalar-Plain">27 de marzo de 2021 13:57:28</span>  <span class="c1"># `locale: es` with `type: datetime`</span>
+<span class="l l-Scalar l-Scalar-Plain">hace 2 semanas</span>                <span class="c1"># `locale: es` with `type: timeago`</span>
+</code></pre></div>
 <div class="tabbed-set tabbed-alternate" data-tabs="3:1"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 1.75C4 .784 4.784 0 5.75 0h5.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v8.586A1.75 1.75 0 0 1 14.25 15h-9a.75.75 0 0 1 0-1.5h9a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 10 4.25V1.5H5.75a.25.25 0 0 0-.25.25v2.5a.75.75 0 0 1-1.5 0v-2.5zm7.5-.188V4.25c0 .138.112.25.25.25h2.688a.252.252 0 0 0-.011-.013l-2.914-2.914a.272.272 0 0 0-.013-.011zM5.72 6.72a.75.75 0 0 0 0 1.06l1.47 1.47-1.47 1.47a.75.75 0 1 0 1.06 1.06l2-2a.75.75 0 0 0 0-1.06l-2-2a.75.75 0 0 0-1.06 0zM3.28 7.78a.75.75 0 0 0-1.06-1.06l-2 2a.75.75 0 0 0 0 1.06l2 2a.75.75 0 0 0 1.06-1.06L1.81 9.25l1.47-1.47z"/></svg></span> mkdocs.yml</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block"></div>
 </div>
 </div>
-<div class="highlight"><pre><span></span><code><span class="nt">plugins</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">git-revision-date-localized</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kt">!ENV</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">ENABLED_GIT_REVISION_DATE</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">True</span><span class="p p-Indicator">]</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="nt">plugins</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="nt">git-revision-date-localized</span><span class="p">:</span>
+      <span class="nt">locale</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">en</span>
+</code></pre></div>
+<h2 id="fallback_to_build_date"><code>fallback_to_build_date</code></h2>
+<p>Default is <code>false</code>. Enables falling back to the time when <code>mkdocs build</code> was executed <em>when git is not available</em>. This means the revision date will be incorrect, but this can be acceptable if you want your project to also successfully build in environments with no access to GIT.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:1"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 1.75C4 .784 4.784 0 5.75 0h5.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v8.586A1.75 1.75 0 0 1 14.25 15h-9a.75.75 0 0 1 0-1.5h9a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 10 4.25V1.5H5.75a.25.25 0 0 0-.25.25v2.5a.75.75 0 0 1-1.5 0v-2.5zm7.5-.188V4.25c0 .138.112.25.25.25h2.688a.252.252 0 0 0-.011-.013l-2.914-2.914a.272.272 0 0 0-.013-.011zM5.72 6.72a.75.75 0 0 0 0 1.06l1.47 1.47-1.47 1.47a.75.75 0 1 0 1.06 1.06l2-2a.75.75 0 0 0 0-1.06l-2-2a.75.75 0 0 0-1.06 0zM3.28 7.78a.75.75 0 0 0-1.06-1.06l-2 2a.75.75 0 0 0 0 1.06l2 2a.75.75 0 0 0 1.06-1.06L1.81 9.25l1.47-1.47z"/></svg></span> mkdocs.yml</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block"></div>
+</div>
+</div>
+<div class="highlight"><pre><span></span><code><span class="nt">plugins</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="nt">git-revision-date-localized</span><span class="p">:</span>
+      <span class="nt">fallback_to_build_date</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<h2 id="enable_creation_date"><code>enable_creation_date</code></h2>
+<p>Default is <code>false</code> (because it has a small effect on build time). Enables a <em>Created</em> date variables, see [available-variables.md]. This will also add a created date at the bottom of each page in <code>mkdocs-material</code> as it has native support (see <a href="../howto/override-a-theme/">overriding a theme</a>).</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:1"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 1.75C4 .784 4.784 0 5.75 0h5.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v8.586A1.75 1.75 0 0 1 14.25 15h-9a.75.75 0 0 1 0-1.5h9a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 10 4.25V1.5H5.75a.25.25 0 0 0-.25.25v2.5a.75.75 0 0 1-1.5 0v-2.5zm7.5-.188V4.25c0 .138.112.25.25.25h2.688a.252.252 0 0 0-.011-.013l-2.914-2.914a.272.272 0 0 0-.013-.011zM5.72 6.72a.75.75 0 0 0 0 1.06l1.47 1.47-1.47 1.47a.75.75 0 1 0 1.06 1.06l2-2a.75.75 0 0 0 0-1.06l-2-2a.75.75 0 0 0-1.06 0zM3.28 7.78a.75.75 0 0 0-1.06-1.06l-2 2a.75.75 0 0 0 0 1.06l2 2a.75.75 0 0 0 1.06-1.06L1.81 9.25l1.47-1.47z"/></svg></span> mkdocs.yml</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block"></div>
+</div>
+</div>
+<div class="highlight"><pre><span></span><code><span class="nt">plugins</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="nt">git-revision-date-localized</span><span class="p">:</span>
+      <span class="nt">enable_creation_date</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<h2 id="exclude"><code>exclude</code></h2>
+<p>Default is empty. Specify a list of page source paths (one per line) that should not have a revision date included (excluded from processing by this plugin). This can be useful for example to remove the revision date from the front page. The source path of a page is relative to your <code>docs/</code> folder. You can also use <a href="https://docs.python.org/3/library/glob.html">globs</a> instead of full source paths. To exclude <code>docs/subfolder/page.md</code> specify in your <code>mkdocs.yml</code> a line under <code>exclude:</code> with <code>- subfolder/page.md</code>. Some examples:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="6:1"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 1.75C4 .784 4.784 0 5.75 0h5.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v8.586A1.75 1.75 0 0 1 14.25 15h-9a.75.75 0 0 1 0-1.5h9a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 10 4.25V1.5H5.75a.25.25 0 0 0-.25.25v2.5a.75.75 0 0 1-1.5 0v-2.5zm7.5-.188V4.25c0 .138.112.25.25.25h2.688a.252.252 0 0 0-.011-.013l-2.914-2.914a.272.272 0 0 0-.013-.011zM5.72 6.72a.75.75 0 0 0 0 1.06l1.47 1.47-1.47 1.47a.75.75 0 1 0 1.06 1.06l2-2a.75.75 0 0 0 0-1.06l-2-2a.75.75 0 0 0-1.06 0zM3.28 7.78a.75.75 0 0 0-1.06-1.06l-2 2a.75.75 0 0 0 0 1.06l2 2a.75.75 0 0 0 1.06-1.06L1.81 9.25l1.47-1.47z"/></svg></span> mkdocs.yml</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block"></div>
+</div>
+</div>
+<div class="highlight"><pre><span></span><code><span class="nt">plugins</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="nt">git-revision-date-localized</span><span class="p">:</span>
+      <span class="nt">exclude</span><span class="p">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">index.md</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">subfolder/page.md</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">another_page.md</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">folder/*</span>
+</code></pre></div>
+<h2 id="enabled"><code>enabled</code></h2>
+<p>Default is <code>true</code>. Enables you to deactivate this plugin. A possible use case is local development where you might want faster build times and/or do not have git available. It's recommended to use this option with an environment variable together with a default fallback (introduced in <code>mkdocs</code> v1.2.1, see <a href="https://www.mkdocs.org/user-guide/configuration/#environment-variables">docs</a>). Example:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="7:1"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio" /><div class="tabbed-labels"><label for="__tabbed_7_1"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 1.75C4 .784 4.784 0 5.75 0h5.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v8.586A1.75 1.75 0 0 1 14.25 15h-9a.75.75 0 0 1 0-1.5h9a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 10 4.25V1.5H5.75a.25.25 0 0 0-.25.25v2.5a.75.75 0 0 1-1.5 0v-2.5zm7.5-.188V4.25c0 .138.112.25.25.25h2.688a.252.252 0 0 0-.011-.013l-2.914-2.914a.272.272 0 0 0-.013-.011zM5.72 6.72a.75.75 0 0 0 0 1.06l1.47 1.47-1.47 1.47a.75.75 0 1 0 1.06 1.06l2-2a.75.75 0 0 0 0-1.06l-2-2a.75.75 0 0 0-1.06 0zM3.28 7.78a.75.75 0 0 0-1.06-1.06l-2 2a.75.75 0 0 0 0 1.06l2 2a.75.75 0 0 0 1.06-1.06L1.81 9.25l1.47-1.47z"/></svg></span> mkdocs.yml</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block"></div>
+</div>
+</div>
+<div class="highlight"><pre><span></span><code><span class="nt">plugins</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="nt">git-revision-date-localized</span><span class="p">:</span>
+      <span class="nt">enabled</span><span class="p">:</span> <span class="kt">!ENV</span> <span class="p p-Indicator">[</span><span class="nv">ENABLED_GIT_REVISION_DATE</span><span class="p p-Indicator">,</span> <span class="nv">True</span><span class="p p-Indicator">]</span>
 </code></pre></div>
 <p>Which enables you to disable the plugin locally using:</p>
 <div class="highlight"><pre><span></span><code><span class="nb">export</span> <span class="nv">ENABLED_GIT_REVISION_DATE</span><span class="o">=</span><span class="nb">false</span>
@@ -585,7 +648,7 @@ mkdocs serve
   <small>
     
       Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago"><span class="timeago" datetime="2022-02-06T22:28:11+01:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date">2022-02-06</span>
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago"><span class="timeago" datetime="2022-02-21T10:50:20+01:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date">2022-02-21</span>
       
         <br>
         Created:
@@ -657,10 +720,10 @@ mkdocs serve
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.092fa1f6.min.js"}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.cefbb252.min.js"}</script>
     
     
-      <script src="../assets/javascripts/bundle.e3b2bf44.min.js"></script>
+      <script src="../assets/javascripts/bundle.a5f8ea78.min.js"></script>
       
         <script src="../js/timeago.min.js"></script>
       
