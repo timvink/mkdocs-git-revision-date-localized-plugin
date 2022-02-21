@@ -46,7 +46,7 @@ class Util:
 
     @staticmethod
     def _date_formats(
-        unix_timestamp: float, locale: str = "en", time_zone: str = "UTC"
+        unix_timestamp: float, locale: str = "en", time_zone: str = "UTC", custom_format: str = "%d. %B %Y"
     ) -> Dict[str, Any]:
         """
         Calculate different date formats / types.
@@ -55,6 +55,7 @@ class Util:
             unix_timestamp (float): A timestamp in seconds since 1970.
             locale (str): Locale code of language to use. Defaults to 'en'.
             time_zone (str): Timezone database name (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
+            custom_format (str): strftime format specifier for the 'custom' type
 
         Returns:
             dict: Different date formats.
@@ -77,8 +78,8 @@ class Util:
             ),
             "iso_date": loc_revision_date.strftime("%Y-%m-%d"),
             "iso_datetime": loc_revision_date.strftime("%Y-%m-%d %H:%M:%S"),
-            "timeago": '<span class="timeago" datetime="%s" locale="%s"></span>'
-            % (loc_revision_date.isoformat(), locale),
+            "timeago": '<span class="timeago" datetime="%s" locale="%s"></span>' % (loc_revision_date.isoformat(), locale),
+            "custom": loc_revision_date.strftime(custom_format),
         }
 
     def get_git_commit_timestamp(
@@ -195,7 +196,8 @@ class Util:
         date_formats = self._date_formats(
             unix_timestamp=commit_timestamp, 
             time_zone=self.config.get("timezone"),
-            locale=locale
+            locale=locale,
+            custom_format=self.config.get('custom_format')
         )
         if add_spans:
             date_formats = self.add_spans(date_formats)

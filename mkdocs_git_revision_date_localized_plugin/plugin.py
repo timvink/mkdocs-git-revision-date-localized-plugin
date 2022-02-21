@@ -37,6 +37,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         ("fallback_to_build_date", config_options.Type(bool, default=False)),
         ("locale", config_options.Type(str, default=None)),
         ("type", config_options.Type(str, default="date")),
+        ("custom_format", config_options.Type(str, default="%d. %B %Y")),
         ("timezone", config_options.Type(str, default="UTC")),
         ("exclude", config_options.Type(list, default=[])),
         ("enable_creation_date", config_options.Type(bool, default=False)),
@@ -61,7 +62,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         if not self.config.get('enabled'):
             return config
         
-        assert self.config['type'] in ["date","datetime","iso_date","iso_datetime","timeago"]
+        assert self.config['type'] in ["date","datetime","iso_date","iso_datetime","timeago","custom"]
 
         self.util = Util(config=self.config)
 
@@ -194,7 +195,6 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             locale = locale[:2]
         assert len(locale) == 2, "locale must be a 2 letter code, see https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes"
         
-
 
         # Retrieve git commit timestamp
         last_revision_timestamp = self.util.get_git_commit_timestamp(

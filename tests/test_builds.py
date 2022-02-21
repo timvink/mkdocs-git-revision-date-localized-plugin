@@ -300,6 +300,7 @@ MKDOCS_FILES = [
     'basic_project/mkdocs_theme_timeago_instant.yml',
     'basic_project/mkdocs_exclude.yml',
     'basic_project/mkdocs_meta.yml',
+    'basic_project/mkdocs_custom_type.yml',
     # 'i18n/mkdocs.yml'
 ]
 
@@ -322,6 +323,7 @@ def test_date_formats():
         "iso_date": "2020-02-22",
         "iso_datetime": "2020-02-22 18:52:09",
         "timeago": '<span class="timeago" datetime="2020-02-22T18:52:09+00:00" locale="en"></span>',
+        "custom": '22. February 2020',
     }
 
 
@@ -363,9 +365,12 @@ def test_tags_are_replaced(tmp_path, mkdocs_file):
     # Assert {{ git_revision_date_localized }} is replaced
     date_formats_revision_date = Util()._date_formats(1642911026, 
         locale=plugin_config.get("locale"),
-        time_zone=plugin_config.get("timezone"))
+        time_zone=plugin_config.get("timezone"),
+        custom_format=plugin_config.get("custom_format")
+    )
     for k, v in date_formats_revision_date.items():
         assert v is not None
+    
     date = date_formats_revision_date.get(plugin_config.get('type'))
     assert re.search(rf"{date}\<\/span.+", contents)
 
@@ -373,7 +378,9 @@ def test_tags_are_replaced(tmp_path, mkdocs_file):
     # Assert {{ git_site_revision_date_localized }} is replaced
     date_formats_revision_date = Util()._date_formats(1643911026, 
         locale=plugin_config.get("locale"),
-        time_zone=plugin_config.get("timezone"))
+        time_zone=plugin_config.get("timezone"),
+        custom_format=plugin_config.get("custom_format")
+    )
     for k, v in date_formats_revision_date.items():
         assert v is not None
     date = date_formats_revision_date.get(plugin_config.get('type')) 
@@ -384,7 +391,9 @@ def test_tags_are_replaced(tmp_path, mkdocs_file):
         # The creation of page_with_tag.md was set in setup_commit_history to 1500854705 ( Mon Jul 24 2017 00:05:05 GMT+0000 )
         date_formats_revision_date = Util()._date_formats(1500854705, 
             locale=plugin_config.get("locale"),
-            time_zone=plugin_config.get("timezone"))
+            time_zone=plugin_config.get("timezone"),
+            custom_format=plugin_config.get("custom_format")
+        )
         for k, v in date_formats_revision_date.items():
             assert v is not None
         date = date_formats_revision_date.get(plugin_config.get('type')) 

@@ -32,11 +32,13 @@ To allow for more flexibility when overriding a theme there are also variables f
 - `page.meta.git_revision_date_localized_raw_iso_date`
 - `page.meta.git_revision_date_localized_raw_iso_datetime`
 - `page.meta.git_revision_date_localized_raw_timeago`
+- `page.meta.git_revision_date_localized_raw_custom`
 - `page.meta.git_site_revision_date_localized_raw_datetime`
 - `page.meta.git_site_revision_date_localized_raw_iso_date`
 - `page.meta.git_site_revision_date_localized_raw_date`
 - `page.meta.git_site_revision_date_localized_raw_iso_datetime`
 - `page.meta.git_site_revision_date_localized_raw_timeago`
+- `page.meta.git_site_revision_date_localized_raw_custom`
 
 And if you've enabled creation date in the config:
 
@@ -45,6 +47,7 @@ And if you've enabled creation date in the config:
 - `page.meta.git_creation_date_localized_raw_iso_date`
 - `page.meta.git_creation_date_localized_raw_iso_datetime`
 - `page.meta.git_creation_date_localized_raw_timeago`
+- `page.meta.git_creation_date_localized_raw_custom`
 
 !!! warning "timeago.js dependency"
 
