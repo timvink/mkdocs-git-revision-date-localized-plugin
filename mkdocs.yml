@@ -8,6 +8,7 @@ nav:
   - index.md
   - available-variables.md
   - How to:
+      - howto/specify-locale.md
       - howto/custom-styling.md
       - howto/override-a-theme.md
   - options.md

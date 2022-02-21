@@ -178,7 +178,8 @@ class Util:
     def get_date_formats_for_timestamp(
         self,
         commit_timestamp: int,
-        add_spans: bool = True
+        locale: str,
+        add_spans: bool = True,
     ) -> Dict[str, str]:
         """
         Determine localized date variants for a given timestamp.
@@ -186,7 +187,7 @@ class Util:
         Args:
             commit_timestamp (int): most recent commit date in unix timestamp.
             locale (str, optional): Locale code of language to use. Defaults to 'en'.
-            time_zone (str): Timezone database name (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
+            add_spans: Wraps output in <span> elements with unique classes for easy CSS formatting
 
         Returns:
             dict: Localized date variants.
@@ -194,7 +195,7 @@ class Util:
         date_formats = self._date_formats(
             unix_timestamp=commit_timestamp, 
             time_zone=self.config.get("timezone"),
-            locale=self.config.get("locale")
+            locale=locale
         )
         if add_spans:
             date_formats = self.add_spans(date_formats)
