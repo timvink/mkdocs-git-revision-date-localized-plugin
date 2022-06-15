@@ -85,7 +85,8 @@ class Util:
     def get_git_commit_timestamp(
             self,
             path: str,
-            is_first_commit: bool = False
+            is_first_commit: bool = False,
+            follow_mode: bool = False
     ) -> int:
         """
         Get a list of commit dates in unix timestamp, starts with the most recent commit.
@@ -95,6 +96,7 @@ class Util:
                                     else, get that of the most recent commit.
             path (str): Location of a markdown file that is part of a Git repository.
             is_first_commit (bool): retrieve commit timestamp when file was created.
+            follow_mode (bool): retrieve first commit timestamp with follow mode.
 
         Returns:
             int: commit date in unix timestamp, starts with the most recent commit.
@@ -112,7 +114,7 @@ class Util:
             if is_first_commit:
                 # diff_filter="A" will select the commit that created the file
                 commit_timestamp = git.log(
-                    realpath, date="unix", format="%at", diff_filter="A", no_show_signature=True
+                    realpath, date="unix", format="%at", diff_filter="A", no_show_signature=True, follow=follow_mode
                 )
                 # A file can be created multiple times, through a file renamed. 
                 # Commits are ordered with most recent commit first
