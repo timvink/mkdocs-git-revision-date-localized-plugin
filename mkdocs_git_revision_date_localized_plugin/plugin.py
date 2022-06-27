@@ -41,7 +41,6 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         ("timezone", config_options.Type(str, default="UTC")),
         ("exclude", config_options.Type(list, default=[])),
         ("enable_creation_date", config_options.Type(bool, default=False)),
-        ("creation_date_with_follow", config_options.Type(bool, default=False)),
         ("enabled", config_options.Type(bool, default=True)),
     )
 
@@ -256,7 +255,6 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         first_revision_timestamp = self.util.get_git_commit_timestamp(
             path=page.file.abs_src_path,
             is_first_commit=True,
-            follow_mode=self.config.get("creation_date_with_follow")
         )
 
         # Creation date formats

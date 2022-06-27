@@ -264,20 +264,11 @@ def validate_build(testproject_path, plugin_config: dict = {}):
         searches = [x in contents for x in date_formats.values()]
         assert any(searches), "No correct creation date formats output was found"
 
-        if plugin_config.get("creation_date_with_follow"):
-            commit_timestamp=repo.get_git_commit_timestamp(
-                path=str(testproject_path / "docs/subfolder/page_with_renamed.md"),
-                is_first_commit=True,
-                follow_mode=True
-            )
-            assert commit_timestamp == 1655229469
-        else:
-            commit_timestamp=repo.get_git_commit_timestamp(
-                path=str(testproject_path / "docs/subfolder/page_with_renamed.md"),
-                is_first_commit=True,
-                follow_mode=False
-            )
-            assert commit_timestamp == 1655229515
+        commit_timestamp=repo.get_git_commit_timestamp(
+            path=str(testproject_path / "docs/subfolder/page_with_renamed.md"),
+            is_first_commit=True
+        )
+        assert commit_timestamp == 1655229469
 
 def validate_mkdocs_file(temp_path: str, mkdocs_yml_file: str):
     """
@@ -313,7 +304,6 @@ MKDOCS_FILES = [
     'basic_project/mkdocs_with_override.yml',
     'basic_project/mkdocs_theme_language.yml',
     'basic_project/mkdocs_creation_date.yml',
-    'basic_project/mkdocs_creation_date_with_follow.yml',
     'basic_project/mkdocs_theme_locale_disabled.yml',
     'basic_project/mkdocs_timeago_locale.yml',
     'basic_project/mkdocs_timeago.yml',
