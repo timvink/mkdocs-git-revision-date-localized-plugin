@@ -155,6 +155,16 @@ def setup_commit_history(testproject_path):
         repo.git.add("docs/page_with_tag.md")
         repo.git.commit(message="update homepage", author=author, date="1642911026") # 	Sun Jan 23 2022 04:10:26 GMT+0000
 
+        bf_file_name = os.path.join(testproject_path, "docs/page_with_renamed.md")
+        af_file_name = os.path.join(testproject_path, "docs/subfolder/page_with_renamed.md")
+        # Since git.mv would actually remove the file, move page_with_renamed.md back to docs if it has been moved
+        if os.path.exists(af_file_name):
+            os.replace(af_file_name, bf_file_name)
+        repo.git.add("docs/page_with_renamed.md")
+        repo.git.commit(message="page_with_renamed.md before renamed", author=author, date="1655229469") #  Tue Jun 14 2022 17:57:49 GMT+0000
+        repo.git.mv("docs/page_with_renamed.md", "docs/subfolder/page_with_renamed.md")
+        repo.git.commit(message="page_with_renamed.md after renamed", author=author, date="1655229515") #  Tue Jun 14 2022 17:58:35 GMT+0000
+
         repo.git.add("docs/first_page.md")
         repo.git.commit(message="first page", author=author, date="1500854705") # Mon Jul 24 2017 00:05:05 GMT+0000
         file_name = os.path.join(testproject_path, "docs/first_page.md")
@@ -254,6 +264,11 @@ def validate_build(testproject_path, plugin_config: dict = {}):
         searches = [x in contents for x in date_formats.values()]
         assert any(searches), "No correct creation date formats output was found"
 
+        commit_timestamp=repo.get_git_commit_timestamp(
+            path=str(testproject_path / "docs/subfolder/page_with_renamed.md"),
+            is_first_commit=True
+        )
+        assert commit_timestamp == 1655229469
 
 def validate_mkdocs_file(temp_path: str, mkdocs_yml_file: str):
     """
@@ -355,10 +370,10 @@ def test_tags_are_replaced(tmp_path, mkdocs_file):
        pytest.skip("Not necessary to test the JS library")
 
     # Make sure count_commits() works
-    # We created 8 commits in setup_commit_history()
+    # We created 10 commits in setup_commit_history()
     with working_directory(testproject_path):
         u = Util()
-        assert commit_count(u._get_repo("docs/page_with_tag.md")) == 8
+        assert commit_count(u._get_repo("docs/page_with_tag.md")) == 10
 
     
     # the revision date was in 'setup_commit_history' was set to 1642911026 (Sun Jan 23 2022 04:10:26 GMT+0000)
