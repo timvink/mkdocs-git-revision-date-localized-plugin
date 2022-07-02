@@ -87,7 +87,7 @@ Default is `false`. Enables falling back to the time when `mkdocs build` was exe
 
 ## `enable_creation_date`
 
-Default is `false` (because it has a small effect on build time). Enables a *Created* date variables, see [available-variables.md]. This will also add a created date at the bottom of each page in `mkdocs-material` as it has native support (see [overriding a theme](howto/override-a-theme.md)).
+Default is `false` (because it has a small effect on build time). Enables a *Created* date variables, see [available variables](available-variables.md). This will also add a created date at the bottom of each page in `mkdocs-material` as it has native support (see [overriding a theme](howto/override-a-theme.md)).
 
 === ":octicons-file-code-16: mkdocs.yml"
 
