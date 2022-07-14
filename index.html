@@ -485,6 +485,10 @@
               
   
                 
+<a href="https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/edit/master/docs/index.md" title="Edit this page" class="md-content__button md-icon">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+</a>
+
 
 
 <p><a href="https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/actions"><img alt="Actions Status" src="https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/workflows/pytest/badge.svg" /></a>
@@ -514,7 +518,8 @@
 <blockquote>
 <p>If you have no <code>plugins</code> entry in your config file yet, you'll likely also want to add the <code>search</code> plugin. MkDocs enables it by default if there is no <code>plugins</code> entry set.</p>
 </blockquote>
-<p>The <a href="https://squidfunk.github.io/mkdocs-material/">mkdocs-material</a> theme has built in support for <code>git-revision-date-localized</code> and you should already see the last revision date on the bottom of your pages. See the <a href="https://timvink.github.io/mkdocs-git-revision-date-localized-plugin/index.html">documentation</a> on how to fine-tune the appearance and the date format.</p>
+<p>The <a href="https://squidfunk.github.io/mkdocs-material/">mkdocs-material</a> theme supports <code>git-revision-date-localized</code>. After installing the plugin and updating your <code>mkdocs.yml</code> you should see the last revision date on the bottom of your pages. Other mkdocs themes require <a href="https://timvink.github.io/mkdocs-git-revision-date-localized-plugin/howto/override-a-theme/">additional customization</a>.</p>
+<p>See the <a href="https://timvink.github.io/mkdocs-git-revision-date-localized-plugin/index.html">documentation</a> on how to fine-tune the appearance and the date format.</p>
 <h3 id="note-when-using-build-environments">Note when using build environments</h3>
 <p>This plugin needs access to the last commit that touched a specific file to be able to retrieve the date. By default many build environments only retrieve the last commit, which means you might need to:</p>
 <details>
@@ -583,7 +588,7 @@
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2021
+      Copyright &copy; 2022
     </div>
   
   

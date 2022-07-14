@@ -489,6 +489,10 @@
               
   
                 
+<a href="https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/edit/master/docs/howto/specify-locale.md" title="Edit this page" class="md-content__button md-icon">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+</a>
+
 
 
 <h1 id="specify-a-locale">Specify a locale</h1>
@@ -506,7 +510,7 @@
 <h2 id="1-page-locale-set-by-the-i18n-plugin">1. Page locale set by the <code>i18n</code> plugin</h2>
 <p>The <a href="https://github.com/ultrabug/mkdocs-static-i18n">mkdocs-static-i18n</a> plugin helps you support multiple language versions of your site. When enabled, <code>i18n</code> will add a <code>locale</code> attribute to each markdown page that <code>git-revision-date-localized</code> will use.</p>
 <h2 id="2-page-locale-set-by-metadata">2. Page locale set by metadata</h2>
-<p>The <a href="https://python-markdown.github.io/extensions/meta_data/">Metadata</a> adds the ability to attach arbitrary key-value pairs to a document via front matter written in YAML syntax before the Markdown. Enable it via mkdocs.yml:</p>
+<p>The <a href="https://python-markdown.github.io/extensions/meta_data/">Metadata</a> extension adds the ability to attach arbitrary key-value pairs to a document via front matter written in YAML syntax before the Markdown. Enable it in your <code>mkdocs.yml</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># mkdocs.yml</span>
 <span class="nt">markdown_extensions</span><span class="p">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">meta</span>
@@ -532,7 +536,7 @@
     <span class="nt">locale</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">en</span>
 </code></pre></div>
 <h2 id="5-fallback-locale">5. Fallback locale</h2>
-<p>If no <code>locale</code> is specified anywhere, the fallback is English (<code>en</code>).</p>
+<p>If no <code>locale</code> is specified anywhere, the fallback is English with the US date format (<code>en</code>).</p>
 <div class="admonition info">
 <p class="admonition-title">Supported locales</p>
 <ul>
@@ -550,7 +554,7 @@
   <small>
     
       Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago"><span class="timeago" datetime="2022-02-21T08:59:26+01:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date">2022-02-21</span>
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago"><span class="timeago" datetime="2022-07-14T13:49:09+02:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date">2022-07-14</span>
       
         <br>
         Created:
@@ -618,7 +622,7 @@
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2021
+      Copyright &copy; 2022
     </div>
   
   
