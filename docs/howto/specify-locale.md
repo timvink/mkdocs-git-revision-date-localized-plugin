@@ -13,7 +13,7 @@ April 27, 2021 13:11:28       # `locale: en` with `type: datetime`
 hace 2 semanas                # `locale: es` with `type: timeago`
 ```
 
-You can set the `locale` in different locations, both for your entire site and on a per-page basis. If specified multiple times `git-revision-date-localized` will use the `locale` that is most specific to a page.
+You can set the `locale` in different locations, both for your entire site and on a per-page basis. If specified multiple times `git-revision-date-localized` will use the `locale` that is most specific to a page. NB the `en` theme defaults to US date format, if you want to adjust this then you can define a [custom type](../options.md/#type).
 
 Here's the order of priority:
 
