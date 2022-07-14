@@ -1,6 +1,5 @@
 site_name: "mkdocs-git-revision-date-localized-plugin"
 site_description: "Mkdocs plugin that enables displaying the localized date of the last git modification of a markdown file."
-edit_uri: ''
 copyright: 'Copyright &copy; 2021'
 repo_url: https://github.com/timvink/mkdocs-git-revision-date-localized-plugin
 
