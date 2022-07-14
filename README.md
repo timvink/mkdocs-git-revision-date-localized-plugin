@@ -20,7 +20,7 @@ Other MkDocs plugins that use information from git:
 
 ## Setup
 
-Install the plugin using `pip3` with the following command:
+Install the plugin using `pip3` with the following command (if running in Docker then you will need to add this to the `Dockerfile` that builds the image):
 
 ```bash
 pip3 install mkdocs-git-revision-date-localized-plugin
@@ -36,7 +36,7 @@ plugins:
 
 > If you have no `plugins` entry in your config file yet, you'll likely also want to add the `search` plugin. MkDocs enables it by default if there is no `plugins` entry set.
 
-The [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) theme has built in support for `git-revision-date-localized` and you should already see the last revision date on the bottom of your pages. See the [documentation](https://timvink.github.io/mkdocs-git-revision-date-localized-plugin/index.html) on how to fine-tune the appearance and the date format.
+The [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) theme has built in support for `git-revision-date-localized` and you should already see the last revision date on the bottom of your pages once you have activated the plugin as noted above. See the [documentation](https://timvink.github.io/mkdocs-git-revision-date-localized-plugin/index.html) on how to fine-tune the appearance and the date format.
 
 ### Note when using build environments
 
