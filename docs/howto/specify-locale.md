@@ -23,7 +23,7 @@ The [mkdocs-static-i18n](https://github.com/ultrabug/mkdocs-static-i18n) plugin 
 
 ## 2. Page locale set by metadata
 
-The [Metadata](https://python-markdown.github.io/extensions/meta_data/) adds the ability to attach arbitrary key-value pairs to a document via front matter written in YAML syntax before the Markdown. Enable it via mkdocs.yml:
+The [Metadata](https://python-markdown.github.io/extensions/meta_data/) extension adds the ability to attach arbitrary key-value pairs to a document via front matter written in YAML syntax before the Markdown. Enable it in your `mkdocs.yml`:
 
 ```yaml
 # mkdocs.yml
@@ -65,7 +65,7 @@ plugins:
 
 ## 5. Fallback locale
 
-If no `locale` is specified anywhere, the fallback is English (`en`).
+If no `locale` is specified anywhere, the fallback is English with the US date format (`en`).
 
 !!! info "Supported locales"
     - When used in combination with `type: date` or `type: datetime`, translation is done using [babel](https://github.com/python-babel/babel) which supports [these locales](http://www.unicode.org/cldr/charts/latest/supplemental/territory_language_information.html)
