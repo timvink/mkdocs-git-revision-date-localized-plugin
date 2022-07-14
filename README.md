@@ -36,7 +36,9 @@ plugins:
 
 > If you have no `plugins` entry in your config file yet, you'll likely also want to add the `search` plugin. MkDocs enables it by default if there is no `plugins` entry set.
 
-The [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) theme has built in support for `git-revision-date-localized` and you should already see the last revision date on the bottom of your pages. See the [documentation](https://timvink.github.io/mkdocs-git-revision-date-localized-plugin/index.html) on how to fine-tune the appearance and the date format.
+The [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) theme supports `git-revision-date-localized`. After installing the plugin and updating your `mkdocs.yml` you should see the last revision date on the bottom of your pages. Other mkdocs themes require [additional customization](https://timvink.github.io/mkdocs-git-revision-date-localized-plugin/howto/override-a-theme/).
+
+See the [documentation](https://timvink.github.io/mkdocs-git-revision-date-localized-plugin/index.html) on how to fine-tune the appearance and the date format.
 
 ### Note when using build environments
 
