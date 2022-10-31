@@ -1,6 +1,6 @@
 # Customize a theme
 
-You can [customize an existing theme](https://www.mkdocs.org/user-guide/styling-your-docs/#customizing-a-theme) by overriding blocks or partials. You might want to do this because your theme is not natively supported, or you would like more control on the formatting. Below are two examples to help get you started.
+You can [customize an existing theme](https://www.mkdocs.org/user-guide/styling-your-docs/#customizing-a-theme) by overriding blocks or partials. You might want to do this because your theme is not natively supported, or you would like more control on the formatting. Below are some examples to help get you started.
 
 ## Example: default `mkdocs` theme
 
@@ -86,3 +86,61 @@ If you want, you can customize further by [extending the mkdocs-material theme](
     ```
 
 [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) also supports [custom translations](https://squidfunk.github.io/mkdocs-material/setup/changing-the-language/#custom-translations) that you can use to specify alternative translations for `source.file.date.updated` ("Last updated") and `source.file.date.created` ("Created"). 
+
+## Example: List last updated pages
+
+Let's say we want to insert a list of the last 10 updated pages into our home page.
+
+We can use the [mkdocs template variables](https://www.mkdocs.org/dev-guide/themes/#template-variables) together with [jinja2 filters](https://jinja.palletsprojects.com/en/latest/templates/#filters) to
+[extend the mkdocs-material theme](https://squidfunk.github.io/mkdocs-material/customization/#extending-the-theme). [@simbo](https://github.com/simbo) provided this example that overrides `main.html`:
+
+=== ":octicons-file-code-16: mkdocs.yml"
+
+    ```yaml
+    theme:
+        name: 'material'
+        custom_dir: docs/overrides
+    ```
+
+=== ":octicons-file-code-16: docs/overrides/main.html"
+
+    ```jinja2
+    {% extends "base.html" %}
+    {% block site_nav %}
+    {{ super() }}
+    {% if page and page.file and page.file.src_path == "index.md" %}
+        <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="navigation">
+        <div class="md-sidebar__scrollwrap">
+            <div class="md-sidebar__inner">
+            <nav class="md-nav md-nav--secondary md-nav--integrated" aria-label="Recently updated" data-md-level="0">
+                <div class="md-nav__title">Recently updated</div>
+                <ul class="md-nav__list" data-md-scrollfix>
+                {% for file in (
+                    pages
+                    | selectattr("page.meta.git_revision_date_localized_raw_iso_datetime")
+                    | selectattr("page.meta.git_creation_date_localized_raw_iso_datetime")
+                    | sort(attribute="page.title")
+                    | sort(attribute="page.meta.git_creation_date_localized_raw_iso_datetime", reverse=true)
+                    | sort(attribute="page.meta.git_revision_date_localized_raw_iso_datetime", reverse=true)
+                    )[:10]
+                %}
+                    <li class="md-nav__item">
+                    <a class="md-nav__link" href="{{ file.url }}" style="display:block">
+                        {{ file.page.title }}
+                        <br/>
+                        <small>
+                        <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago">
+                            <span class="timeago" datetime="{{ file.page.meta.git_revision_date_localized_raw_iso_datetime }}" locale="en"></span>
+                        </span>
+                        </small>
+                    </a>
+                    </li>
+                {% endfor %}
+                </ul>
+            </nav>
+            </div>
+        </div>
+        </div>
+    {% endif %}
+    {% endblock %}
+    ```
