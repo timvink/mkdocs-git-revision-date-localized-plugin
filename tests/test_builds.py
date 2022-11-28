@@ -16,6 +16,7 @@ import os
 import re
 import shutil
 from contextlib import contextmanager
+from pathlib import Path
 
 # MkDocs
 from mkdocs.__main__ import build_command
@@ -112,6 +113,8 @@ def setup_clean_mkdocs_folder(mkdocs_yml_path, output_path):
         )
         shutil.rmtree(str(testproject_path))
 
+    # shutil.copytree(str(Path(mkdocs_yml_path).parent), testproject_path)
+
     # Copy correct mkdocs.yml file and our test 'docs/'
     if "i18n" in mkdocs_yml_path:
         shutil.copytree("tests/fixtures/i18n/docs", str(testproject_path / "docs"))
@@ -119,6 +122,9 @@ def setup_clean_mkdocs_folder(mkdocs_yml_path, output_path):
         shutil.copytree("tests/fixtures/basic_project/docs", str(testproject_path / "docs"))
     
     shutil.copyfile(mkdocs_yml_path, str(testproject_path / "mkdocs.yml"))
+
+    if "gen-files" in mkdocs_yml_path:
+        shutil.copyfile(str(Path(mkdocs_yml_path).parent / "gen_pages.py"), str(testproject_path / "gen_pages.py"))
 
     return testproject_path
 
@@ -143,48 +149,53 @@ def setup_commit_history(testproject_path):
     repo = git.Repo.init(testproject_path, bare=False)
     author = "Test Person <testtest@gmail.com>"
 
+
     with working_directory(testproject_path):
 
         # page_with_tags contains tags we replace and test
-        repo.git.add("docs/page_with_tag.md")
-        repo.git.commit(message="add homepage", author=author, date="1500854705") # Mon Jul 24 2017 00:05:05 GMT+0000
+        if os.path.exists("docs/page_with_tag.md"):
+            repo.git.add("docs/page_with_tag.md")
+            repo.git.commit(message="add homepage", author=author, date="1500854705") # Mon Jul 24 2017 00:05:05 GMT+0000
 
-        file_name = os.path.join(testproject_path, "docs/page_with_tag.md")
-        with open(file_name, "a") as the_file:
-            the_file.write("awa\n")
-        repo.git.add("docs/page_with_tag.md")
-        repo.git.commit(message="update homepage", author=author, date="1642911026") # 	Sun Jan 23 2022 04:10:26 GMT+0000
+            file_name = os.path.join(testproject_path, "docs/page_with_tag.md")
+            with open(file_name, "a") as the_file:
+                the_file.write("awa\n")
+            repo.git.add("docs/page_with_tag.md")
+            repo.git.commit(message="update homepage", author=author, date="1642911026") # 	Sun Jan 23 2022 04:10:26 GMT+0000
 
-        bf_file_name = os.path.join(testproject_path, "docs/page_with_renamed.md")
-        af_file_name = os.path.join(testproject_path, "docs/subfolder/page_with_renamed.md")
-        # Since git.mv would actually remove the file, move page_with_renamed.md back to docs if it has been moved
-        if os.path.exists(af_file_name):
-            os.replace(af_file_name, bf_file_name)
-        repo.git.add("docs/page_with_renamed.md")
-        repo.git.commit(message="page_with_renamed.md before renamed", author=author, date="1655229469") #  Tue Jun 14 2022 17:57:49 GMT+0000
-        repo.git.mv("docs/page_with_renamed.md", "docs/subfolder/page_with_renamed.md")
-        repo.git.commit(message="page_with_renamed.md after renamed", author=author, date="1655229515") #  Tue Jun 14 2022 17:58:35 GMT+0000
+        if os.path.exists("docs/page_with_renamed.md"):
+            bf_file_name = os.path.join(testproject_path, "docs/page_with_renamed.md")
+            af_file_name = os.path.join(testproject_path, "docs/subfolder/page_with_renamed.md")
+            # Since git.mv would actually remove the file, move page_with_renamed.md back to docs if it has been moved
+            if os.path.exists(af_file_name):
+                os.replace(af_file_name, bf_file_name)
+            repo.git.add("docs/page_with_renamed.md")
+            repo.git.commit(message="page_with_renamed.md before renamed", author=author, date="1655229469") #  Tue Jun 14 2022 17:57:49 GMT+0000
+            repo.git.mv("docs/page_with_renamed.md", "docs/subfolder/page_with_renamed.md")
+            repo.git.commit(message="page_with_renamed.md after renamed", author=author, date="1655229515") #  Tue Jun 14 2022 17:58:35 GMT+0000
 
-        repo.git.add("docs/first_page.md")
-        repo.git.commit(message="first page", author=author, date="1500854705") # Mon Jul 24 2017 00:05:05 GMT+0000
-        file_name = os.path.join(testproject_path, "docs/first_page.md")
-        with open(file_name, "w+") as the_file:
-            the_file.write("Hello\n")
-        repo.git.add("docs/first_page.md")
-        repo.git.commit(message="first page update 1", author=author, date="1519964705") # 	Fri Mar 02 2018 04:25:05 GMT+0000
-        with open(file_name, "w") as the_file:
-            the_file.write("# First Test Page Edited\n\nSome Lorem text")
-        repo.git.add("docs/first_page.md")
-        repo.git.commit(message="first page update 2", author=author, date="1643911026") # 	Thu Feb 03 2022 17:57:06 GMT+0000
+        if os.path.exists("docs/first_page.md"):
+            repo.git.add("docs/first_page.md")
+            repo.git.commit(message="first page", author=author, date="1500854705") # Mon Jul 24 2017 00:05:05 GMT+0000
+            file_name = os.path.join(testproject_path, "docs/first_page.md")
+            with open(file_name, "w+") as the_file:
+                the_file.write("Hello\n")
+            repo.git.add("docs/first_page.md")
+            repo.git.commit(message="first page update 1", author=author, date="1519964705") # 	Fri Mar 02 2018 04:25:05 GMT+0000
+            with open(file_name, "w") as the_file:
+                the_file.write("# First Test Page Edited\n\nSome Lorem text")
+            repo.git.add("docs/first_page.md")
+            repo.git.commit(message="first page update 2", author=author, date="1643911026") # 	Thu Feb 03 2022 17:57:06 GMT+0000
 
         repo.git.add("mkdocs.yml")
         repo.git.commit(message="add mkdocs", author=author, date="1500854705 -0700") # Mon Jul 24 2017 00:05:05 GMT+0000
-        repo.git.add("docs/second_page.md")
-        repo.git.commit(message="second page", author=author, date="1643911026") # 	Thu Feb 03 2022 17:57:06 GMT+0000
+
+        if os.path.exists("docs/second_page.md"):
+            repo.git.add("docs/second_page.md")
+            repo.git.commit(message="second page", author=author, date="1643911026") # 	Thu Feb 03 2022 17:57:06 GMT+0000
+        
         repo.git.add("docs/index.md")
         repo.git.commit(message="homepage", author=author, date="1643911026") # 	Thu Feb 03 2022 17:57:06 GMT+0000
-
-
 
     return repo
 
@@ -264,11 +275,12 @@ def validate_build(testproject_path, plugin_config: dict = {}):
         searches = [x in contents for x in date_formats.values()]
         assert any(searches), "No correct creation date formats output was found"
 
-        commit_timestamp=repo.get_git_commit_timestamp(
-            path=str(testproject_path / "docs/subfolder/page_with_renamed.md"),
-            is_first_commit=True
-        )
-        assert commit_timestamp == 1655229469
+        if os.path.exists(str(testproject_path / "docs/subfolder/page_with_renamed.md")):
+            commit_timestamp=repo.get_git_commit_timestamp(
+                path=str(testproject_path / "docs/subfolder/page_with_renamed.md"),
+                is_first_commit=True
+            )
+            assert commit_timestamp == 1655229469
 
 def validate_mkdocs_file(temp_path: str, mkdocs_yml_file: str):
     """
@@ -642,3 +654,21 @@ def test_low_fetch_depth(tmp_path, caplog):
     assert result.exit_code == 0
     assert "Running on GitHub Actions might" in caplog.text
 
+
+
+def test_mkdocs_genfiles_plugin(tmp_path):
+    """
+    Make sure the mkdocs-gen-files plugin works correctly.
+    """
+    testproject_path = setup_clean_mkdocs_folder(
+        mkdocs_yml_path=f"tests/fixtures/mkdocs-gen-files/mkdocs.yml", output_path=tmp_path
+    )
+    setup_commit_history(testproject_path)
+    result = build_docs_setup(testproject_path)
+    assert result.exit_code == 0, f"'mkdocs build' command failed with {result.stdout}"
+
+    # validate the build
+    plugin_config=get_plugin_config_from_mkdocs(str(testproject_path / "mkdocs.yml"))
+    validate_build(
+        testproject_path, plugin_config
+    )

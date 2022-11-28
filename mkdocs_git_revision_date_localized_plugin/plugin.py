@@ -8,6 +8,7 @@ https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/
 import logging
 import re
 import os
+import time
 
 # 3rd party
 from mkdocs.config import config_options
@@ -195,12 +196,15 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             locale = locale[:2]
         assert len(locale) == 2, "locale must be a 2 letter code, see https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes"
         
-
         # Retrieve git commit timestamp
-        last_revision_timestamp = self.util.get_git_commit_timestamp(
-                path=page.file.abs_src_path,
-                is_first_commit=False,
-        )
+        # Except for generated pages (f.e. by mkdocs-gen-files plugin)
+        if hasattr(page.file, "generated_by"):
+            last_revision_timestamp = int(time.time())
+        else:
+            last_revision_timestamp = self.util.get_git_commit_timestamp(
+                    path=page.file.abs_src_path,
+                    is_first_commit=False,
+            )
 
         # Last revision date
         revision_dates = self.util.get_date_formats_for_timestamp(last_revision_timestamp, locale=locale, add_spans=True)
@@ -252,10 +256,14 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             return markdown
     
         # Retrieve git commit timestamp
-        first_revision_timestamp = self.util.get_git_commit_timestamp(
-            path=page.file.abs_src_path,
-            is_first_commit=True,
-        )
+        # Except for generated pages (f.e. by mkdocs-gen-files plugin)
+        if hasattr(page.file, "generated_by"):
+            first_revision_timestamp = int(time.time())
+        else:
+            first_revision_timestamp = self.util.get_git_commit_timestamp(
+                path=page.file.abs_src_path,
+                is_first_commit=True,
+            )
 
         # Creation date formats
         creation_dates = self.util.get_date_formats_for_timestamp(first_revision_timestamp, locale=locale, add_spans=True)

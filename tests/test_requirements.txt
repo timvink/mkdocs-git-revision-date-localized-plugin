@@ -4,3 +4,4 @@ codecov
 click
 mkdocs-material
 mkdocs-static-i18n
+mkdocs-gen-files

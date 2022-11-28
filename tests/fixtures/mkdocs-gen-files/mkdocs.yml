@@ -1,0 +1,13 @@
+site_name: demo revision date
+use_directory_urls: true
+
+theme:
+    name: material
+
+plugins:
+  - search
+  - git-revision-date-localized:
+      enable_creation_date: true
+  - gen-files:
+      scripts:
+        - gen_pages.py  # or any other name or path
