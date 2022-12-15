@@ -4,8 +4,8 @@ This plugin offers the following variables:
 
 | timestamp | description |
 |:-----------|:------------|
-| `git-revision-date-localized` | Last git commit that touched a file. Enabled by default. |
-| `git-creation-date-localized` | First git commit that touched a file. Enable in [options](options.md). |
+| `git_revision_date_localized` | Last git commit that touched a file. Enabled by default. |
+| `git_creation_date_localized` | First git commit that touched a file. Enable in [options](options.md). |
 | `git_site_revision_date_localized` | Last git commit that touched any file in the `docs/` folder. Enabled by default. |
 
 You can use these variables wrapped in curly brackets (`{{` and `}}`) anywhere in a markdown file, like so:
@@ -21,8 +21,8 @@ Changing the `type`, `timezone` and/or `locale` in the [options](options.md) wil
 
 If you do not want to include revision dates manually in each markdown file, or if you would like more control on the formatting, you can [override a theme](howto/override-a-theme.md). You can use the same three variables but with a `page.meta.` prefix:
 
-- `page.meta.git-revision-date-localized`
-- `page.meta.git-creation-date-localized`
+- `page.meta.git_revision_date_localized`
+- `page.meta.git_creation_date_localized`
 - `page.meta.git_revision_date_localized_raw_date`
 
 To allow for more flexibility when overriding a theme there are also variables for each different `type` available (regardless of the setting for `type` in [options](options.md)), where the output is also not wrapped in `<span>` elements (so you can do the CSS styling yourself): 
