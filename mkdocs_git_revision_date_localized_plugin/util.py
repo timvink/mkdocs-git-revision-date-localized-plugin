@@ -101,6 +101,14 @@ class Util:
         """
         commit_timestamp = ""
 
+        # Determine the logging level
+        # Only log warnings when plugin is set to strict.
+        # That way, users turn those into errors using mkdocs build --strict
+        if self.config.get('strict'):
+            log = logger.warning
+        else:
+            log = logger.info
+
         # perform git log operation
         try:
             # Retrieve author date in UNIX format (%at)
@@ -126,20 +134,20 @@ class Util:
                 )
         except (InvalidGitRepositoryError, NoSuchPathError) as err:
             if self.config.get('fallback_to_build_date'):
-                logger.warning(
+                log(
                     "[git-revision-date-localized-plugin] Unable to find a git directory and/or git is not installed."
                     " Option 'fallback_to_build_date' set to 'true': Falling back to build date"
                 )
                 commit_timestamp = time.time()
             else:
-                logger.error(
+                log(
                     "[git-revision-date-localized-plugin] Unable to find a git directory and/or git is not installed."
                     " To ignore this error, set option 'fallback_to_build_date: true'"
                 )
                 raise err
         except GitCommandError as err:
             if self.config.get('fallback_to_build_date'):
-                logger.warning(
+                log(
                     "[git-revision-date-localized-plugin] Unable to read git logs of '%s'. Is git log readable?"
                     " Option 'fallback_to_build_date' set to 'true': Falling back to build date"
                     % path
@@ -154,13 +162,13 @@ class Util:
                 raise err
         except GitCommandNotFound as err:
             if self.config.get('fallback_to_build_date'):
-                logger.warning(
+                log(
                     "[git-revision-date-localized-plugin] Unable to perform command: 'git log'. Is git installed?"
                     " Option 'fallback_to_build_date' set to 'true': Falling back to build date"
                 )
                 commit_timestamp = time.time()
             else:
-                logger.error(
+                log(
                     "[git-revision-date-localized-plugin] Unable to perform command 'git log'. Is git installed?"
                     " To ignore this error, set option 'fallback_to_build_date: true'"
                 )
@@ -169,7 +177,7 @@ class Util:
         # create timestamp
         if commit_timestamp == "":
             commit_timestamp = time.time()
-            logger.warning(
+            log(
                 "[git-revision-date-localized-plugin] '%s' has no git logs, using current timestamp"
                 % path
             )
