@@ -16,6 +16,7 @@ You can customize the plugin by setting options in `mkdocs.yml`. For example:
         exclude:
             - index.md
         enabled: true
+        strict: true
   ```
 
 ## `type`
@@ -131,3 +132,18 @@ Which enables you to disable the plugin locally using:
 export ENABLED_GIT_REVISION_DATE=false
 mkdocs serve
 ```
+
+## `strict`
+
+Default is `true`. When enabled, the logs will show warnings when something is wrong but a fallback has been used. When disabled, the logger will use the INFO level instead.
+
+- If you want to raise an error when a warning is logged, use [mkdocs strict mode](https://www.mkdocs.org/user-guide/configuration/#strict) (with `mkdocs build --strict`).
+- If you are already using [mkdocs strict mode](https://www.mkdocs.org/user-guide/configuration/#strict), but do not care about these warnings, you can set `strict: false` to ensure no errors are raised.
+
+=== ":octicons-file-code-16: mkdocs.yml"
+
+  ```yaml
+  plugins:
+    - git-revision-date-localized:
+        strict: true
+  ```
