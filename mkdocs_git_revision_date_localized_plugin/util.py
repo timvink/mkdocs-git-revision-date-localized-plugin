@@ -16,7 +16,7 @@ from git import (
     NoSuchPathError,
 )
 
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 logger = logging.getLogger("mkdocs.plugins")
 
@@ -31,6 +31,9 @@ class Util:
         """Initialize utility class."""
         self.config = config
         self.repo_cache = {}
+
+        ignore_commits_file = self.config.get("ignored_commits_file")
+        self.ignored_commits = self.parse_git_ignore_revs(ignore_commits_file) if ignore_commits_file else []
 
     def _get_repo(self, path: str) -> Git:
         if not os.path.isdir(path):
@@ -117,6 +120,7 @@ class Util:
             realpath = os.path.realpath(path)
             git = self._get_repo(realpath)
 
+            # Ignored commits are only considered for the most recent update, not for creation
             if is_first_commit:
                 # diff_filter="A" will select the commit that created the file
                 commit_timestamp = git.log(
@@ -128,10 +132,21 @@ class Util:
                 if commit_timestamp != "":
                     commit_timestamp = commit_timestamp.split()[-1]
             else:
-                # Latest commit touching a specific file
-                commit_timestamp = git.log(
-                    realpath, date="unix", format="%at", n=1, no_show_signature=True
-                )
+                # Retrieve the history for the file in the format <hash> <timestamp>
+                # The maximum number of commits we will ever need to examine is 1 more than the number of ignored commits.
+                lines = git.log(
+                        realpath, date="unix", format="%H %at", n=len(self.ignored_commits)+1, no_show_signature=True,
+                ).split("\n")
+                # process the commits for the file in reverse-chronological order. Ignore any commit that is on the
+                # ignored list. If the line is empty, we've reached the end and need to use the fallback behavior
+                for line in lines:
+                    if not line:
+                        commit_timestamp = ""
+                        break
+                    commit, commit_timestamp = line.split(" ")
+                    if not any(commit.startswith(x) for x in self.ignored_commits):
+                        break
+
         except (InvalidGitRepositoryError, NoSuchPathError) as err:
             if self.config.get('fallback_to_build_date'):
                 log(
@@ -224,3 +239,19 @@ class Util:
                 % (date_type, date_string)
             )
         return date_formats
+
+    @staticmethod
+    def parse_git_ignore_revs(filename: str) -> List[str]:
+        """
+        Parses a file that is the same format as git's blame.ignoreRevsFile and return the list of commit hashes.
+
+        Whitespace, blanklines and comments starting with # are all ignored.
+        """
+        result = []
+        with open(filename, "rt") as f:
+            for line in f:
+                line = line.split("#", 1)[0].strip()
+                if not line:
+                    continue
+                result.append(line)
+        return result

@@ -159,9 +159,14 @@ def setup_commit_history(testproject_path):
 
             file_name = os.path.join(testproject_path, "docs/page_with_tag.md")
             with open(file_name, "a") as the_file:
+                the_file.write("test\n")
+            repo.git.add("docs/page_with_tag.md")
+            repo.git.commit(message="update homepage #1", author=author, date="1525475836") # 	Fri May 04 2018 23:17:16 GMT+0000
+
+            with open(file_name, "a") as the_file:
                 the_file.write("awa\n")
             repo.git.add("docs/page_with_tag.md")
-            repo.git.commit(message="update homepage", author=author, date="1642911026") # 	Sun Jan 23 2022 04:10:26 GMT+0000
+            repo.git.commit(message="update homepage #2", author=author, date="1642911026") # 	Sun Jan 23 2022 04:10:26 GMT+0000
 
         if os.path.exists("docs/page_with_renamed.md"):
             bf_file_name = os.path.join(testproject_path, "docs/page_with_renamed.md")
@@ -382,10 +387,10 @@ def test_tags_are_replaced(tmp_path, mkdocs_file):
        pytest.skip("Not necessary to test the JS library")
 
     # Make sure count_commits() works
-    # We created 10 commits in setup_commit_history()
+    # We created 11 commits in setup_commit_history()
     with working_directory(testproject_path):
         u = Util()
-        assert commit_count(u._get_repo("docs/page_with_tag.md")) == 10
+        assert commit_count(u._get_repo("docs/page_with_tag.md")) == 11
 
     
     # the revision date was in 'setup_commit_history' was set to 1642911026 (Sun Jan 23 2022 04:10:26 GMT+0000)
@@ -672,3 +677,37 @@ def test_mkdocs_genfiles_plugin(tmp_path):
     validate_build(
         testproject_path, plugin_config
     )
+
+
+def test_ignored_commits(tmp_path):
+    testproject_path = setup_clean_mkdocs_folder(
+        "tests/fixtures/basic_project/mkdocs_ignored_commits.yml", tmp_path
+    )
+    repo = setup_commit_history(testproject_path)
+
+    # First test that the middle commit doesn't show up by default
+    # January 23, 2022 is the date of the most recent commit
+    with open(str(testproject_path / "ignored-commits.txt"), "wt") as fp:
+        fp.write("")
+
+    result = build_docs_setup(testproject_path)
+    assert result.exit_code == 0
+
+    page_with_tag = testproject_path / "site/page_with_tag/index.html"
+    contents = page_with_tag.read_text(encoding="utf8")
+    assert "January 23, 2022" in contents
+
+    # Now mark the most recent change to page_with_tag as ignored
+    # May 4, 2018 is the date of the second most recent commit
+    hash = repo.git.log("docs/page_with_tag.md", format="%H", n=1)
+
+    with open(str(testproject_path / "ignored-commits.txt"), "wt") as fp:
+        fp.write(hash)
+
+    # should not raise warning
+    result = build_docs_setup(testproject_path)
+    assert result.exit_code == 0
+
+    page_with_tag = testproject_path / "site/page_with_tag/index.html"
+    contents = page_with_tag.read_text(encoding="utf8")
+    assert "May 4, 2018" in contents
