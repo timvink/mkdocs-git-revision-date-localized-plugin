@@ -6,13 +6,16 @@ https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/
 """
 # standard lib
 import logging
+import multiprocessing
 import re
 import os
 import time
 
 # 3rd party
 from mkdocs.config import config_options
+from mkdocs.config.defaults import MkDocsConfig
 from mkdocs.plugins import BasePlugin
+from mkdocs.structure.files import Files
 from mkdocs.structure.nav import Page
 from mkdocs.utils import copy_file
 from mkdocs.exceptions import ConfigurationError
@@ -33,6 +36,10 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
 
     See https://www.mkdocs.org/user-guide/plugins
     """
+
+    def __init__(self):
+        super().__init__()
+        self.commit_timestamps = {}
 
     config_scheme = (
         ("fallback_to_build_date", config_options.Type(bool, default=False)),
@@ -63,7 +70,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         """
         if not self.config.get('enabled'):
             return config
-        
+
         assert self.config['type'] in ["date","datetime","iso_date","iso_datetime","timeago","custom"]
 
         self.util = Util(config=self.config)
@@ -138,8 +145,31 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
                 msg = "[git-revision-date-localized] should be defined after the i18n plugin in your mkdocs.yml file. "
                 msg += "This is because i18n adds a 'locale' variable to markdown pages that this plugin supports."
                 raise ConfigurationError(msg)
-        
+
         return config
+
+    def parallel_compute_commit_timestamps(self, files, docs_dir):
+        pool = multiprocessing.Pool(processes=min(10, multiprocessing.cpu_count()))
+        results = []
+        for file in files:
+            if file.is_documentation_page():
+                abs_src_path = os.path.join(docs_dir, file.src_uri)
+                result = pool.apply_async(
+                    self.util.get_git_commit_timestamp, args=(abs_src_path, False)
+                )
+                results.append((abs_src_path, result))
+        pool.close()
+        pool.join()
+        for src_uri, result in results:
+            self.commit_timestamps[src_uri] = result.get()
+
+    def on_files(self, files: Files, config: MkDocsConfig):
+        # TechDocs copies docs_dir to a tmp dir and we need the real git path.
+        if not self.commit_timestamps:
+            real_docs_dir = os.path.join(
+                os.path.dirname(config["config_file_path"]), "docs"
+            )
+            self.parallel_compute_commit_timestamps(files, real_docs_dir)
 
     def on_page_markdown(
         self, markdown: str, page: Page, config: config_options.Config, files, **kwargs
@@ -189,23 +219,20 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         # Finally, if no page locale set, we take the locale determined on_config()
         if not locale:
             locale = self.config.get("locale")
-        
+
         # MkDocs supports 2-letter and 5-letter locales
         # https://www.mkdocs.org/user-guide/localizing-your-theme/#supported-locales
         # We need the 2 letter variant
         if len(locale) == 5:
             locale = locale[:2]
         assert len(locale) == 2, "locale must be a 2 letter code, see https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes"
-        
+
         # Retrieve git commit timestamp
         # Except for generated pages (f.e. by mkdocs-gen-files plugin)
         if hasattr(page.file, "generated_by"):
             last_revision_timestamp = int(time.time())
         else:
-            last_revision_timestamp = self.util.get_git_commit_timestamp(
-                    path=page.file.abs_src_path,
-                    is_first_commit=False,
-            )
+            last_revision_timestamp = self.commit_timestamps[page.file.abs_src_path]
 
         # Last revision date
         revision_dates = self.util.get_date_formats_for_timestamp(last_revision_timestamp, locale=locale, add_spans=True)
@@ -250,12 +277,11 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             flags=re.IGNORECASE,
         )
 
-
         # If creation date not enabled, return markdown
         # This is for speed: prevents another `git log` operation each file
         if not self.config.get("enable_creation_date"):
             return markdown
-    
+
         # Retrieve git commit timestamp
         # Except for generated pages (f.e. by mkdocs-gen-files plugin)
         if hasattr(page.file, "generated_by"):
