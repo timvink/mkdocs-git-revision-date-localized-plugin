@@ -30,6 +30,7 @@ from click.testing import CliRunner
 # package module
 from mkdocs_git_revision_date_localized_plugin.util import Util
 from mkdocs_git_revision_date_localized_plugin.ci import commit_count
+from mkdocs_git_revision_date_localized_plugin.dates import get_date_formats
 
 # ##################################
 # ######## Globals #################
@@ -342,18 +343,6 @@ INVALID_MKDOCS_FILES = [
 # ##################################
 
 
-def test_date_formats():
-    u = Util()
-    assert u._date_formats(1582397529) == {
-        "date": "February 22, 2020",
-        "datetime": "February 22, 2020 18:52:09",
-        "iso_date": "2020-02-22",
-        "iso_datetime": "2020-02-22 18:52:09",
-        "timeago": '<span class="timeago" datetime="2020-02-22T18:52:09+00:00" locale="en"></span>',
-        "custom": '22. February 2020',
-    }
-
-
 @pytest.mark.parametrize("mkdocs_file", MKDOCS_FILES, ids=lambda x: f"mkdocs file: {x}")
 def test_tags_are_replaced(tmp_path, mkdocs_file):
     """
@@ -390,7 +379,7 @@ def test_tags_are_replaced(tmp_path, mkdocs_file):
     
     # the revision date was in 'setup_commit_history' was set to 1642911026 (Sun Jan 23 2022 04:10:26 GMT+0000)
     # Assert {{ git_revision_date_localized }} is replaced
-    date_formats_revision_date = Util()._date_formats(1642911026, 
+    date_formats_revision_date = get_date_formats(1642911026, 
         locale=plugin_config.get("locale"),
         time_zone=plugin_config.get("timezone"),
         custom_format=plugin_config.get("custom_format")
@@ -403,7 +392,7 @@ def test_tags_are_replaced(tmp_path, mkdocs_file):
 
     # The last site revision was set in setup_commit_history to 1643911026 (Thu Feb 03 2022 17:57:06 GMT+0000)
     # Assert {{ git_site_revision_date_localized }} is replaced
-    date_formats_revision_date = Util()._date_formats(1643911026, 
+    date_formats_revision_date = get_date_formats(1643911026, 
         locale=plugin_config.get("locale"),
         time_zone=plugin_config.get("timezone"),
         custom_format=plugin_config.get("custom_format")
@@ -416,7 +405,7 @@ def test_tags_are_replaced(tmp_path, mkdocs_file):
     # Note {{ git_creation_date_localized }} is only replaced when configured in the config
     if plugin_config.get("enable_creation_date"):
         # The creation of page_with_tag.md was set in setup_commit_history to 1500854705 ( Mon Jul 24 2017 00:05:05 GMT+0000 )
-        date_formats_revision_date = Util()._date_formats(1500854705, 
+        date_formats_revision_date = get_date_formats(1500854705, 
             locale=plugin_config.get("locale"),
             time_zone=plugin_config.get("timezone"),
             custom_format=plugin_config.get("custom_format")
@@ -628,15 +617,19 @@ def test_low_fetch_depth(tmp_path, caplog):
 
     # Clone the local repo with fetch depth of 1
     repo = git.Repo.init(cloned_folder, bare=False)
+    try:
+        repo.heads.main.rename("main", force=True)
+    except:
+        pass
     origin = repo.create_remote("origin", str(testproject_path))
-    origin.fetch(depth=1, prune=True)
+    origin.fetch(refspec="refs/heads/main:refs/heads/origin", depth=1, prune=True)
     repo.create_head(
-        "master", origin.refs.master
+        "main", origin.refs.main
     )  # create local branch "master" from remote "master"
-    repo.heads.master.set_tracking_branch(
-        origin.refs.master
+    repo.heads.main.set_tracking_branch(
+        origin.refs.main
     )  # set local "master" to track remote "master
-    repo.heads.master.checkout()  # checkout local "master" to working tree
+    repo.heads.main.checkout()  # checkout local "master" to working tree
 
     # should not raise warning
     result = build_docs_setup(cloned_folder)
