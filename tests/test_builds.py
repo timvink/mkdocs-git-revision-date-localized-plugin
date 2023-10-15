@@ -148,6 +148,7 @@ def setup_commit_history(testproject_path):
     testproject_path = str(testproject_path)
 
     repo = git.Repo.init(testproject_path, bare=False)
+    repo.git.checkout("-b", "master")
     author = "Test Person <testtest@gmail.com>"
 
 
@@ -618,18 +619,18 @@ def test_low_fetch_depth(tmp_path, caplog):
     # Clone the local repo with fetch depth of 1
     repo = git.Repo.init(cloned_folder, bare=False)
     try:
-        repo.heads.main.rename("main", force=True)
+        repo.heads.main.rename("master", force=True)
     except:
         pass
     origin = repo.create_remote("origin", str(testproject_path))
-    origin.fetch(refspec="refs/heads/main:refs/heads/origin", depth=1, prune=True)
+    origin.fetch(depth=1, prune=True)
     repo.create_head(
-        "main", origin.refs.main
+        "master", origin.refs.master
     )  # create local branch "master" from remote "master"
-    repo.heads.main.set_tracking_branch(
-        origin.refs.main
+    repo.heads.master.set_tracking_branch(
+        origin.refs.master
     )  # set local "master" to track remote "master
-    repo.heads.main.checkout()  # checkout local "master" to working tree
+    repo.heads.master.checkout()  # checkout local "master" to working tree
 
     # should not raise warning
     result = build_docs_setup(cloned_folder)
