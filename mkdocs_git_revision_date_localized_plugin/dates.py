@@ -1,7 +1,7 @@
 
 from babel.dates import format_date, get_timezone
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict
 
 
@@ -26,7 +26,7 @@ def get_date_formats(
     assert time_zone is not None
     assert locale is not None
     
-    utc_revision_date = datetime.fromtimestamp(int(unix_timestamp))
+    utc_revision_date = datetime.fromtimestamp(int(unix_timestamp), tz=timezone.utc)
     loc_revision_date = utc_revision_date.replace(
         tzinfo=get_timezone("UTC")
     ).astimezone(get_timezone(time_zone))
