@@ -16,7 +16,7 @@ from git import (
     NoSuchPathError,
 )
 
-from typing import Any, Dict
+from typing import Dict
 
 logger = logging.getLogger("mkdocs.plugins")
 
