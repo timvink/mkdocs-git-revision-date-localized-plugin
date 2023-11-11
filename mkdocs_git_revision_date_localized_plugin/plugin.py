@@ -199,7 +199,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         
         # Retrieve git commit timestamp
         # Except for generated pages (f.e. by mkdocs-gen-files plugin)
-        if getattr(page.file, "generated_by"):
+        if getattr(page.file, "generated_by", None):
             last_revision_timestamp = int(time.time())
         else:
             last_revision_timestamp = self.util.get_git_commit_timestamp(
@@ -258,7 +258,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
     
         # Retrieve git commit timestamp
         # Except for generated pages (f.e. by mkdocs-gen-files plugin)
-        if getattr(page.file, "generated_by"):
+        if getattr(page.file, "generated_by", None):
             first_revision_timestamp = int(time.time())
         else:
             first_revision_timestamp = self.util.get_git_commit_timestamp(
