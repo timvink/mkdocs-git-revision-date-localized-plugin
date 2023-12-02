@@ -176,7 +176,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
 
         # First prio is use mkdocs-static-i18n locale if set
         try:
-            locale = page.locale
+            locale = page.file.locale
 
         except AttributeError:
             locale = None
