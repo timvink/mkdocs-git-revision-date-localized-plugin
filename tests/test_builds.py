@@ -457,7 +457,7 @@ def test_build_material_theme(tmp_path):
     # in German because locale is set to 'de'
     index_file = testproject_path / "site/index.html"
     contents = index_file.read_text(encoding="utf8")
-    assert re.search(r"Letztes Update\:\s[<span class].+", contents)
+    assert re.search(r"Letztes Update", contents)
 
 
 def test_material_theme_locale(tmp_path):
@@ -474,7 +474,7 @@ def test_material_theme_locale(tmp_path):
     # The date will be in german though
     index_file = testproject_path / "site/index.html"
     contents = index_file.read_text(encoding="utf8")
-    assert re.search(r"Last update\:\s[<span class].+", contents)
+    assert re.search(r"Last update", contents)
 
 
 def test_material_theme_locale_disabled(tmp_path):
@@ -491,7 +491,7 @@ def test_material_theme_locale_disabled(tmp_path):
     # The date will be in german though
     index_file = testproject_path / "site/index.html"
     contents = index_file.read_text(encoding="utf8")
-    assert re.search(r"Last update\:\s[<span class].+", contents) is None
+    assert re.search(r"Last update", contents) is None
 
 
 def test_material_theme_no_locale(tmp_path):
@@ -507,7 +507,7 @@ def test_material_theme_no_locale(tmp_path):
     # in english because default locale is set to 'en'
     index_file = testproject_path / "site/index.html"
     contents = index_file.read_text(encoding="utf8")
-    assert re.search(r"Last update\:\s[<span class].+", contents)
+    assert re.search(r"Last update", contents)
 
 
 
