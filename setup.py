@@ -12,7 +12,7 @@ del file
 
 setup(
     name="mkdocs-git-revision-date-localized-plugin",
-    version="1.2.1",
+    version="1.2.2",
     description="Mkdocs plugin that enables displaying the localized date of the last git modification of a markdown file.",
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
