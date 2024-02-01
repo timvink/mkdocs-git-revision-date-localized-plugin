@@ -3,6 +3,8 @@ import logging
 import os
 import time
 
+from markupsafe import Markup
+
 from mkdocs_git_revision_date_localized_plugin.ci import raise_ci_warnings
 from mkdocs_git_revision_date_localized_plugin.dates import get_date_formats
 
@@ -85,7 +87,7 @@ class Util:
                 commit_timestamp = git.log(
                     realpath, date="unix", format="%at", diff_filter="A", no_show_signature=True, follow=True
                 )
-                # A file can be created multiple times, through a file renamed. 
+                # A file can be created multiple times, through a file renamed.
                 # Commits are ordered with most recent commit first
                 # Get the oldest commit only
                 if commit_timestamp != "":
@@ -165,7 +167,7 @@ class Util:
             dict: Localized date variants.
         """
         date_formats = get_date_formats(
-            unix_timestamp=commit_timestamp, 
+            unix_timestamp=commit_timestamp,
             time_zone=self.config.get("timezone"),
             locale=locale,
             custom_format=self.config.get('custom_format')
@@ -183,7 +185,7 @@ class Util:
         """
         for date_type, date_string in date_formats.items():
             date_formats[date_type] = (
-                '<span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-%s">%s</span>'
+                Markup('<span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-%s">%s</span>')
                 % (date_type, date_string)
             )
         return date_formats
