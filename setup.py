@@ -12,7 +12,7 @@ del file
 
 setup(
     name="mkdocs-git-revision-date-localized-plugin",
-    version="1.2.2",
+    version="1.2.3",
     description="Mkdocs plugin that enables displaying the localized date of the last git modification of a markdown file.",
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
@@ -22,13 +22,13 @@ setup(
     author_email="vinktim@gmail.com",
     include_package_data=True,
     license="MIT",
-    python_requires=">=3.6",
+    python_requires=">=3.8",
     classifiers=[
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
