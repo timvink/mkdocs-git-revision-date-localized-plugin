@@ -3,6 +3,8 @@ import logging
 import os
 import time
 
+from markupsafe import Markup
+
 from mkdocs_git_revision_date_localized_plugin.ci import raise_ci_warnings
 from mkdocs_git_revision_date_localized_plugin.dates import get_date_formats
 
@@ -182,7 +184,7 @@ class Util:
         Wraps the date string in <span> elements with CSS identifiers.
         """
         for date_type, date_string in date_formats.items():
-            date_formats[date_type] = (
+            date_formats[date_type] = Markup(
                 '<span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-%s">%s</span>'
                 % (date_type, date_string)
             )
