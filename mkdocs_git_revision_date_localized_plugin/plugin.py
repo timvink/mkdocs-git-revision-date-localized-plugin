@@ -36,6 +36,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
 
     config_scheme = (
         ("fallback_to_build_date", config_options.Type(bool, default=False)),
+        ("use_file_dates", config_options.Type(bool, default=False)),
         ("locale", config_options.Type(str, default=None)),
         ("type", config_options.Type(str, default="date")),
         ("custom_format", config_options.Type(str, default="%d. %B %Y")),
