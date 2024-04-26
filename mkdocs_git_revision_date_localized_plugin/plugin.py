@@ -79,7 +79,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         # theme locale
         if "theme" in config and "locale" in config.get("theme"):
             custom_theme = config.get("theme")
-            theme_locale = custom_theme._vars.get("locale")
+            theme_locale = custom_theme.locale
             logging.debug(
                 "Locale '%s' extracted from the custom theme: '%s'"
                 % (theme_locale, custom_theme.name)
