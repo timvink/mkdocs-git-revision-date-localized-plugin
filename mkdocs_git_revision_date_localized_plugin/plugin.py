@@ -4,20 +4,18 @@ MkDocs Plugin.
 https://www.mkdocs.org/
 https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/
 """
-# standard lib
 import logging
 import re
 import os
 import time
 
-# 3rd party
+from mkdocs import __version__ as mkdocs_version
 from mkdocs.config import config_options
 from mkdocs.plugins import BasePlugin
 from mkdocs.structure.nav import Page
 from mkdocs.utils import copy_file
 from mkdocs.exceptions import ConfigurationError
 
-# package modules
 from mkdocs_git_revision_date_localized_plugin.util import Util
 from mkdocs_git_revision_date_localized_plugin.exclude import exclude
 
@@ -25,7 +23,6 @@ from typing import Any, Dict
 from collections import OrderedDict
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-
 
 class GitRevisionDateLocalizedPlugin(BasePlugin):
     """
@@ -79,7 +76,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         # theme locale
         if "theme" in config and "locale" in config.get("theme"):
             custom_theme = config.get("theme")
-            theme_locale = custom_theme.locale
+            theme_locale = custom_theme.locale if mkdocs_version >= "1.6.0" else custom_theme._vars.get("locale")
             logging.debug(
                 "Locale '%s' extracted from the custom theme: '%s'"
                 % (theme_locale, custom_theme.name)
