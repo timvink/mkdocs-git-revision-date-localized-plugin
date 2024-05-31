@@ -22,6 +22,8 @@ from mkdocs_git_revision_date_localized_plugin.exclude import exclude
 from typing import Any, Dict
 from collections import OrderedDict
 
+from packaging.version import Version
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 class GitRevisionDateLocalizedPlugin(BasePlugin):
@@ -76,7 +78,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         # theme locale
         if "theme" in config and "locale" in config.get("theme"):
             custom_theme = config.get("theme")
-            theme_locale = custom_theme.locale if mkdocs_version >= "1.6.0" else custom_theme._vars.get("locale")
+            theme_locale = custom_theme.locale if Version(mkdocs_version) >= Version("1.6.0") else custom_theme._vars.get("locale")
             logging.debug(
                 "Locale '%s' extracted from the custom theme: '%s'"
                 % (theme_locale, custom_theme.name)
