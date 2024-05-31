@@ -36,6 +36,7 @@ def raise_ci_warnings(repo) -> None:
 
     # Github Actions
     elif os.getenv("GITHUB_ACTIONS") is not None and n_commits == 1:
+        # See also https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
         # Default is fetch-depth of 1 for github actions
         logging.warning(
             """
@@ -61,7 +62,7 @@ def raise_ci_warnings(repo) -> None:
         )
 
     # Bitbucket pipelines
-    elif os.getenv("CI") is not None and n_commits < 50:
+    elif os.getenv("BITBUCKET_BUILD_NUMBER") is not None and n_commits < 50:
         # Default is fetch-depth of 50 for bitbucket pipelines
         logging.warning(
             """
