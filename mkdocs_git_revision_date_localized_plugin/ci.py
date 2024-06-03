@@ -30,7 +30,7 @@ def raise_ci_warnings(repo) -> None:
                 Git revision dates due to a shallow git fetch depth.
 
                 Make sure to set GIT_DEPTH to 0 in your .gitlab-ci.yml file
-                (see https://docs.gitlab.com/ee/user/project/pipelines/settings.html#git-shallow-clone).
+                (see https://docs.gitlab.com/ee/user/project/repository/monorepos/index.html#shallow-cloning).
                 """
         )
 
