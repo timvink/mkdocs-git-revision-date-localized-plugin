@@ -40,19 +40,14 @@ The [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) theme suppor
 
 See the [documentation](https://timvink.github.io/mkdocs-git-revision-date-localized-plugin/index.html) on how to fine-tune the appearance and the date format.
 
-### Note when using build environments
+### **Note when using build systems like Github Actions**
 
-This plugin needs access to the last commit that touched a specific file to be able to retrieve the date. By default many build environments only retrieve the last commit, which means you might need to:
+This plugin needs access to the last commit that touched a specific file to be able to retrieve the date. By default many CI/CD build systems only retrieve the last commit, which means you might need to change your CI/CD settings:
 
-<details>
-  <summary>Change your CI settings</summary>
-    <ul>
-      <li>github actions: set <code>fetch-depth</code> to <code>0</code> (<a href="https://github.com/actions/checkout">docs</a>)</li>
-      <li>gitlab runners: set <code>GIT_DEPTH</code> to <code>0</code> (<a href="https://docs.gitlab.com/ee/ci/pipelines/settings.html#limit-the-number-of-changes-fetched-during-clone">docs</a>)</li>
-      <li>bitbucket pipelines: set <code>clone: depth: full</code> (<a href="https://support.atlassian.com/bitbucket-cloud/docs/configure-bitbucket-pipelinesyml/">docs</a>)</li>
-    </ul>
-</details>
-
+- Github Actions: set `fetch-depth` to `0` (<a href="https://github.com/actions/checkout">docs</a>)</li>
+- Gitlab Runners: set `GIT_DEPTH` to `0` (<a href="https://docs.gitlab.com/ee/ci/pipelines/settings.html#limit-the-number-of-changes-fetched-during-clone">docs</a>)</li>
+- Bitbucket pipelines: set `clone: depth: full` (<a href="https://support.atlassian.com/bitbucket-cloud/docs/configure-bitbucket-pipelinesyml/">docs</a>)</li>
+- Azure Devops pipelines: set `Agent.Source.Git.ShallowFetchDepth` to something very high like `10e99` ([docs](https://docs.microsoft.com/en-us/azure/devops/pipelines/repos/pipeline-options-for-git?view=azure-devops#shallow-fetch))
 
 ## Documentation
 
