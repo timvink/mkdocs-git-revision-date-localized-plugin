@@ -36,7 +36,7 @@ jobs:
 
     - name: Build
       run: |
-        python setup.py sdist bdist_wheel
+        python -m build
 
     # See https://docs.pypi.org/trusted-publishers/using-a-publisher/
     - name: Publish package distributions to PyPI
