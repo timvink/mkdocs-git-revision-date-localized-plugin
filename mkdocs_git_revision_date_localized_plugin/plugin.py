@@ -76,16 +76,16 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         plugin_locale = self.config.get("locale", None)
 
         # theme locale
-        if "theme" in config and "locale" in config.get("theme"):
+        if "theme" in config and "language" in config.get("theme"):
             custom_theme = config.get("theme")
-            theme_locale = custom_theme.locale if Version(mkdocs_version) >= Version("1.6.0") else custom_theme._vars.get("locale")
+            theme_locale = custom_theme._vars.get("language")
             logging.debug(
                 "Locale '%s' extracted from the custom theme: '%s'"
                 % (theme_locale, custom_theme.name)
             )
-        elif "theme" in config and "language" in config.get("theme"):
+        elif "theme" in config and "locale" in config.get("theme"):
             custom_theme = config.get("theme")
-            theme_locale = custom_theme._vars.get("language")
+            theme_locale = custom_theme.locale if Version(mkdocs_version) >= Version("1.6.0") else custom_theme._vars.get("locale")
             logging.debug(
                 "Locale '%s' extracted from the custom theme: '%s'"
                 % (theme_locale, custom_theme.name)
