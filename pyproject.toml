@@ -1,0 +1,116 @@
+[build-system]
+requires = ["setuptools>=70.0", "setuptools-scm>=8.0"]
+build-backend = "setuptools.build_meta"
+
+[project.entry-points."mkdocs.plugins"]
+"git-revision-date-localized" = "mkdocs_git_revision_date_localized_plugin.plugin:GitRevisionDateLocalizedPlugin"
+
+[project]
+name="mkdocs-git-revision-date-localized-plugin"
+keywords = ["mkdocs", "plugin"]
+authors = [
+    { name = "Tim Vink", email = "vinktim@gmail.com" }
+]
+license = { text = "MIT" }
+
+description="Mkdocs plugin that enables displaying the localized date of the last git modification of a markdown file."
+readme = { file = "README.md", content-type = "text/markdown" }
+
+requires-python=">=3.8"
+
+classifiers=[
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+]
+
+dynamic = ["version","dependencies","optional-dependencies"]
+
+[project.urls]
+"Homepage" = "https://github.com/timvink/mkdocs-git-revision-date-localized-plugin"
+
+[tool.setuptools.dynamic]
+version = {attr = "mkdocs_git_revision_date_localized_plugin.__version__"}
+
+dependencies={file = ["requirements.txt"]}
+
+optional-dependencies.dev={file = ["requirements_dev.txt"]}
+optional-dependencies.base={file = ["requirements.txt"]}
+optional-dependencies.all={file = ["requirements.txt", "requirements_dev.txt"]}
+
+[tool.pytest.ini_options]
+markers = [
+    "serial",
+    "no_temp_caching",
+]
+
+# https://github.com/charliermarsh/ruff
+[tool.ruff]
+
+# Rules to apply
+lint.select= ["E", "F", "I", "UP"]
+
+# Exclude rules
+lint.ignore = ['D104'
+        ,'D212'
+        ,'D200'
+        ,'D412'
+        ,'E731'
+        ,'E501'
+        ,'E722'
+        ,'D104'
+        ,'E402'
+        ,"UP038" # UP038 Use `X | Y` in `isinstance` call instead of `(X, Y)`
+]
+
+# Exclude files in tests dir
+lint.exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+
+# Set line length, keep same as black
+line-length = 120
+
+extend-exclude = [
+        "*.yml",
+        "*.toml",
+        "*.md",
+        ".json",
+        "Makefile",
+        "*.txt",
+]
+
+ #supported for python 3.10
+target-version = "py310" 
+
+# Always autofix
+fix = true
+
+[tool.uv]
+dev-dependencies = [
+    "ruff",
+]

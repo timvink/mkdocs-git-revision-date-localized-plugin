@@ -12,19 +12,12 @@ Thanks for considering to contribute to this project! Some guidelines:
 Make sure to install an editable version before running the tests:
 
 ```python
-pip install -r tests/test_requirements.txt
+pip install -r requirement_dev.txt
 pip install -e .
 pytest --cov=mkdocs_git_revision_date_localized_plugin --cov-report term-missing tests/
 ```
 
 If it makes sense, writing tests for your PRs is always appreciated and will help get them merged.
-
-In addition, this project uses [flake8](https://github.com/PyCQA/flake8) for static code checking:
-
-```python
-pip install pyflakes
-pyflakes tests/ mkdocs_git_revision_date_localized_plugin/
-```
 
 ## Manual testing
 

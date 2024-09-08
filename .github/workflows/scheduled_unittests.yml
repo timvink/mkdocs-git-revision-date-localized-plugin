@@ -20,14 +20,14 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@master
       with:
-        python-version: "3.11"
+        python-version: "3.12"
 
     - name: Install dependencies
       run: |
         pip3 install --upgrade pip
         pip3 install --upgrade setuptools
         pip3 install --upgrade wheel
-        pip3 install -r tests/test_requirements.txt
+        pip3 install -r requirements_dev.txt
         pip3 install .
 
     - name: Run unit tests

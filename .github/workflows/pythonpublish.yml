@@ -30,11 +30,9 @@ jobs:
       run: |
         git config --global user.name "Github Action"
         git config --global user.email "githubaction@gmail.com"
-        pip install -r tests/test_requirements.txt
-        pip install mkdocs-material
+        pip install -r requirements_dev.txt
         pip install .
         pytest
-
 
     - name: Build
       run: |
@@ -46,5 +44,5 @@ jobs:
 
     - name: Deploy mkdocs site
       run: | 
-        pip install mkdocs-git-authors-plugin
+        pip install -r requirements_dev.txt
         mkdocs gh-deploy --force
