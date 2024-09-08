@@ -36,6 +36,7 @@ jobs:
 
     - name: Build
       run: |
+        pip install build setuptools
         python -m build
 
     # See https://docs.pypi.org/trusted-publishers/using-a-publisher/
