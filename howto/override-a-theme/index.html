@@ -446,6 +446,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#example-populate-sitemapxlm" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: Populate sitemap.xlm
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -530,6 +539,15 @@
   <a href="#example-list-last-updated-pages" class="md-nav__link">
     <span class="md-ellipsis">
       Example: List last updated pages
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-populate-sitemapxlm" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: Populate sitemap.xlm
     </span>
   </a>
   
@@ -690,6 +708,25 @@ Then you can extend the base <code>mkdocs</code> theme by adding a new file <cod
 </div>
 </div>
 </div>
+<h2 id="example-populate-sitemapxlm">Example: Populate <code>sitemap.xlm</code></h2>
+<p>Having a correct lastmod in your <code>sitemap.xlm</code> is important for SEO, as it indicates to Search engines when to re-index pages, see <a href="https://blogs.bing.com/webmaster/february-2023/The-Importance-of-Setting-the-lastmod-Tag-in-Your-Sitemap">this blog from Bing</a>.</p>
+<p><a href="https://github.com/thesuperzapper"><code>@thesuperzapper</code></a> shared this <a href="https://squidfunk.github.io/mkdocs-material/customization/?h=overri#extending-the-theme">override</a> in <a href="https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/120">mkdocs-git-revision-date-localized-plugin#120</a>:</p>
+<div class="highlight"><pre><span></span><code><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="p">&lt;</span><span class="nt">urlset</span> <span class="na">xmlns</span><span class="o">=</span><span class="s">&quot;http://www.sitemaps.org/schemas/sitemap/0.9&quot;</span><span class="p">&gt;</span>
+{%- for file in pages -%}
+    {% if not file.page.is_link and (file.page.abs_url or file.page.canonical_url) %}
+    <span class="p">&lt;</span><span class="nt">url</span><span class="p">&gt;</span>
+         <span class="p">&lt;</span><span class="nt">loc</span><span class="p">&gt;</span>{% if file.page.canonical_url %}{{ file.page.canonical_url|e }}{% else %}{{ file.page.abs_url|e }}{% endif %}<span class="p">&lt;/</span><span class="nt">loc</span><span class="p">&gt;</span>
+         {#- NOTE: we exclude `lastmod` for pages using a template, as their update time is not correctly detected #}
+         {%- if not file.page.meta.template and file.page.meta.git_revision_date_localized_raw_iso_datetime %}
+         <span class="p">&lt;</span><span class="nt">lastmod</span><span class="p">&gt;</span>{{ (file.page.meta.git_revision_date_localized_raw_iso_datetime + &quot;+00:00&quot;) | replace(&quot; &quot;, &quot;T&quot;) }}<span class="p">&lt;/</span><span class="nt">lastmod</span><span class="p">&gt;</span>
+         {%- endif %}
+         <span class="p">&lt;</span><span class="nt">changefreq</span><span class="p">&gt;</span>daily<span class="p">&lt;/</span><span class="nt">changefreq</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">url</span><span class="p">&gt;</span>
+    {%- endif -%}
+{% endfor %}
+<span class="p">&lt;/</span><span class="nt">urlset</span><span class="p">&gt;</span>
+</code></pre></div>
 
 
 
@@ -712,7 +749,7 @@ Then you can extend the base <code>mkdocs</code> theme by adding a new file <cod
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago"><span class="timeago" datetime="2022-10-31T13:57:12+01:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date">2022-10-31</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago"><span class="timeago" datetime="2024-09-08T19:45:34+02:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date">2024-09-08</span>
   </span>
 
     
