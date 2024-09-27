@@ -92,8 +92,15 @@ class Util:
                     commit_timestamp = commit_timestamp.split()[-1]
             else:
                 # Latest commit touching a specific file
+                if self.config.get('last_update_exclude_renames'):
+                    # We can remove if-else statement and do a one-liner as well
+                    diff_filter_param = "r"
+                    follow_param = True
+                else:
+                    diff_filter_param = ""
+                    follow_param = False
                 commit_timestamp = git.log(
-                    realpath, date="unix", format="%at", n=1, no_show_signature=True
+                    realpath, date="unix", format="%at", diff_filter=diff_filter_param, n=1, no_show_signature=True, follow=follow_param
                 )
         except (InvalidGitRepositoryError, NoSuchPathError) as err:
             if self.config.get('fallback_to_build_date'):

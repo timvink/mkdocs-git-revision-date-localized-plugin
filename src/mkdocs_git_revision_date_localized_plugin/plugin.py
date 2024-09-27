@@ -43,6 +43,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         ("enable_creation_date", config_options.Type(bool, default=False)),
         ("enabled", config_options.Type(bool, default=True)),
         ("strict", config_options.Type(bool, default=True)),
+        ("last_update_exclude_renames", config_options.Type(bool, default=False))
     )
 
     def on_config(self, config: config_options.Config, **kwargs) -> Dict[str, Any]:
