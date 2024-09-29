@@ -80,10 +80,12 @@ class Util:
             realpath = os.path.realpath(path)
             git = self._get_repo(realpath)
 
+            follow_option=self.config.get('version_history_follow_enabled')
+
             if is_first_commit:
                 # diff_filter="A" will select the commit that created the file
                 commit_timestamp = git.log(
-                    realpath, date="unix", format="%at", diff_filter="A", no_show_signature=True, follow=True
+                    realpath, date="unix", format="%at", diff_filter="Ar", no_show_signature=True, follow=follow_option
                 )
                 # A file can be created multiple times, through a file renamed. 
                 # Commits are ordered with most recent commit first
@@ -92,16 +94,12 @@ class Util:
                     commit_timestamp = commit_timestamp.split()[-1]
             else:
                 # Latest commit touching a specific file
-                if self.config.get('last_update_exclude_renames'):
-                    # We can remove if-else statement and do a one-liner as well
-                    diff_filter_param = "r"
-                    follow_param = True
-                else:
-                    diff_filter_param = ""
-                    follow_param = False
                 commit_timestamp = git.log(
-                    realpath, date="unix", format="%at", diff_filter=diff_filter_param, n=1, no_show_signature=True, follow=follow_param
+                    realpath, date="unix", format="%at",
+                    diff_filter="r", n=1, no_show_signature=True, follow=follow_option,
+                    ignore_all_space=True, ignore_blank_lines=True
                 )
+
         except (InvalidGitRepositoryError, NoSuchPathError) as err:
             if self.config.get('fallback_to_build_date'):
                 log(
