@@ -133,6 +133,14 @@ export ENABLED_GIT_REVISION_DATE=false
 mkdocs serve
 ```
 
+## `enable_git_follow`
+
+Default is `true`. When enabled it will issue `--follow` option for git history tracing; meaning it will also track file's previous history for rename and move operations. 
+
+When disabled (by setting it to `false`), each file's history will only consist of its current name and path, it's history from the previous paths or names will not be included.
+
+When enabled (by setting it to `true`), history tracking with `--follow` will be enabled and history will include the file's history from rename and other paths. 
+
 ## `strict`
 
 Default is `true`. When enabled, the logs will show warnings when something is wrong but a fallback has been used. When disabled, the logger will use the INFO level instead.

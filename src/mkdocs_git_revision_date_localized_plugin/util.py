@@ -80,7 +80,7 @@ class Util:
             realpath = os.path.realpath(path)
             git = self._get_repo(realpath)
 
-            follow_option=self.config.get('version_history_follow_enabled')
+            follow_option=self.config.get('enable_git_follow')
 
             if is_first_commit:
                 # diff_filter="A" will select the commit that created the file
