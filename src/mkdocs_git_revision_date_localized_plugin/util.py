@@ -80,10 +80,12 @@ class Util:
             realpath = os.path.realpath(path)
             git = self._get_repo(realpath)
 
+            follow_option=self.config.get('enable_git_follow')
+
             if is_first_commit:
                 # diff_filter="A" will select the commit that created the file
                 commit_timestamp = git.log(
-                    realpath, date="unix", format="%at", diff_filter="A", no_show_signature=True, follow=True
+                    realpath, date="unix", format="%at", diff_filter="Ar", no_show_signature=True, follow=follow_option
                 )
                 # A file can be created multiple times, through a file renamed. 
                 # Commits are ordered with most recent commit first
@@ -93,8 +95,11 @@ class Util:
             else:
                 # Latest commit touching a specific file
                 commit_timestamp = git.log(
-                    realpath, date="unix", format="%at", n=1, no_show_signature=True
+                    realpath, date="unix", format="%at",
+                    diff_filter="r", n=1, no_show_signature=True, follow=follow_option,
+                    ignore_all_space=True, ignore_blank_lines=True
                 )
+
         except (InvalidGitRepositoryError, NoSuchPathError) as err:
             if self.config.get('fallback_to_build_date'):
                 log(
