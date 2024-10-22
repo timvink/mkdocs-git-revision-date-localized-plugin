@@ -15,6 +15,7 @@ You can customize the plugin by setting options in `mkdocs.yml`. For example:
         enable_creation_date: true
         exclude:
             - index.md
+        enable_git_follow: true
         enabled: true
         strict: true
   ```
@@ -114,6 +115,13 @@ Default is empty. Specify a list of page source paths (one per line) that should
           - folder/*
   ```
 
+## `enable_git_follow`
+
+Default is `true`. When enabled it will use `git log --follow` to find the git history. This means git will follow changes if you rename or move the file also.
+Despite being a sensible default, there is a known bug with `--follow`: if you have committed an empty version of a file, then `git log --follow` can follow the wrong trail and give wrong results (see [this blogpost](https://blog.plover.com/prog/git-log-follow.html)).
+
+When disabled (by setting it to `false`), each file's history will only consist of its current name and path, it's history from the previous paths or names will not be included.
+
 ## `enabled`
 
 Default is `true`. Enables you to deactivate this plugin. A possible use case is local development where you might want faster build times and/or do not have git available. It's recommended to use this option with an environment variable together with a default fallback (introduced in `mkdocs` v1.2.1, see [docs](https://www.mkdocs.org/user-guide/configuration/#environment-variables)). Example:
@@ -132,14 +140,6 @@ Which enables you to disable the plugin locally using:
 export ENABLED_GIT_REVISION_DATE=false
 mkdocs serve
 ```
-
-## `enable_git_follow`
-
-Default is `true`. When enabled it will issue `--follow` option for git history tracing; meaning it will also track file's previous history for rename and move operations. 
-
-When disabled (by setting it to `false`), each file's history will only consist of its current name and path, it's history from the previous paths or names will not be included.
-
-When enabled (by setting it to `true`), history tracking with `--follow` will be enabled and history will include the file's history from rename and other paths. 
 
 ## `strict`
 
