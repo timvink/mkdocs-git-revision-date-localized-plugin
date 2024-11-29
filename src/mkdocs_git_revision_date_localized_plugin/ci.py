@@ -43,8 +43,8 @@ def raise_ci_warnings(repo) -> None:
                 [git-revision-date-localized-plugin] Running on GitHub Actions might lead to wrong
                 Git revision dates due to a shallow git fetch depth.
 
-                Try setting fetch-depth to 0 in your GitHub Action
-                (see https://github.com/actions/checkout).
+                Try setting `fetch-depth: 0` in your GitHub Action.
+                See https://github.com/actions/checkout for more information.
                 """
         )
 
