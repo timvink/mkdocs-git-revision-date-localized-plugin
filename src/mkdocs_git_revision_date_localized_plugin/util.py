@@ -186,9 +186,10 @@ class Util:
         """
         Wraps the date string in <span> elements with CSS identifiers.
         """
+        datetime_string = date_formats['datetime']
         for date_type, date_string in date_formats.items():
             date_formats[date_type] = (
-                '<span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-%s">%s</span>'
-                % (date_type, date_string)
+                '<span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-%s" title="%s">%s</span>'
+                % (date_type, datetime_string, date_string)
             )
         return date_formats
