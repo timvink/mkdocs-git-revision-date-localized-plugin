@@ -13,10 +13,11 @@
 
 (*Example when used together with the [mkdocs-material](https://github.com/squidfunk/mkdocs-material) theme*)
 
-Other MkDocs plugins that use information from git:
+Other related MkDocs plugins:
 
 - [mkdocs-git-authors-plugin](https://github.com/timvink/mkdocs-git-authors-plugin) for displaying the authors from git
 - [mkdocs-git-committers-plugin](https://github.com/byrnereese/mkdocs-git-committers-plugin) for displaying authors' github user profiles
+- [mkdocs-document-dates](https://github.com/jaywhj/mkdocs-document-dates) for displaying dates based on file creation and modification dates.
 
 ## Setup
 
