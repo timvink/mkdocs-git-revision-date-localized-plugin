@@ -9,6 +9,7 @@ import logging
 import re
 import os
 import time
+import multiprocessing
 
 from mkdocs import __version__ as mkdocs_version
 from mkdocs.config import config_options
@@ -16,6 +17,8 @@ from mkdocs.plugins import BasePlugin
 from mkdocs.structure.nav import Page
 from mkdocs.utils import copy_file
 from mkdocs.exceptions import ConfigurationError
+from mkdocs.config.defaults import MkDocsConfig
+from mkdocs.structure.files import Files
 
 from mkdocs_git_revision_date_localized_plugin.util import Util
 from mkdocs_git_revision_date_localized_plugin.exclude import exclude
@@ -47,7 +50,13 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         ("strict", config_options.Type(bool, default=True)),
         ("enable_git_follow", config_options.Type(bool, default=True)),
         ("ignored_commits_file", config_options.Type(str, default=None)),
+        ("enable_parallel_processing", config_options.Type(bool, default=True)),
     )
+
+    def __init__(self):
+        super().__init__()
+        self.last_revision_commits = {}
+        self.created_commits = {}
 
     def on_config(self, config: config_options.Config, **kwargs) -> Dict[str, Any]:
         """
@@ -135,6 +144,42 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
 
         return config
 
+
+    def parallel_compute_commit_timestamps(self, files, docs_dir, is_first_commit=False):
+        pool = multiprocessing.Pool(processes=min(10, multiprocessing.cpu_count()))
+        results = []
+        for file in files:
+            if file.is_documentation_page():
+                abs_src_path = os.path.join(docs_dir, file.src_uri)
+                result = pool.apply_async(
+                    self.util.get_git_commit_timestamp, args=(abs_src_path, is_first_commit)
+                )
+                results.append((abs_src_path, result))
+        pool.close()
+        pool.join()
+        if is_first_commit:
+            for src_uri, result in results:
+                self.created_commits[src_uri] = result.get()
+        else:
+            for src_uri, result in results:
+                self.last_revision_commits[src_uri] = result.get()
+
+    def on_files(self, files: Files, config: MkDocsConfig):
+        """
+        Compute commit timestamps for all files in parallel.
+        """
+        if not self.config.get("enabled") or not self.config.get("enable_parallel_processing"):
+            return
+        # Some plugins like TechDocs/monorepo copies docs_dir to a tmp dir and we need the real git path.
+        real_docs_dir = os.path.join(
+            os.path.dirname(config["config_file_path"]), "docs"
+        )
+        if not self.last_revision_commits:
+            self.parallel_compute_commit_timestamps(files=files, docs_dir=real_docs_dir, is_first_commit=False)
+        if not self.created_commits:
+            self.parallel_compute_commit_timestamps(files=files, docs_dir=real_docs_dir, is_first_commit=True)
+
+
     def on_page_markdown(self, markdown: str, page: Page, config: config_options.Config, files, **kwargs) -> str:
         """
         Replace jinja2 tags in markdown and templates with the localized dates.
@@ -189,10 +234,12 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         if getattr(page.file, "generated_by", None):
             last_revision_hash, last_revision_timestamp = "", int(time.time())
         else:
-            last_revision_hash, last_revision_timestamp = self.util.get_git_commit_timestamp(
-                path=page.file.abs_src_path,
-                is_first_commit=False,
-            )
+            last_revision_hash, last_revision_timestamp = self.last_revision_commits.get(page.file.abs_src_path, (None, None))
+            if last_revision_timestamp is None:
+                last_revision_hash, last_revision_timestamp = self.util.get_git_commit_timestamp(
+                    path=page.file.abs_src_path,
+                    is_first_commit=False,
+                )
 
         # Last revision date
         revision_dates = self.util.get_date_formats_for_timestamp(
@@ -261,10 +308,12 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         if getattr(page.file, "generated_by", None):
             first_revision_hash, first_revision_timestamp = "", int(time.time())
         else:
-            first_revision_hash, first_revision_timestamp = self.util.get_git_commit_timestamp(
-                path=page.file.abs_src_path,
-                is_first_commit=True,
-            )
+            first_revision_hash, first_revision_timestamp = self.created_commits.get(page.file.abs_src_path, (None, None))
+            if first_revision_timestamp is None: 
+                first_revision_hash, first_revision_timestamp = self.util.get_git_commit_timestamp(
+                    path=page.file.abs_src_path,
+                    is_first_commit=True,
+                )
 
         if first_revision_timestamp > last_revision_timestamp:
             # See also https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/111

@@ -177,3 +177,15 @@ git `blame.ignoreRevsFile`. This can be useful to ignore specific commits that a
     - git-revision-date-localized:
         ignored_commits_file: .git-blame-ignore-revs
   ```
+
+## `enable_parallel_processing`
+
+Default is `true`. When enabled, the plugin will use `multiprocessing` to iterate through all site files in parallel. Disable if you encounter any errors (and open an issue!).
+
+=== ":octicons-file-code-16: mkdocs.yml"
+
+  ```yaml
+  plugins:
+    - git-revision-date-localized:
+        enable_parallel_processing: True
+  ```
