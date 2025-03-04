@@ -50,6 +50,18 @@ This plugin needs access to the last commit that touched a specific file to be a
 - Bitbucket pipelines: set `clone: depth: full` (<a href="https://support.atlassian.com/bitbucket-cloud/docs/configure-bitbucket-pipelinesyml/">docs</a>)</li>
 - Azure Devops pipelines: set `Agent.Source.Git.ShallowFetchDepth` to something very high like `10e99` ([docs](https://docs.microsoft.com/en-us/azure/devops/pipelines/repos/pipeline-options-for-git?view=azure-devops#shallow-fetch))
 
+*Tip*: You can speed up your builds for large codebases by running git garbage collection (`git gc`) occasionly. You can also use _sparse checkouts_ to only apply the fetch-depth 0 for the folders we're interested (credits Martin [in this tweet](https://x.com/squidfunk/status/1705279829770150291)):
+
+```yaml
+# example sparse checkout for github actions
+- uses: actions/checkout@v4
+  with:
+    fetch-depth: 0
+    sparse-checkout: |
+      docs
+      includes
+```
+
 ## Documentation
 
 See [timvink.github.io/mkdocs-git-revision-date-localized-plugin](https://timvink.github.io/mkdocs-git-revision-date-localized-plugin/index.html).
