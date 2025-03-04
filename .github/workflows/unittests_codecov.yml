@@ -21,23 +21,16 @@ jobs:
     steps:
     - uses: actions/checkout@master
 
-    - name: Setup Python
-      uses: actions/setup-python@master
+    - name: Install uv and set the python version
+      uses: astral-sh/setup-uv@v5
       with:
         python-version: ${{ matrix.python-version }}
-
-    - name: Install dependencies
-      run: |
-        pip3 install --upgrade pip
-        pip3 install --upgrade setuptools
-        pip3 install --upgrade wheel
-        pip3 install ".[dev]"
 
     - name: Generate coverage report
       run: |
         git config --global user.name "Github Action"
         git config --global user.email "githubaction@gmail.com"
-        pytest --cov=mkdocs_git_revision_date_localized_plugin --cov-report=xml
+        uv run pytest --cov=mkdocs_git_revision_date_localized_plugin --cov-report=xml
 
     - name: Upload coverage to Codecov
       if: "contains(env.USING_COVERAGE, matrix.python-version)"

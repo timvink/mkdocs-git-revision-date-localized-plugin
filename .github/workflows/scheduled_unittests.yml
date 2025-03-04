@@ -16,22 +16,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-
-    - name: Setup Python
-      uses: actions/setup-python@master
-      with:
-        python-version: "3.12"
-
-    - name: Install dependencies
-      run: |
-        pip3 install --upgrade pip
-        pip3 install --upgrade setuptools
-        pip3 install --upgrade wheel
-        pip3 install ".[dev]"
-
+    - name: Install uv and set the python version
+      uses: astral-sh/setup-uv@v5
     - name: Run unit tests
       run: |
         git config --global user.name "Github Action"
         git config --global user.email "githubaction@gmail.com"
-        pytest
+        uv run pytest
   
