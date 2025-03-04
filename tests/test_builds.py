@@ -255,11 +255,12 @@ def validate_build(testproject_path, plugin_config: dict = {}):
     assert re.search(r"renders as\:\s[<span>|\w].+", contents)
 
     repo = Util(config=plugin_config, mkdocs_dir=testproject_path)
-    date_formats = repo.get_date_formats_for_timestamp(
-        commit_timestamp=repo.get_git_commit_timestamp(
+    commit_hash, commit_timestamp =repo.get_git_commit_timestamp(
             path=str(testproject_path / "docs/page_with_tag.md"),
             is_first_commit=False,
-        ),
+        )
+    date_formats = repo.get_date_formats_for_timestamp(
+        commit_timestamp,
         locale=plugin_config['locale'],
         add_spans=True,
     )
@@ -268,10 +269,7 @@ def validate_build(testproject_path, plugin_config: dict = {}):
     assert any(searches), "No correct revision date formats output was found"
 
     if plugin_config.get("enable_creation_date"):
-        commit_timestamp=repo.get_git_commit_timestamp(
-            path=str(testproject_path / "docs/page_with_tag.md"),
-            is_first_commit=True,
-        )
+        commit_hash, commit_timestamp = repo.get_git_commit_timestamp(path=str(testproject_path / "docs/page_with_tag.md"),is_first_commit=True,)
         assert commit_timestamp == 1500854705
         date_formats = repo.get_date_formats_for_timestamp(
             commit_timestamp=commit_timestamp,
@@ -283,7 +281,7 @@ def validate_build(testproject_path, plugin_config: dict = {}):
         assert any(searches), "No correct creation date formats output was found"
 
         if os.path.exists(str(testproject_path / "docs/subfolder/page_with_renamed.md")):
-            commit_timestamp=repo.get_git_commit_timestamp(
+            commit_hash, commit_timestamp=repo.get_git_commit_timestamp(
                 path=str(testproject_path / "docs/subfolder/page_with_renamed.md"),
                 is_first_commit=True
             )

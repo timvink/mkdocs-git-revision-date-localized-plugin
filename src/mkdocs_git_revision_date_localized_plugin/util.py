@@ -16,7 +16,7 @@ from git import (
     NoSuchPathError,
 )
 
-from typing import Any, Dict, List
+from typing import Dict, List, Tuple
 
 logger = logging.getLogger("mkdocs.plugins")
 
@@ -53,7 +53,7 @@ class Util:
             self,
             path: str,
             is_first_commit: bool = False
-    ) -> int:
+    ) -> Tuple[str, int]:
         """
         Get a list of commit dates in unix timestamp, starts with the most recent commit.
 
@@ -64,9 +64,10 @@ class Util:
             is_first_commit (bool): retrieve commit timestamp when file was created.
 
         Returns:
-            int: commit date in unix timestamp, starts with the most recent commit.
+            tuple[str, int]: commit hash and commit date in unix timestamp.
         """
         commit_timestamp = ""
+        commit_hash = ""
         n_ignored_commits = 0
 
         # Determine the logging level
@@ -118,8 +119,9 @@ class Util:
                     if not line:
                         commit_timestamp = ""
                         break
-                    commit, commit_timestamp = line.split(" ")
-                    if not any(commit.startswith(x) for x in self.ignored_commits):
+                    commit_hash, commit_timestamp = line.split(" ")
+                    breakpoint()
+                    if not any(commit_hash.startswith(x) for x in self.ignored_commits):
                         break
                     else:
                         n_ignored_commits += 1
@@ -195,7 +197,7 @@ class Util:
                 msg += f" (ignored {n_ignored_commits} commits)"
             log(msg)
 
-        return int(commit_timestamp)
+        return commit_hash, int(commit_timestamp)
 
     def get_date_formats_for_timestamp(
         self,
@@ -261,3 +263,33 @@ class Util:
             logger.error(f"An error occurred while reading the file {filename}: {e}")
         
         return result
+
+    def get_tag_name_for_commit(self, commit_hash: str) -> str:
+        """
+        Get the tag name for a specific commit.
+        
+        Args:
+            commit_hash (str): The commit hash to find tags for
+        
+        Returns:
+            str: Tag name if found, otherwise empty string
+        """
+        if not commit_hash:
+            return ""
+        
+        try:
+            for path, git in self.repo_cache.items():
+                try:
+                    # Check if there's a tag pointing to this commit
+                    tags = git.tag('--points-at', commit_hash, format='%(refname:short)')
+                    if tags:
+                        # Return first tag if multiple tags exist for the commit
+                        return tags.split('\n')[0]
+                except GitCommandError:
+                    # Continue checking other repositories in cache
+                    continue
+            
+            return ""  # No tag found for this commit
+        except Exception as e:
+            logger.debug(f"Error getting tag for commit {commit_hash}: {str(e)}")
+            return ""
