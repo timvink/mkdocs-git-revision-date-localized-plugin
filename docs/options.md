@@ -18,6 +18,7 @@ You can customize the plugin by setting options in `mkdocs.yml`. For example:
         enable_git_follow: true
         enabled: true
         strict: true
+        ignored_commits_file: .git-blame-ignore-revs
   ```
 
 ## `type`
@@ -154,4 +155,19 @@ Default is `true`. When enabled, the logs will show warnings when something is w
   plugins:
     - git-revision-date-localized:
         strict: true
+  ```
+
+## `ignored_commits_file`
+
+Default is `None`. When specified, contains a file that contains a list of commit hashes to ignore
+when determining the most recent updated time. The format of the file is the same as the format of
+git `blame.ignoreRevsFile`. This can be useful to ignore formatting updates or other mass changes to the documents.
+
+
+=== ":octicons-file-code-16: mkdocs.yml"
+
+  ```yaml
+  plugins:
+    - git-revision-date-localized:
+        ignored_commits_file: .git-blame-ignore-revs
   ```
