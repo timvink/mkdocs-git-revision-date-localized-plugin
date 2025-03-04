@@ -271,10 +271,10 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
                 is_first_commit=True,
             )
 
-        if first_revision_timestamp < last_revision_timestamp:
+        if first_revision_timestamp > last_revision_timestamp:
             # See also https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/111
             msg = "First revision timestamp is older than last revision timestamp for page %s. " % page.file.src_path
-            msg += "This can be due to a quick in `git` follow behaviour. You can try to set `enable_git_follow: false` in the plugin configuration.
+            msg += "This can be due to a quick in `git` follow behaviour. You can try to set `enable_git_follow: false` in the plugin configuration."
             logging.warning(msg)
             first_revision_hash, first_revision_timestamp = last_revision_hash, last_revision_timestamp
 
