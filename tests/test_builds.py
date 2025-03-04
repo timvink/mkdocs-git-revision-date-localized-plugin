@@ -301,7 +301,7 @@ def validate_mkdocs_file(temp_path: str, mkdocs_yml_file: str):
     )
     setup_commit_history(testproject_path)
     result = build_docs_setup(testproject_path)
-    assert result.exit_code == 0, "'mkdocs build' command failed"
+    assert result.exit_code == 0, f"'mkdocs build' command failed with output:\n{result.stdout}"
 
     # validate build with locale retrieved from mkdocs config file
     validate_build(
