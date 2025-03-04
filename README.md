@@ -7,17 +7,11 @@
 
 # mkdocs-git-revision-date-localized-plugin
 
-[MkDocs](https://www.mkdocs.org/) plugin that enables displaying the date of the last git modification of a page. The plugin uses [babel](https://github.com/python-babel/babel/tree/master/babel) and [timeago.js](https://github.com/hustcc/timeago.js) to provide different localized date formats. Initial fork from [mkdocs-git-revision-date-plugin](https://github.com/zhaoterryy/mkdocs-git-revision-date-plugin).
+[MkDocs](https://www.mkdocs.org/) plugin that enables displaying the date of the last git modification of a page. The plugin uses [babel](https://github.com/python-babel/babel/tree/master/babel) and [timeago.js](https://github.com/hustcc/timeago.js) to provide different localized date formats. Works with [`mkdocs-material`](https://squidfunk.github.io/mkdocs-material/), see [adding a git repository](https://squidfunk.github.io/mkdocs-material/setup/adding-a-git-repository/).
 
 ![demo](https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/raw/master/demo_screencast.gif)
 
 (*Example when used together with the [mkdocs-material](https://github.com/squidfunk/mkdocs-material) theme*)
-
-Other related MkDocs plugins:
-
-- [mkdocs-git-authors-plugin](https://github.com/timvink/mkdocs-git-authors-plugin) for displaying the authors from git
-- [mkdocs-git-committers-plugin](https://github.com/byrnereese/mkdocs-git-committers-plugin) for displaying authors' github user profiles
-- [mkdocs-document-dates](https://github.com/jaywhj/mkdocs-document-dates) for displaying dates based on file creation and modification dates.
 
 ## Setup
 
@@ -69,3 +63,10 @@ See [timvink.github.io/mkdocs-git-revision-date-localized-plugin](https://timvin
 ## Contributing
 
 Contributions are very welcome! Please read [CONTRIBUTING.md](https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/blob/master/CONTRIBUTING.md) before putting in any work.
+
+## Related MkDocs plugins:
+
+- [mkdocs-git-authors-plugin](https://github.com/timvink/mkdocs-git-authors-plugin) for displaying the authors from git
+- [mkdocs-git-committers-plugin-2](https://github.com/ojacques/mkdocs-git-committers-plugin-2) for displaying authors' github user profiles
+- [mkdocs-document-dates](https://github.com/jaywhj/mkdocs-document-dates) for displaying dates based on file creation and modification dates.
+- Initial fork from [mkdocs-git-revision-date-plugin](https://github.com/zhaoterryy/mkdocs-git-revision-date-plugin).
