@@ -53,17 +53,19 @@ Default is `UTC`. Specify a time zone database name ([reference](https://en.wiki
 
 ## `locale`
 
-Default is `None`. Specify a two letter [ISO639](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code to display dates in your preferred language. Note this plugin supports many different ways to [specify the locale](howto/specify-locale.md), but if not specified anywhere the fallback is English (`en`).
+Default is `None`. Specify a two letter [ISO639](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code (f.e. `en`) or [5-letter language code with added territory/region/country](https://www.mkdocs.org/user-guide/localizing-your-theme/#supported-locales) (`en_US`) to display dates in your preferred language. Note this plugin supports many different ways to [specify the locale](howto/specify-locale.md), but if not specified _anywhere_ the fallback will be English (`en`). `locale` is used to translate timestamps to dates when `type: date` or `type: datetime` (using [babel](https://github.com/python-babel/babel)) as well as to translate datetimes to a relative timeago string when `type: timeago` (using [timeago.js](https://github.com/hustcc/timeago.js)).
 
 Example outputs:
 
 ```yaml
-April 27, 2021                # `locale: en` with `type: date` (default)
-April 27, 2021 13:11:28       # `locale: en` with `type: datetime`
-2 weeks ago                   # `locale: en` with `type: timeago`
-27 de marzo de 2021           # `locale: es` with `type: date`
-27 de marzo de 2021 13:57:28  # `locale: es` with `type: datetime`
-hace 2 semanas                # `locale: es` with `type: timeago`
+# `locale: en`
+April 27, 2021                # with `type: date` (default)
+April 27, 2021 13:11:28       # with `type: datetime`
+2 weeks ago                   # with `type: timeago`
+# `locale: es`
+27 de marzo de 2021           # with `type: date`
+27 de marzo de 2021 13:57:28  # with `type: datetime`
+hace 2 semanas                # with `type: timeago`
 ```
 
 === ":octicons-file-code-16: mkdocs.yml"
@@ -71,8 +73,12 @@ hace 2 semanas                # `locale: es` with `type: timeago`
   ```yaml
   plugins:
     - git-revision-date-localized:
-        locale: en
+        locale: en_US
   ```
+
+!!! note when using `type: timeago`
+
+  When using `type: timeago` then [timeago.js](https://github.com/hustcc/timeago.js) is added to your website, which supports [these locales](https://github.com/hustcc/timeago.js/tree/master/src/lang). If you specify a locale not supported by timeago.js, the fallback is English (`en`). It might happen that your specific locale is supported by babel (used by date formats) but not by timeago. In that case open an issue with this plugin.
 
 
 ## `fallback_to_build_date`

@@ -1,6 +1,6 @@
 # Specify a locale
 
-`locale` is a two letter [ISO639](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code that `git-revision-date-localized` uses to display dates in your preferred language.
+`locale` is aa two letter [ISO639](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code (f.e. `en`) or [5-letter language code with added territory/region/country](https://www.mkdocs.org/user-guide/localizing-your-theme/#supported-locales) (`en_US`) that `git-revision-date-localized` uses to display dates in your preferred language.
 
 For example:
 
@@ -68,6 +68,7 @@ plugins:
 If no `locale` is specified anywhere, the fallback is English with the US date format (`en`).
 
 !!! info "Supported locales"
+
     - When used in combination with `type: date` or `type: datetime`, translation is done using [babel](https://github.com/python-babel/babel) which supports [these locales](http://www.unicode.org/cldr/charts/latest/supplemental/territory_language_information.html)
 
     - When used in combination with `type: timeago` then [timeago.js](https://github.com/hustcc/timeago.js) is added to your website, which supports [these locales](https://github.com/hustcc/timeago.js/tree/master/src/lang). If you specify a locale not supported by timeago.js, the fallback is English (`en`)
