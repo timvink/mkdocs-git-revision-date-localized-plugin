@@ -67,7 +67,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         
         assert self.config['type'] in ["date","datetime","iso_date","iso_datetime","timeago","custom"]
 
-        self.util = Util(config=self.config)
+        self.util = Util(config=self.config, mkdocs_dir=os.path.abspath(os.path.dirname(config.get('config_file_path'))))
 
         # Save last commit timestamp for entire site
         self.last_site_revision_timestamp = self.util.get_git_commit_timestamp(

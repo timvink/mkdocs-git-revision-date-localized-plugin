@@ -27,13 +27,14 @@ class Util:
     This helps find git and calculate relevant dates.
     """
 
-    def __init__(self, config={}):
+    def __init__(self, config: Dict, mkdocs_dir: str):
         """Initialize utility class."""
         self.config = config
         self.repo_cache = {}
 
         ignore_commits_file = self.config.get("ignored_commits_file")
-        self.ignored_commits = self.parse_git_ignore_revs(ignore_commits_file) if ignore_commits_file else []
+        ignore_commits_filepath = os.path.join(mkdocs_dir, ignore_commits_file) if ignore_commits_file else None
+        self.ignored_commits = self.parse_git_ignore_revs(ignore_commits_filepath) if ignore_commits_file else []
 
     def _get_repo(self, path: str) -> Git:
         if not os.path.isdir(path):
@@ -66,6 +67,7 @@ class Util:
             int: commit date in unix timestamp, starts with the most recent commit.
         """
         commit_timestamp = ""
+        n_ignored_commits = 0
 
         # Determine the logging level
         # Only log warnings when plugin is set to strict.
@@ -111,7 +113,7 @@ class Util:
                 ).split("\n")
                 
                 # process the commits for the file in reverse-chronological order. Ignore any commit that is on the
-                # ignored list. If the line is empty, we've reached the end and need to use the fallback behavior
+                # ignored list. If the line is empty, we've reached the end and need to use the fallback behavior.
                 for line in lines:
                     if not line:
                         commit_timestamp = ""
@@ -119,6 +121,9 @@ class Util:
                     commit, commit_timestamp = line.split(" ")
                     if not any(commit.startswith(x) for x in self.ignored_commits):
                         break
+                    else:
+                        n_ignored_commits += 1
+
 
         except (InvalidGitRepositoryError, NoSuchPathError) as err:
             if self.config.get('fallback_to_build_date'):
@@ -165,10 +170,13 @@ class Util:
         # create timestamp
         if commit_timestamp == "":
             commit_timestamp = time.time()
-            log(
+            msg = (
                 "[git-revision-date-localized-plugin] '%s' has no git logs, using current timestamp"
                 % path
             )
+            if n_ignored_commits:
+                msg += f" (ignored {n_ignored_commits} commits)"
+            log(msg)
 
         return int(commit_timestamp)
 
@@ -222,10 +230,17 @@ class Util:
         Whitespace, blanklines and comments starting with # are all ignored.
         """
         result = []
-        with open(filename, "rt") as f:
-            for line in f:
-                line = line.split("#", 1)[0].strip()
-                if not line:
-                    continue
-                result.append(line)
+        
+        try:
+            with open(filename, "rt", encoding='utf-8') as f:
+                for line in f:
+                    line = line.split("#", 1)[0].strip()
+                    if not line:
+                        continue
+                    result.append(line)
+        except FileNotFoundError:
+            logger.error(f"File not found: {filename}")
+        except Exception as e:
+            logger.error(f"An error occurred while reading the file {filename}: {e}")
+        
         return result

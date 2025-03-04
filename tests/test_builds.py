@@ -254,7 +254,7 @@ def validate_build(testproject_path, plugin_config: dict = {}):
     contents = page_with_tag.read_text(encoding="utf8")
     assert re.search(r"renders as\:\s[<span>|\w].+", contents)
 
-    repo = Util(config=plugin_config)
+    repo = Util(config=plugin_config, mkdocs_dir=testproject_path)
     date_formats = repo.get_date_formats_for_timestamp(
         commit_timestamp=repo.get_git_commit_timestamp(
             path=str(testproject_path / "docs/page_with_tag.md"),
@@ -380,7 +380,7 @@ def test_tags_are_replaced(tmp_path, mkdocs_file):
     # Make sure count_commits() works
     # We created 11 commits in setup_commit_history()
     with working_directory(testproject_path):
-        u = Util()
+        u = Util(config={}, mkdocs_dir=os.getcwd())
         assert commit_count(u._get_repo("docs/page_with_tag.md")) == 11
 
     
@@ -682,7 +682,7 @@ def test_ignored_commits(tmp_path):
 
     # First test that the middle commit doesn't show up by default
     # January 23, 2022 is the date of the most recent commit
-    with open(str(testproject_path / "ignored-commits.txt"), "wt") as fp:
+    with open(str(testproject_path / "ignored-commits.txt"), "wt", encoding="utf-8") as fp:
         fp.write("")
 
     result = build_docs_setup(testproject_path)
@@ -694,10 +694,10 @@ def test_ignored_commits(tmp_path):
 
     # Now mark the most recent change to page_with_tag as ignored
     # May 4, 2018 is the date of the second most recent commit
-    hash = repo.git.log("docs/page_with_tag.md", format="%H", n=1)
+    commit_hash = repo.git.log("docs/page_with_tag.md", format="%H", n=1)
 
-    with open(str(testproject_path / "ignored-commits.txt"), "wt") as fp:
-        fp.write(hash)
+    with open(str(testproject_path / "ignored-commits.txt"), "wt", encoding="utf-8") as fp:
+        fp.write(commit_hash)
 
     # should not raise warning
     result = build_docs_setup(testproject_path)

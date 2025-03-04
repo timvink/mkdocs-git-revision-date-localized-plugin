@@ -159,9 +159,9 @@ Default is `true`. When enabled, the logs will show warnings when something is w
 
 ## `ignored_commits_file`
 
-Default is `None`. When specified, contains a file that contains a list of commit hashes to ignore
-when determining the most recent updated time. The format of the file is the same as the format of
-git `blame.ignoreRevsFile`. This can be useful to ignore formatting updates or other mass changes to the documents.
+Default is `None`. You can specify a file path (relative to your `mkdocs.yml` directory) that contains a list of commit hashes to ignore
+when determining the revision date. The format of the file is the same as the format of
+git `blame.ignoreRevsFile`. This can be useful to ignore specific commits that apply formatting updates or other mass changes to the documents.
 
 
 === ":octicons-file-code-16: mkdocs.yml"
