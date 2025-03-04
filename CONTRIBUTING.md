@@ -7,14 +7,16 @@ Thanks for considering to contribute to this project! Some guidelines:
 - This package tries to be as simple as possible for the user (hide any complexity from the user). New options are only added when there is clear value to the majority of users.
 - When issues or pull requests are not going to be resolved or merged, they should be closed as soon as possible. This is kinder than deciding this after a long period. Our issue tracker should reflect work to be done.
 
+## Setup
+
+We use [uv to manage dependencies](https://docs.astral.sh/uv/getting-started/installation/). 
+
 ## Unit Tests
 
-Make sure to install an editable version before running the tests:
+To run the unit tests, use:
 
 ```python
-pip install -r requirements_dev.txt
-pip install -e .
-pytest --cov=mkdocs_git_revision_date_localized_plugin --cov-report term-missing tests/
+uv run pytest --cov=mkdocs_git_revision_date_localized_plugin --cov-report term-missing tests/
 ```
 
 If it makes sense, writing tests for your PRs is always appreciated and will help get them merged.
@@ -25,14 +27,14 @@ To quickly serve a test website with your latest changes to the plugin use the s
 For example:
 
 ```python
-pip install -r tests/test_requirements.txt
-pip install -e .
-mkdocs serve -f tests/fixtures/basic_project/mkdocs.yml
+uv run mkdocs serve -f tests/fixtures/basic_project/mkdocs.yml
 ```
 
 ## Code Style
 
 Make sure your code *roughly* follows [PEP-8](https://www.python.org/dev/peps/pep-0008/)
 and keeps things consistent with the rest of the code.
+
+We run `ruff format` to automatically style the code.
 
 We use Google-style docstrings.

@@ -31,19 +31,19 @@ classifiers=[
     "License :: OSI Approved :: MIT License",
 ]
 
-dynamic = ["version","dependencies","optional-dependencies"]
+dynamic = ["version"]
+dependencies = [
+    "babel>=2.7.0",
+    "gitpython>=3.1.44",
+    "mkdocs>=1.0",
+    "pytz>=2025.1",
+]
 
 [project.urls]
 "Homepage" = "https://github.com/timvink/mkdocs-git-revision-date-localized-plugin"
 
 [tool.setuptools.dynamic]
 version = {attr = "mkdocs_git_revision_date_localized_plugin.__version__"}
-
-dependencies={file = ["requirements.txt"]}
-
-optional-dependencies.dev={file = ["requirements_dev.txt"]}
-optional-dependencies.base={file = ["requirements.txt"]}
-optional-dependencies.all={file = ["requirements.txt", "requirements_dev.txt"]}
 
 [tool.pytest.ini_options]
 markers = [
@@ -114,5 +114,13 @@ fix = true
 
 [tool.uv]
 dev-dependencies = [
+    "click>=8.1.8",
+    "codecov>=2.1.13",
+    "mkdocs-gen-files>=0.5.0",
+    "mkdocs-git-authors-plugin>=0.9.2",
+    "mkdocs-material>=9.6.7",
+    "mkdocs-static-i18n>=1.3.0",
+    "pytest>=8.3.5",
+    "pytest-cov>=5.0.0",
     "ruff",
 ]
