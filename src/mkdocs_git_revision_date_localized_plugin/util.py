@@ -154,6 +154,8 @@ class Util:
                 )
                 raise err
         except GitCommandNotFound as err:
+            if "detected dubious ownership" in str(err):
+                raise err
             if self.config.get('fallback_to_build_date'):
                 log(
                     "[git-revision-date-localized-plugin] Unable to perform command: 'git log'. Is git installed?"
