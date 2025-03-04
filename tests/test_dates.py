@@ -1,7 +1,7 @@
 import pytest
 from datetime import datetime, timezone
 from babel.dates import get_timezone
-
+from babel.core import UnknownLocaleError
 from mkdocs_git_revision_date_localized_plugin.dates import get_date_formats
 
 
@@ -17,6 +17,37 @@ def test_get_dates():
         "custom": "01. January 1970"
     }
     assert get_date_formats(0) == expected_output
+
+    # Test with 4-letter locale
+    new_expected_output = expected_output.copy()
+    new_expected_output["timeago"] = '<span class="timeago" datetime="1970-01-01T00:00:00+00:00" locale="en_US"></span>'
+    assert get_date_formats(0, locale="en_US") == new_expected_output
+    
+    # Test with different locale
+    expected_output = {
+        "date": "1 janvier 1970",
+        "datetime": "1 janvier 1970 00:00:00",
+        "iso_date": "1970-01-01",
+        "iso_datetime": "1970-01-01 00:00:00",
+        "timeago": '<span class="timeago" datetime="1970-01-01T00:00:00+00:00" locale="fr"></span>',
+        "custom": "01. janvier 1970"
+    }
+    assert get_date_formats(0, locale="fr") == expected_output
+
+    # Test with pt_BR locale
+    expected_output = {
+        "date": "1 de janeiro de 1970",
+        "datetime": "1 de janeiro de 1970 00:00:00",
+        "iso_date": "1970-01-01",
+        "iso_datetime": "1970-01-01 00:00:00",
+        "timeago": '<span class="timeago" datetime="1970-01-01T00:00:00+00:00" locale="pt_BR"></span>',
+        "custom": "01. janeiro 1970"
+    }
+    assert get_date_formats(0, locale="pt_BR") == expected_output
+
+    # Test with non-existing locale
+    with pytest.raises(UnknownLocaleError):
+        get_date_formats(0, locale="abcd")
 
     # Test with custom arguments
     expected_output = {

@@ -81,7 +81,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         # Get locale from plugin configuration
         plugin_locale = self.config.get("locale", None)
 
-        # theme locale
+        # Get locale from theme configuration
         if "theme" in config and "language" in config.get("theme"):
             custom_theme = config.get("theme")
             theme_locale = (
@@ -96,7 +96,6 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
                 custom_theme.locale if Version(mkdocs_version) >= Version("1.6.0") else custom_theme._vars.get("locale")
             )
             logging.debug("Locale '%s' extracted from the custom theme: '%s'" % (theme_locale, custom_theme.name))
-
         else:
             theme_locale = None
             logging.debug("No locale found in theme configuration (or no custom theme set)")
@@ -116,9 +115,6 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
 
         # Validate locale
         locale_set = str(locale_set)
-        assert len(locale_set) == 2, (
-            "locale must be a 2 letter code, see https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes"
-        )
 
         # set locale also in plugin configuration
         self.config["locale"] = locale_set
@@ -173,7 +169,6 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         # First prio is use mkdocs-static-i18n locale if set
         try:
             locale = page.file.locale
-
         except AttributeError:
             locale = None
 
@@ -183,17 +178,11 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
                 locale = page.meta["locale"]
 
         # Finally, if no page locale set, we take the locale determined on_config()
+        # (fourth prio is plugin configuration)
+        # (firth prio is theme configuration)
+        # (sixth prio is fallback to English)
         if not locale:
             locale = self.config.get("locale")
-
-        # MkDocs supports 2-letter and 5-letter locales
-        # https://www.mkdocs.org/user-guide/localizing-your-theme/#supported-locales
-        # We need the 2 letter variant
-        if len(locale) == 5:
-            locale = locale[:2]
-        assert len(locale) == 2, (
-            "locale must be a 2 letter code, see https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes"
-        )
 
         # Retrieve git commit timestamp
         # Except for generated pages (f.e. by mkdocs-gen-files plugin)
