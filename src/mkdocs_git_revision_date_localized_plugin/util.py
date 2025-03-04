@@ -120,7 +120,6 @@ class Util:
                         commit_timestamp = ""
                         break
                     commit_hash, commit_timestamp = line.split(" ")
-                    breakpoint()
                     if not any(commit_hash.startswith(x) for x in self.ignored_commits):
                         break
                     else:
