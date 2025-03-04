@@ -70,7 +70,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         self.util = Util(config=self.config, mkdocs_dir=os.path.abspath(os.path.dirname(config.get('config_file_path'))))
 
         # Save last commit timestamp for entire site
-        self.last_site_revision_timestamp = self.util.get_git_commit_timestamp(
+        self.last_site_revision_hash, self.last_site_revision_timestamp = self.util.get_git_commit_timestamp(
             config.get('docs_dir')
         )
 
@@ -201,9 +201,9 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         # Retrieve git commit timestamp
         # Except for generated pages (f.e. by mkdocs-gen-files plugin)
         if getattr(page.file, "generated_by", None):
-            last_revision_timestamp = int(time.time())
+            last_revision_hash, last_revision_timestamp = "", int(time.time())
         else:
-            last_revision_timestamp = self.util.get_git_commit_timestamp(
+            last_revision_hash, last_revision_timestamp = self.util.get_git_commit_timestamp(
                     path=page.file.abs_src_path,
                     is_first_commit=False,
             )
@@ -221,6 +221,8 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         # Add to page meta information, for developers
         # Include variants without the CSS <span> elements (raw date strings)
         page.meta["git_revision_date_localized"] = revision_date
+        page.meta["git_revision_date_localized_hash"] = last_revision_hash
+        page.meta["git_revision_date_localized_tag"] = self.util.get_tag_name_for_commit(last_revision_hash)
         revision_dates_raw = self.util.get_date_formats_for_timestamp(last_revision_timestamp, locale=locale, add_spans=False)
         for date_type, date_string in revision_dates_raw.items():
             page.meta["git_revision_date_localized_raw_%s" % date_type] = date_string
@@ -234,6 +236,8 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         )
 
         # Also add site last updated information, for developers
+        page.meta["git_site_revision_date_localized_hash"] = self.last_site_revision_hash
+        page.meta["git_site_revision_date_localized_tag"] = self.util.get_tag_name_for_commit(self.last_site_revision_hash)
         site_dates = self.util.get_date_formats_for_timestamp(self.last_site_revision_timestamp, locale=locale, add_spans=True)
         site_date = site_dates[self.config["type"]]
         if self.config["type"] == "timeago":
@@ -260,9 +264,9 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         # Retrieve git commit timestamp
         # Except for generated pages (f.e. by mkdocs-gen-files plugin)
         if getattr(page.file, "generated_by", None):
-            first_revision_timestamp = int(time.time())
+            first_revision_hash, first_revision_timestamp = "", int(time.time())
         else:
-            first_revision_timestamp = self.util.get_git_commit_timestamp(
+            first_revision_hash, first_revision_timestamp = self.util.get_git_commit_timestamp(
                 path=page.file.abs_src_path,
                 is_first_commit=True,
             )
@@ -279,6 +283,8 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
 
         # Add to page meta information, for developers
         # Include variants without the CSS <span> elements (raw date strings)
+        page.meta["git_creation_date_localized_hash"] = first_revision_hash
+        page.meta["git_creation_date_localized_tag"] = self.util.get_tag_name_for_commit(first_revision_hash)
         page.meta["git_creation_date_localized"] = creation_date
         creation_dates_raw = self.util.get_date_formats_for_timestamp(first_revision_timestamp, locale=locale, add_spans=False)
         for date_type, date_string in creation_dates_raw.items():

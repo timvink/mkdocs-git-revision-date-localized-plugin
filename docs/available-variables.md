@@ -1,8 +1,8 @@
 # Available variables
 
-This plugin offers the following variables:
+This plugin offers the following timestamp variables:
 
-| timestamp | description |
+| variable | description |
 |:-----------|:------------|
 | `git_revision_date_localized` | Last git commit that touched a file. Enabled by default. |
 | `git_creation_date_localized` | First git commit that touched a file. Enable in [options](options.md). |
@@ -33,6 +33,9 @@ To allow for more flexibility when overriding a theme there are also variables f
 - `page.meta.git_revision_date_localized_raw_iso_datetime`
 - `page.meta.git_revision_date_localized_raw_timeago`
 - `page.meta.git_revision_date_localized_raw_custom`
+
+Their are also available on the entire site level:
+
 - `page.meta.git_site_revision_date_localized_raw_datetime`
 - `page.meta.git_site_revision_date_localized_raw_iso_date`
 - `page.meta.git_site_revision_date_localized_raw_date`
@@ -48,6 +51,15 @@ And if you've enabled creation date in the config:
 - `page.meta.git_creation_date_localized_raw_iso_datetime`
 - `page.meta.git_creation_date_localized_raw_timeago`
 - `page.meta.git_creation_date_localized_raw_custom`
+
+We also expose the git hash and the git tag (empty if not tag associated with the commit):
+
+- `page.meta.git_revision_date_localized_hash`
+- `page.meta.git_revision_date_localized_tag`
+- `page.meta.git_site_revision_date_localized_hash`
+- `page.meta.git_site_revision_date_localized_tag`
+- `page.meta.git_creation_date_localized_hash`
+- `page.meta.git_creation_date_localized_tag`
 
 !!! warning "timeago.js dependency"
 
