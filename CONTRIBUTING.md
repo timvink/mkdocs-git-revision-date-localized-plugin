@@ -12,7 +12,7 @@ Thanks for considering to contribute to this project! Some guidelines:
 Make sure to install an editable version before running the tests:
 
 ```python
-pip install -r requirement_dev.txt
+pip install -r requirements_dev.txt
 pip install -e .
 pytest --cov=mkdocs_git_revision_date_localized_plugin --cov-report term-missing tests/
 ```

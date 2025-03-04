@@ -43,7 +43,8 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         ("enable_creation_date", config_options.Type(bool, default=False)),
         ("enabled", config_options.Type(bool, default=True)),
         ("strict", config_options.Type(bool, default=True)),
-        ("enable_git_follow", config_options.Type(bool, default=True))
+        ("enable_git_follow", config_options.Type(bool, default=True)),
+        ("ignored_commits_file", config_options.Type(str, default=None)),
     )
 
     def on_config(self, config: config_options.Config, **kwargs) -> Dict[str, Any]:
@@ -66,7 +67,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         
         assert self.config['type'] in ["date","datetime","iso_date","iso_datetime","timeago","custom"]
 
-        self.util = Util(config=self.config)
+        self.util = Util(config=self.config, mkdocs_dir=os.path.abspath(os.path.dirname(config.get('config_file_path'))))
 
         # Save last commit timestamp for entire site
         self.last_site_revision_timestamp = self.util.get_git_commit_timestamp(
