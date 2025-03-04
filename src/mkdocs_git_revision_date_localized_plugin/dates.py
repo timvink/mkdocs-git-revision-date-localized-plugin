@@ -1,4 +1,3 @@
-
 from babel.dates import format_date, get_timezone
 
 from datetime import datetime, timezone
@@ -6,10 +5,7 @@ from typing import Any, Dict
 
 
 def get_date_formats(
-    unix_timestamp: float, 
-    locale: str = "en", 
-    time_zone: str = "UTC", 
-    custom_format: str = "%d. %B %Y"
+    unix_timestamp: float, locale: str = "en", time_zone: str = "UTC", custom_format: str = "%d. %B %Y"
 ) -> Dict[str, Any]:
     """
     Calculate different date formats / types.
@@ -25,11 +21,9 @@ def get_date_formats(
     """
     assert time_zone is not None
     assert locale is not None
-    
+
     utc_revision_date = datetime.fromtimestamp(int(unix_timestamp), tz=timezone.utc)
-    loc_revision_date = utc_revision_date.replace(
-        tzinfo=get_timezone("UTC")
-    ).astimezone(get_timezone(time_zone))
+    loc_revision_date = utc_revision_date.replace(tzinfo=get_timezone("UTC")).astimezone(get_timezone(time_zone))
 
     return {
         "date": format_date(loc_revision_date, format="long", locale=locale),
@@ -44,4 +38,3 @@ def get_date_formats(
         "timeago": '<span class="timeago" datetime="%s" locale="%s"></span>' % (loc_revision_date.isoformat(), locale),
         "custom": loc_revision_date.strftime(custom_format),
     }
-    
