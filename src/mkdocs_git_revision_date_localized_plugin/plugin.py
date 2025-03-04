@@ -4,6 +4,7 @@ MkDocs Plugin.
 https://www.mkdocs.org/
 https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/
 """
+
 import logging
 import re
 import os
@@ -25,6 +26,7 @@ from collections import OrderedDict
 from packaging.version import Version
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+
 
 class GitRevisionDateLocalizedPlugin(BasePlugin):
     """
@@ -62,16 +64,18 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         Returns:
             dict: global configuration object
         """
-        if not self.config.get('enabled'):
+        if not self.config.get("enabled"):
             return config
-        
-        assert self.config['type'] in ["date","datetime","iso_date","iso_datetime","timeago","custom"]
 
-        self.util = Util(config=self.config, mkdocs_dir=os.path.abspath(os.path.dirname(config.get('config_file_path'))))
+        assert self.config["type"] in ["date", "datetime", "iso_date", "iso_datetime", "timeago", "custom"]
+
+        self.util = Util(
+            config=self.config, mkdocs_dir=os.path.abspath(os.path.dirname(config.get("config_file_path")))
+        )
 
         # Save last commit timestamp for entire site
         self.last_site_revision_hash, self.last_site_revision_timestamp = self.util.get_git_commit_timestamp(
-            config.get('docs_dir')
+            config.get("docs_dir")
         )
 
         # Get locale from plugin configuration
@@ -80,24 +84,22 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         # theme locale
         if "theme" in config and "language" in config.get("theme"):
             custom_theme = config.get("theme")
-            theme_locale = custom_theme["language"] if Version(mkdocs_version) >= Version("1.6.0") else custom_theme._vars.get("language")
-            logging.debug(
-                "Locale '%s' extracted from the custom theme: '%s'"
-                % (theme_locale, custom_theme.name)
+            theme_locale = (
+                custom_theme["language"]
+                if Version(mkdocs_version) >= Version("1.6.0")
+                else custom_theme._vars.get("language")
             )
+            logging.debug("Locale '%s' extracted from the custom theme: '%s'" % (theme_locale, custom_theme.name))
         elif "theme" in config and "locale" in config.get("theme"):
             custom_theme = config.get("theme")
-            theme_locale = custom_theme.locale if Version(mkdocs_version) >= Version("1.6.0") else custom_theme._vars.get("locale")
-            logging.debug(
-                "Locale '%s' extracted from the custom theme: '%s'"
-                % (theme_locale, custom_theme.name)
+            theme_locale = (
+                custom_theme.locale if Version(mkdocs_version) >= Version("1.6.0") else custom_theme._vars.get("locale")
             )
+            logging.debug("Locale '%s' extracted from the custom theme: '%s'" % (theme_locale, custom_theme.name))
 
         else:
             theme_locale = None
-            logging.debug(
-                "No locale found in theme configuration (or no custom theme set)"
-            )
+            logging.debug("No locale found in theme configuration (or no custom theme set)")
 
         # First prio: plugin locale
         if plugin_locale:
@@ -106,10 +108,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         # Second prio: theme locale
         elif theme_locale:
             locale_set = theme_locale
-            logging.debug(
-                "Locale not set in plugin. Fallback to theme configuration: %s"
-                % locale_set
-            )
+            logging.debug("Locale not set in plugin. Fallback to theme configuration: %s" % locale_set)
         # Lastly, fallback is English
         else:
             locale_set = "en"
@@ -117,19 +116,17 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
 
         # Validate locale
         locale_set = str(locale_set)
-        assert len(locale_set) == 2, "locale must be a 2 letter code, see https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes"
+        assert len(locale_set) == 2, (
+            "locale must be a 2 letter code, see https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes"
+        )
 
         # set locale also in plugin configuration
         self.config["locale"] = locale_set
 
         # Add pointers to support files for timeago.js
         if self.config.get("type") == "timeago":
-            config["extra_javascript"] = ["js/timeago_mkdocs_material.js"] + config[
-                "extra_javascript"
-            ]
-            config["extra_javascript"] = ["js/timeago.min.js"] + config[
-                "extra_javascript"
-            ]
+            config["extra_javascript"] = ["js/timeago_mkdocs_material.js"] + config["extra_javascript"]
+            config["extra_javascript"] = ["js/timeago.min.js"] + config["extra_javascript"]
             config["extra_css"] = ["css/timeago.css"] + config["extra_css"]
 
         # Compatibility with mkdocs-static-i18n
@@ -139,12 +136,10 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
                 msg = "[git-revision-date-localized] should be defined after the i18n plugin in your mkdocs.yml file. "
                 msg += "This is because i18n adds a 'locale' variable to markdown pages that this plugin supports."
                 raise ConfigurationError(msg)
-        
+
         return config
 
-    def on_page_markdown(
-        self, markdown: str, page: Page, config: config_options.Config, files, **kwargs
-    ) -> str:
+    def on_page_markdown(self, markdown: str, page: Page, config: config_options.Config, files, **kwargs) -> str:
         """
         Replace jinja2 tags in markdown and templates with the localized dates.
 
@@ -164,7 +159,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         Returns:
             str: Markdown source text of page as string
         """
-        if not self.config.get('enabled'):
+        if not self.config.get("enabled"):
             return markdown
 
         # Exclude pages specified in config
@@ -185,31 +180,35 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         # Second prio is a frontmatter variable 'locale' set in the markdown
         if not locale:
             if "locale" in page.meta:
-                locale = page.meta['locale']
+                locale = page.meta["locale"]
 
         # Finally, if no page locale set, we take the locale determined on_config()
         if not locale:
             locale = self.config.get("locale")
-        
+
         # MkDocs supports 2-letter and 5-letter locales
         # https://www.mkdocs.org/user-guide/localizing-your-theme/#supported-locales
         # We need the 2 letter variant
         if len(locale) == 5:
             locale = locale[:2]
-        assert len(locale) == 2, "locale must be a 2 letter code, see https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes"
-        
+        assert len(locale) == 2, (
+            "locale must be a 2 letter code, see https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes"
+        )
+
         # Retrieve git commit timestamp
         # Except for generated pages (f.e. by mkdocs-gen-files plugin)
         if getattr(page.file, "generated_by", None):
             last_revision_hash, last_revision_timestamp = "", int(time.time())
         else:
             last_revision_hash, last_revision_timestamp = self.util.get_git_commit_timestamp(
-                    path=page.file.abs_src_path,
-                    is_first_commit=False,
+                path=page.file.abs_src_path,
+                is_first_commit=False,
             )
 
         # Last revision date
-        revision_dates = self.util.get_date_formats_for_timestamp(last_revision_timestamp, locale=locale, add_spans=True)
+        revision_dates = self.util.get_date_formats_for_timestamp(
+            last_revision_timestamp, locale=locale, add_spans=True
+        )
         revision_date = revision_dates[self.config["type"]]
 
         # timeago output is dynamic, which breaks when you print a page
@@ -223,7 +222,9 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         page.meta["git_revision_date_localized"] = revision_date
         page.meta["git_revision_date_localized_hash"] = last_revision_hash
         page.meta["git_revision_date_localized_tag"] = self.util.get_tag_name_for_commit(last_revision_hash)
-        revision_dates_raw = self.util.get_date_formats_for_timestamp(last_revision_timestamp, locale=locale, add_spans=False)
+        revision_dates_raw = self.util.get_date_formats_for_timestamp(
+            last_revision_timestamp, locale=locale, add_spans=False
+        )
         for date_type, date_string in revision_dates_raw.items():
             page.meta["git_revision_date_localized_raw_%s" % date_type] = date_string
 
@@ -237,13 +238,19 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
 
         # Also add site last updated information, for developers
         page.meta["git_site_revision_date_localized_hash"] = self.last_site_revision_hash
-        page.meta["git_site_revision_date_localized_tag"] = self.util.get_tag_name_for_commit(self.last_site_revision_hash)
-        site_dates = self.util.get_date_formats_for_timestamp(self.last_site_revision_timestamp, locale=locale, add_spans=True)
+        page.meta["git_site_revision_date_localized_tag"] = self.util.get_tag_name_for_commit(
+            self.last_site_revision_hash
+        )
+        site_dates = self.util.get_date_formats_for_timestamp(
+            self.last_site_revision_timestamp, locale=locale, add_spans=True
+        )
         site_date = site_dates[self.config["type"]]
         if self.config["type"] == "timeago":
             site_date += site_dates["iso_date"]
         page.meta["git_site_revision_date_localized"] = site_date
-        site_dates_raw = self.util.get_date_formats_for_timestamp(self.last_site_revision_timestamp, locale=locale, add_spans=False)
+        site_dates_raw = self.util.get_date_formats_for_timestamp(
+            self.last_site_revision_timestamp, locale=locale, add_spans=False
+        )
         for date_type, date_string in site_dates_raw.items():
             page.meta["git_site_revision_date_localized_raw_%s" % date_type] = date_string
 
@@ -255,12 +262,11 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             flags=re.IGNORECASE,
         )
 
-
         # If creation date not enabled, return markdown
         # This is for speed: prevents another `git log` operation each file
         if not self.config.get("enable_creation_date"):
             return markdown
-    
+
         # Retrieve git commit timestamp
         # Except for generated pages (f.e. by mkdocs-gen-files plugin)
         if getattr(page.file, "generated_by", None):
@@ -279,7 +285,9 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             first_revision_hash, first_revision_timestamp = last_revision_hash, last_revision_timestamp
 
         # Creation date formats
-        creation_dates = self.util.get_date_formats_for_timestamp(first_revision_timestamp, locale=locale, add_spans=True)
+        creation_dates = self.util.get_date_formats_for_timestamp(
+            first_revision_timestamp, locale=locale, add_spans=True
+        )
         creation_date = creation_dates[self.config["type"]]
 
         # timeago output is dynamic, which breaks when you print a page
@@ -293,7 +301,9 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         page.meta["git_creation_date_localized_hash"] = first_revision_hash
         page.meta["git_creation_date_localized_tag"] = self.util.get_tag_name_for_commit(first_revision_hash)
         page.meta["git_creation_date_localized"] = creation_date
-        creation_dates_raw = self.util.get_date_formats_for_timestamp(first_revision_timestamp, locale=locale, add_spans=False)
+        creation_dates_raw = self.util.get_date_formats_for_timestamp(
+            first_revision_timestamp, locale=locale, add_spans=False
+        )
         for date_type, date_string in creation_dates_raw.items():
             page.meta["git_creation_date_localized_raw_%s" % date_type] = date_string
 
@@ -314,7 +324,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         Adds the timeago assets to the build.
         """
         # Add timeago files:
-        if self.config.get("type") == "timeago" and self.config.get('enabled'):
+        if self.config.get("type") == "timeago" and self.config.get("enabled"):
             files = [
                 "js/timeago.min.js",
                 "js/timeago_mkdocs_material.js",

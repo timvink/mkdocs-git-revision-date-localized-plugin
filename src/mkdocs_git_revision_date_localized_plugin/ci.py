@@ -20,7 +20,6 @@ def raise_ci_warnings(repo) -> None:
 
     n_commits = commit_count(repo)
 
-
     # Gitlab Runners
     if os.getenv("GITLAB_CI") is not None and n_commits < 50:
         # Default is GIT_DEPTH of 50 for gitlab
@@ -76,7 +75,6 @@ def raise_ci_warnings(repo) -> None:
         )
 
 
-
 def commit_count(repo) -> int:
     """
     Determine the number of commits in a repository.
@@ -87,7 +85,7 @@ def commit_count(repo) -> int:
     Returns:
         count (int): Number of commits.
     """
-    return int(repo.rev_list('--count','HEAD'))
+    return int(repo.rev_list("--count", "HEAD"))
 
 
 def is_shallow_clone(repo) -> bool:
