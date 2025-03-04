@@ -166,6 +166,21 @@ class Util:
                     " To ignore this error, set option 'fallback_to_build_date: true'"
                 )
                 raise err
+        except Exception as err:
+            if self.config.get('fallback_to_build_date'):
+                log(
+                    "[git-revision-date-localized-plugin] An unexpected error occurred: %s"
+                    " Option 'fallback_to_build_date' set to 'true': Falling back to build date"
+                    % str(err)
+                )
+                commit_timestamp = time.time()
+            else:
+                logger.error(
+                    "[git-revision-date-localized-plugin] An unexpected error occurred: %s"
+                    " To ignore this error, set option 'fallback_to_build_date: true'"
+                    % str(err)
+                )
+                raise err
 
         # create timestamp
         if commit_timestamp == "":
