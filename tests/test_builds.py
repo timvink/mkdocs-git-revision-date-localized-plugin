@@ -127,6 +127,10 @@ def setup_clean_mkdocs_folder(mkdocs_yml_path, output_path):
     if "gen-files" in mkdocs_yml_path:
         shutil.copyfile(str(Path(mkdocs_yml_path).parent / "gen_pages.py"), str(testproject_path / "gen_pages.py"))
 
+    # Copy monorepo files
+    if "monorepo" in mkdocs_yml_path:
+        shutil.copytree("tests/fixtures/monorepo", str(testproject_path), dirs_exist_ok=True)
+
     return testproject_path
 
 
@@ -313,27 +317,27 @@ def validate_mkdocs_file(temp_path: str, mkdocs_yml_file: str):
 
 
 MKDOCS_FILES = [
-    'basic_project/mkdocs_theme_no_locale.yml', 
+    'basic_project/mkdocs_creation_date.yml',
+    'basic_project/mkdocs_custom_type.yml',
+    'basic_project/mkdocs_datetime.yml',
+    'basic_project/mkdocs_exclude.yml',
+    'basic_project/mkdocs_fallback_to_build_date.yml',
+    'basic_project/mkdocs_locale.yml',
+    'basic_project/mkdocs_meta.yml',
+    'basic_project/mkdocs_plugin_locale.yml',
     'basic_project/mkdocs.yml', 
     'basic_project/mkdocs_theme_timeago_locale.yml',
-    'basic_project/mkdocs_datetime.yml',
-    'basic_project/mkdocs_plugin_locale.yml',
-    'basic_project/mkdocs_with_override.yml',
     'basic_project/mkdocs_theme_language.yml',
     'basic_project/mkdocs_theme_locale_and_language.yml',
     'basic_project/mkdocs_theme_locale_disabled.yml',
     'basic_project/mkdocs_theme_timeago.yml',
     'basic_project/mkdocs_theme_locale.yml',
+    'basic_project/mkdocs_theme_no_locale.yml', 
     'basic_project/mkdocs_theme_timeago_override.yml',
     'basic_project/mkdocs_theme_timeago_instant.yml',
-    'basic_project/mkdocs_creation_date.yml',
     'basic_project/mkdocs_timeago_locale.yml',
     'basic_project/mkdocs_timeago.yml',
-    'basic_project/mkdocs_fallback_to_build_date.yml',
-    'basic_project/mkdocs_locale.yml',
-    'basic_project/mkdocs_exclude.yml',
-    'basic_project/mkdocs_meta.yml',
-    'basic_project/mkdocs_custom_type.yml',
+    'basic_project/mkdocs_with_override.yml',
     # 'i18n/mkdocs.yml'
 ]
 
@@ -704,3 +708,19 @@ def test_ignored_commits(tmp_path):
     page_with_tag = testproject_path / "site/page_with_tag/index.html"
     contents = page_with_tag.read_text(encoding="utf8")
     assert "May 4, 2018" in contents
+
+
+
+def test_monorepo_compat(tmp_path):
+    testproject_path = setup_clean_mkdocs_folder(
+        "tests/fixtures/monorepo/mkdocs.yml", tmp_path
+    )
+    repo = setup_commit_history(testproject_path)
+    result = build_docs_setup(testproject_path)
+
+    # author = "Test Person <testtest@gmail.com>"
+    # with working_directory(testproject_path):
+    #     repo.git.add(".")
+    #     repo.git.commit(message="add all", author=author, date="1500854705")
+
+    assert result.exit_code == 0, f"'mkdocs build' command failed with:\n\n{result.stdout}"

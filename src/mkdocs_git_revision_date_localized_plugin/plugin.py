@@ -23,7 +23,7 @@ from mkdocs.structure.files import Files
 from mkdocs_git_revision_date_localized_plugin.util import Util
 from mkdocs_git_revision_date_localized_plugin.exclude import exclude
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from collections import OrderedDict
 
 from packaging.version import Version
@@ -145,12 +145,15 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         return config
 
 
-    def parallel_compute_commit_timestamps(self, files, docs_dir, is_first_commit=False):
+    def parallel_compute_commit_timestamps(self, files, original_source: Optional[Dict] = None, is_first_commit=False):
         pool = multiprocessing.Pool(processes=min(10, multiprocessing.cpu_count()))
         results = []
         for file in files:
             if file.is_documentation_page():
-                abs_src_path = os.path.join(docs_dir, file.src_uri)
+                abs_src_path = file.abs_src_path
+                # Support plugins like monorep that might have moved the files from the original source that is under git
+                if original_source and abs_src_path in original_source:
+                    abs_src_path = original_source[abs_src_path]
                 result = pool.apply_async(
                     self.util.get_git_commit_timestamp, args=(abs_src_path, is_first_commit)
                 )
@@ -170,14 +173,17 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         """
         if not self.config.get("enabled") or not self.config.get("enable_parallel_processing"):
             return
-        # Some plugins like TechDocs/monorepo copies docs_dir to a tmp dir and we need the real git path.
-        real_docs_dir = os.path.join(
-            os.path.dirname(config["config_file_path"]), "docs"
-        )
+        
+        # Support monorepo/techdocs, which copies the docs_dir to a temporary directory
+        if "monorepo" in config.get('plugins', {}):
+            original_source = config.get('plugins').get('monorepo').merger.files_source_dir
+        else:
+            original_source = None
+
         if not self.last_revision_commits:
-            self.parallel_compute_commit_timestamps(files=files, docs_dir=real_docs_dir, is_first_commit=False)
+            self.parallel_compute_commit_timestamps(files=files, original_source=original_source, is_first_commit=False)
         if not self.created_commits:
-            self.parallel_compute_commit_timestamps(files=files, docs_dir=real_docs_dir, is_first_commit=True)
+            self.parallel_compute_commit_timestamps(files=files, original_source=original_source, is_first_commit=True)
 
 
     def on_page_markdown(self, markdown: str, page: Page, config: config_options.Config, files, **kwargs) -> str:
