@@ -333,6 +333,7 @@ MKDOCS_FILES = [
     "basic_project/mkdocs_fallback_to_build_date.yml",
     "basic_project/mkdocs_locale.yml",
     "basic_project/mkdocs_meta.yml",
+    "basic_project/mkdocs_no_parallel.yml",
     "basic_project/mkdocs_plugin_locale.yml",
     "basic_project/mkdocs.yml",
     "basic_project/mkdocs_theme_timeago_locale.yml",

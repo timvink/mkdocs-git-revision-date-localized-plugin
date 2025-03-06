@@ -180,10 +180,14 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         else:
             original_source = None
 
-        if not self.last_revision_commits:
-            self.parallel_compute_commit_timestamps(files=files, original_source=original_source, is_first_commit=False)
-        if not self.created_commits:
-            self.parallel_compute_commit_timestamps(files=files, original_source=original_source, is_first_commit=True)
+        try:
+            if not self.last_revision_commits:
+                self.parallel_compute_commit_timestamps(files=files, original_source=original_source, is_first_commit=False)
+            if not self.created_commits:
+                self.parallel_compute_commit_timestamps(files=files, original_source=original_source, is_first_commit=True)
+        except Exception as e:
+            logging.warning(f"Parallel processing failed: {str(e)}.\n To fall back to serial processing, use 'enable_parallel_processing: False' setting.")
+            
 
     def on_page_markdown(self, markdown: str, page: Page, config: config_options.Config, files, **kwargs) -> str:
         """
