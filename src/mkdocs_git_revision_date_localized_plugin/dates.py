@@ -43,49 +43,49 @@ def get_date_formats(
 def strftime_to_babel_format(fmt: str) -> str:
     """
     Convert strftime format string to Babel format pattern.
-    
+
     Args:
         fmt (str): strftime format string
-        
+
     Returns:
         str: Babel format pattern
     """
     # Dictionary mapping strftime directives to Babel format patterns
     mapping = {
-        '%a': 'EEE',     # Weekday abbreviated
-        '%A': 'EEEE',    # Weekday full
-        '%b': 'MMM',     # Month abbreviated
-        '%B': 'MMMM',    # Month full
-        '%c': '',        # Locale's date and time (not directly mappable)
-        '%d': 'dd',      # Day of month zero-padded
-        '%-d': 'd',      # Day of month
-        '%e': 'd',       # Day of month space-padded
-        '%f': 'SSSSSS',  # Microsecond
-        '%H': 'HH',      # Hour 24h zero-padded
-        '%-H': 'H',      # Hour 24h
-        '%I': 'hh',      # Hour 12h zero-padded
-        '%-I': 'h',      # Hour 12h
-        '%j': 'DDD',     # Day of year
-        '%m': 'MM',      # Month zero-padded
-        '%-m': 'M',      # Month
-        '%M': 'mm',      # Minute zero-padded
-        '%-M': 'm',      # Minute
-        '%p': 'a',       # AM/PM
-        '%S': 'ss',      # Second zero-padded
-        '%-S': 's',      # Second
-        '%w': 'e',       # Weekday as number
-        '%W': 'w',       # Week of year
-        '%x': '',        # Locale's date (not directly mappable)
-        '%X': '',        # Locale's time (not directly mappable)
-        '%y': 'yy',      # Year without century
-        '%Y': 'yyyy',    # Year with century
-        '%z': 'Z',       # UTC offset
-        '%Z': 'z',       # Timezone name
-        '%%': '%'        # Literal %
+        "%a": "EEE",  # Weekday abbreviated
+        "%A": "EEEE",  # Weekday full
+        "%b": "MMM",  # Month abbreviated
+        "%B": "MMMM",  # Month full
+        "%c": "",  # Locale's date and time (not directly mappable)
+        "%d": "dd",  # Day of month zero-padded
+        "%-d": "d",  # Day of month
+        "%e": "d",  # Day of month space-padded
+        "%f": "SSSSSS",  # Microsecond
+        "%H": "HH",  # Hour 24h zero-padded
+        "%-H": "H",  # Hour 24h
+        "%I": "hh",  # Hour 12h zero-padded
+        "%-I": "h",  # Hour 12h
+        "%j": "DDD",  # Day of year
+        "%m": "MM",  # Month zero-padded
+        "%-m": "M",  # Month
+        "%M": "mm",  # Minute zero-padded
+        "%-M": "m",  # Minute
+        "%p": "a",  # AM/PM
+        "%S": "ss",  # Second zero-padded
+        "%-S": "s",  # Second
+        "%w": "e",  # Weekday as number
+        "%W": "w",  # Week of year
+        "%x": "",  # Locale's date (not directly mappable)
+        "%X": "",  # Locale's time (not directly mappable)
+        "%y": "yy",  # Year without century
+        "%Y": "yyyy",  # Year with century
+        "%z": "Z",  # UTC offset
+        "%Z": "z",  # Timezone name
+        "%%": "%",  # Literal %
     }
-    
+
     result = fmt
     for strftime_code, babel_code in mapping.items():
         result = result.replace(strftime_code, babel_code)
-    
+
     return result

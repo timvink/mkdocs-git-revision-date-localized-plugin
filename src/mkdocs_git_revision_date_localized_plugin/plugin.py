@@ -144,7 +144,6 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
 
         return config
 
-
     def parallel_compute_commit_timestamps(self, files, original_source: Optional[Dict] = None, is_first_commit=False):
         pool = multiprocessing.Pool(processes=min(10, multiprocessing.cpu_count()))
         results = []
@@ -154,9 +153,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
                 # Support plugins like monorep that might have moved the files from the original source that is under git
                 if original_source and abs_src_path in original_source:
                     abs_src_path = original_source[abs_src_path]
-                result = pool.apply_async(
-                    self.util.get_git_commit_timestamp, args=(abs_src_path, is_first_commit)
-                )
+                result = pool.apply_async(self.util.get_git_commit_timestamp, args=(abs_src_path, is_first_commit))
                 results.append((abs_src_path, result))
         pool.close()
         pool.join()
@@ -173,10 +170,10 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         """
         if not self.config.get("enabled") or not self.config.get("enable_parallel_processing"):
             return
-        
+
         # Support monorepo/techdocs, which copies the docs_dir to a temporary directory
-        if "monorepo" in config.get('plugins', {}):
-            original_source = config.get('plugins').get('monorepo').merger.files_source_dir
+        if "monorepo" in config.get("plugins", {}):
+            original_source = config.get("plugins").get("monorepo").merger.files_source_dir
         else:
             original_source = None
 
@@ -184,7 +181,6 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             self.parallel_compute_commit_timestamps(files=files, original_source=original_source, is_first_commit=False)
         if not self.created_commits:
             self.parallel_compute_commit_timestamps(files=files, original_source=original_source, is_first_commit=True)
-
 
     def on_page_markdown(self, markdown: str, page: Page, config: config_options.Config, files, **kwargs) -> str:
         """
@@ -240,7 +236,9 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         if getattr(page.file, "generated_by", None):
             last_revision_hash, last_revision_timestamp = "", int(time.time())
         else:
-            last_revision_hash, last_revision_timestamp = self.last_revision_commits.get(page.file.abs_src_path, (None, None))
+            last_revision_hash, last_revision_timestamp = self.last_revision_commits.get(
+                page.file.abs_src_path, (None, None)
+            )
             if last_revision_timestamp is None:
                 last_revision_hash, last_revision_timestamp = self.util.get_git_commit_timestamp(
                     path=page.file.abs_src_path,
@@ -314,8 +312,10 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         if getattr(page.file, "generated_by", None):
             first_revision_hash, first_revision_timestamp = "", int(time.time())
         else:
-            first_revision_hash, first_revision_timestamp = self.created_commits.get(page.file.abs_src_path, (None, None))
-            if first_revision_timestamp is None: 
+            first_revision_hash, first_revision_timestamp = self.created_commits.get(
+                page.file.abs_src_path, (None, None)
+            )
+            if first_revision_timestamp is None:
                 first_revision_hash, first_revision_timestamp = self.util.get_git_commit_timestamp(
                     path=page.file.abs_src_path,
                     is_first_commit=True,

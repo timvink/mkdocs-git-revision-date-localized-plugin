@@ -9,9 +9,10 @@ TEST_PARAMS = [
     ("\n\n\n\n\nabc123\n\n\n\n\n", ["abc123"]),
 ]
 
+
 @pytest.mark.parametrize("test_input,expected", TEST_PARAMS)
 def test_parse_git_ignore_revs(test_input, expected):
-    with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', delete=False) as fp:
+    with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", delete=False) as fp:
         fp.write(test_input)
         temp_file_name = fp.name
     try:
