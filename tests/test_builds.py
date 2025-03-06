@@ -144,8 +144,7 @@ def setup_commit_history(testproject_path):
     Returns:
         repo (repo): git.Repo object
     """
-    assert not os.path.exists(str(testproject_path / ".git"))
-    testproject_path = str(testproject_path)
+    assert not (testproject_path / ".git").exists()
 
     repo = git.Repo.init(testproject_path, bare=False)
     repo.git.checkout("-b", "master")
@@ -159,7 +158,7 @@ def setup_commit_history(testproject_path):
                 message="add homepage", author=author, date="1500854705"
             )  # Mon Jul 24 2017 00:05:05 GMT+0000
 
-            file_name = os.path.join(testproject_path, "docs/page_with_tag.md")
+            file_name = testproject_path / "docs/page_with_tag.md"
             with open(file_name, "a") as the_file:
                 the_file.write("test\n")
             repo.git.add("docs/page_with_tag.md")
@@ -175,10 +174,10 @@ def setup_commit_history(testproject_path):
             )  # 	Sun Jan 23 2022 04:10:26 GMT+0000
 
         if os.path.exists("docs/page_with_renamed.md"):
-            bf_file_name = os.path.join(testproject_path, "docs/page_with_renamed.md")
-            af_file_name = os.path.join(testproject_path, "docs/subfolder/page_with_renamed.md")
+            bf_file_name = testproject_path / "docs/page_with_renamed.md"
+            af_file_name = testproject_path / "docs/subfolder/page_with_renamed.md"
             # Since git.mv would actually remove the file, move page_with_renamed.md back to docs if it has been moved
-            if os.path.exists(af_file_name):
+            if af_file_name.exists():
                 os.replace(af_file_name, bf_file_name)
             repo.git.add("docs/page_with_renamed.md")
             repo.git.commit(
@@ -192,7 +191,7 @@ def setup_commit_history(testproject_path):
         if os.path.exists("docs/first_page.md"):
             repo.git.add("docs/first_page.md")
             repo.git.commit(message="first page", author=author, date="1500854705")  # Mon Jul 24 2017 00:05:05 GMT+0000
-            file_name = os.path.join(testproject_path, "docs/first_page.md")
+            file_name = testproject_path / "docs/first_page.md"
             with open(file_name, "w+") as the_file:
                 the_file.write("Hello\n")
             repo.git.add("docs/first_page.md")
@@ -211,7 +210,7 @@ def setup_commit_history(testproject_path):
             message="add mkdocs", author=author, date="1500854705 -0700"
         )  # Mon Jul 24 2017 00:05:05 GMT+0000
 
-        if os.path.exists("docs/second_page.md"):
+        if Path("docs/second_page.md").exists():
             repo.git.add("docs/second_page.md")
             repo.git.commit(
                 message="second page", author=author, date="1643911026"

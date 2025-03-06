@@ -10,6 +10,7 @@ import re
 import os
 import time
 import multiprocessing
+from pathlib import Path
 
 from mkdocs import __version__ as mkdocs_version
 from mkdocs.config import config_options
@@ -28,7 +29,7 @@ from collections import OrderedDict
 
 from packaging.version import Version
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = Path(__file__).parent.absolute()
 
 
 class GitRevisionDateLocalizedPlugin(BasePlugin):
@@ -147,12 +148,13 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
     def parallel_compute_commit_timestamps(self, files, original_source: Optional[Dict] = None, is_first_commit=False):
         pool = multiprocessing.Pool(processes=min(10, multiprocessing.cpu_count()))
         results = []
-        for file in files:
-            if file.is_documentation_page():
-                abs_src_path = file.abs_src_path
+        for f in files:
+            if f.is_documentation_page():
+                abs_src_path = f.abs_src_path
                 # Support plugins like monorep that might have moved the files from the original source that is under git
                 if original_source and abs_src_path in original_source:
                     abs_src_path = original_source[abs_src_path]
+                abs_src_path = Path(abs_src_path).absolute()
                 result = pool.apply_async(self.util.get_git_commit_timestamp, args=(abs_src_path, is_first_commit))
                 results.append((abs_src_path, result))
         pool.close()
@@ -374,8 +376,8 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
                 "js/timeago_mkdocs_material.js",
                 "css/timeago.css",
             ]
-            for file in files:
-                dest_file_path = os.path.join(config["site_dir"], file)
-                src_file_path = os.path.join(HERE, file)
-                assert os.path.exists(src_file_path)
-                copy_file(src_file_path, dest_file_path)
+            for f in files:
+                dest_file_path = Path(config["site_dir"]) / f
+                src_file_path = HERE / f
+                assert src_file_path.exists()
+                copy_file(str(src_file_path), str(dest_file_path))
