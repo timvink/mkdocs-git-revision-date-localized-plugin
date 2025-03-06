@@ -155,7 +155,8 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
                 if original_source and abs_src_path in original_source:
                     abs_src_path = original_source[abs_src_path]
                 abs_src_path = Path(abs_src_path).absolute()
-                result = pool.apply_async(self.util.get_git_commit_timestamp, args=(abs_src_path, is_first_commit))
+                assert abs_src_path.exists()
+                result = pool.apply_async(self.util.get_git_commit_timestamp, args=(str(abs_src_path), is_first_commit))
                 results.append((abs_src_path, result))
         pool.close()
         pool.join()
