@@ -14,5 +14,6 @@ theme:
 
 plugins:
     - search
-    - git-revision-date-localized
+    # Note; here monorepo is defined after git-revision-date-localized
     - monorepo
+    - git-revision-date-localized

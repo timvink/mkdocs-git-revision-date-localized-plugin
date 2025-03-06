@@ -13,6 +13,7 @@ You can reproduce locally with:
 # standard lib
 import logging
 import os
+import sys
 import re
 import shutil
 from contextlib import contextmanager
@@ -680,14 +681,16 @@ def test_ignored_commits(tmp_path):
     assert "May 4, 2018" in contents
 
 
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="monorepo plugin did not work for me on windows (even without this plugin)")
 def test_monorepo_compat(tmp_path):
     testproject_path = setup_clean_mkdocs_folder("tests/fixtures/monorepo/mkdocs.yml", tmp_path)
-    repo = setup_commit_history(testproject_path)
+    setup_commit_history(testproject_path)
     result = build_docs_setup(testproject_path)
+    assert result.exit_code == 0, f"'mkdocs build' command failed with:\n\n{result.stdout}"
 
-    # author = "Test Person <testtest@gmail.com>"
-    # with working_directory(testproject_path):
-    #     repo.git.add(".")
-    #     repo.git.commit(message="add all", author=author, date="1500854705")
-
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="monorepo plugin did not work for me on windows (even without this plugin)")
+def test_monorepo_compat_reverse_order(tmp_path):
+    testproject_path = setup_clean_mkdocs_folder("tests/fixtures/monorepo/mkdocs_reverse_order.yml", tmp_path)
+    setup_commit_history(testproject_path)
+    result = build_docs_setup(testproject_path)
     assert result.exit_code == 0, f"'mkdocs build' command failed with:\n\n{result.stdout}"
