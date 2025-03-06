@@ -1,8 +1,8 @@
 from mkdocs_git_revision_date_localized_plugin.exclude import exclude
 import pytest
 
-def test_exclude():
 
+def test_exclude():
     with pytest.raises(AssertionError):
         exclude("fsdfs", "not a list")
 

@@ -1,0 +1,19 @@
+site_name: Cats API
+
+nav:
+  - Intro: 'index.md'
+  - Authentication: 'authentication.md'
+  - Components: '*include ./components/*/mkdocs.yml'
+  - API:
+    - v1: '!include ./v1/mkdocs.yml'
+    - v2: '!include ./v2/mkdocs.yml'
+    - v3: '!include ./v3/mkdocs.yml'
+
+theme:
+    name: material
+
+plugins:
+    - search
+    # Note; here monorepo is defined after git-revision-date-localized
+    - monorepo
+    - git-revision-date-localized

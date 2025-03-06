@@ -3,6 +3,7 @@
 import logging
 import os
 import time
+from pathlib import Path
 
 from mkdocs_git_revision_date_localized_plugin.ci import raise_ci_warnings
 from mkdocs_git_revision_date_localized_plugin.dates import get_date_formats
@@ -34,7 +35,7 @@ class Util:
         self.repo_cache = {}
 
         ignore_commits_file = self.config.get("ignored_commits_file")
-        ignore_commits_filepath = os.path.join(mkdocs_dir, ignore_commits_file) if ignore_commits_file else None
+        ignore_commits_filepath = Path(mkdocs_dir) / ignore_commits_file if ignore_commits_file else None
         self.ignored_commits = self.parse_git_ignore_revs(ignore_commits_filepath) if ignore_commits_file else []
 
     def _get_repo(self, path: str) -> Git:
