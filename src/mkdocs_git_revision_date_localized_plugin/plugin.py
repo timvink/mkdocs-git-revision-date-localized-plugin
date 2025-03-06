@@ -154,9 +154,9 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
                 # Support plugins like monorep that might have moved the files from the original source that is under git
                 if original_source and abs_src_path in original_source:
                     abs_src_path = original_source[abs_src_path]
-                abs_src_path = Path(abs_src_path).absolute()
-                assert abs_src_path.exists()
-                result = pool.apply_async(self.util.get_git_commit_timestamp, args=(str(abs_src_path), is_first_commit))
+                assert Path(abs_src_path).exists()
+                abs_src_path = str(Path(abs_src_path).absolute())
+                result = pool.apply_async(self.util.get_git_commit_timestamp, args=(abs_src_path, is_first_commit))
                 results.append((abs_src_path, result))
         pool.close()
         pool.join()
@@ -240,7 +240,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             last_revision_hash, last_revision_timestamp = "", int(time.time())
         else:
             last_revision_hash, last_revision_timestamp = self.last_revision_commits.get(
-                page.file.abs_src_path, (None, None)
+                str(Path(page.file.abs_src_path).absolute()), (None, None)
             )
             if last_revision_timestamp is None:
                 last_revision_hash, last_revision_timestamp = self.util.get_git_commit_timestamp(
@@ -316,7 +316,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             first_revision_hash, first_revision_timestamp = "", int(time.time())
         else:
             first_revision_hash, first_revision_timestamp = self.created_commits.get(
-                page.file.abs_src_path, (None, None)
+                str(Path(page.file.abs_src_path).absolute()), (None, None)
             )
             if first_revision_timestamp is None:
                 first_revision_hash, first_revision_timestamp = self.util.get_git_commit_timestamp(
