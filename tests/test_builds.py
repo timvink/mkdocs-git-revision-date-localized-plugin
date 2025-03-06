@@ -723,4 +723,4 @@ def test_monorepo_compat(tmp_path):
     #     repo.git.add(".")
     #     repo.git.commit(message="add all", author=author, date="1500854705")
 
-    assert result.exit_code == 0, f"'mkdocs build' command failed with:\n\n{result.stdout}"
+    assert result.exit_code == 0, f"'mkdocs build' command failed with:\n\n{result.stdout}\n\n{result.stderr}"
