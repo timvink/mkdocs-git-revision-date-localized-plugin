@@ -149,7 +149,6 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         pool = multiprocessing.Pool(processes=min(10, multiprocessing.cpu_count()))
         results = []
         for f in files:
-            print(f.abs_src_path)
             if not f.is_documentation_page():
                 continue
             elif getattr(f, "generated_by", None):
