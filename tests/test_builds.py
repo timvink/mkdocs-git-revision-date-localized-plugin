@@ -119,7 +119,9 @@ def setup_clean_mkdocs_folder(mkdocs_yml_path, output_path):
     else:
         shutil.copytree("tests/fixtures/basic_project/docs", str(testproject_path / "docs"))
 
+    shutil.copyfile("tests/fixtures/basic_project/gen_files.py", str(testproject_path / "gen_files.py"))
     shutil.copyfile(mkdocs_yml_path, str(testproject_path / "mkdocs.yml"))
+
 
     if "gen-files" in mkdocs_yml_path:
         shutil.copyfile(str(Path(mkdocs_yml_path).parent / "gen_pages.py"), str(testproject_path / "gen_pages.py"))
@@ -694,3 +696,15 @@ def test_monorepo_compat_reverse_order(tmp_path):
     setup_commit_history(testproject_path)
     result = build_docs_setup(testproject_path)
     assert result.exit_code == 0, f"'mkdocs build' command failed with:\n\n{result.stdout}"
+
+
+def test_genfiles_plugin(tmp_path):
+    testproject_path = setup_clean_mkdocs_folder("tests/fixtures/basic_project/mkdocs_plugin_genfiles.yml", tmp_path)
+    setup_commit_history(testproject_path)
+
+    result = build_docs_setup(testproject_path)
+    assert result.exit_code == 0, f"'mkdocs build' command failed with:\n\n{result.stdout}"
+
+    page_with_tag = testproject_path / "site/foo/index.html"
+    contents = page_with_tag.read_text(encoding="utf8")
+    assert "Bar, world!" in contents
