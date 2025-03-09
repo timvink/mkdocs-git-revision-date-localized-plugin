@@ -149,11 +149,21 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         pool = multiprocessing.Pool(processes=min(10, multiprocessing.cpu_count()))
         results = []
         for f in files:
-            if f.is_documentation_page():
+            print(f.abs_src_path)
+            if not f.is_documentation_page():
+                continue
+            elif getattr(f, "generated_by", None):
+                continue
+            elif f.abs_src_path is None:
+                continue
+            elif exclude(f.src_path, self.config.get("exclude", [])):
+                continue
+            else:
                 abs_src_path = f.abs_src_path
-                # Support plugins like monorep that might have moved the files from the original source that is under git
+                # Support plugins like monorepo that might have moved the files from the original source that is under git
                 if original_source and abs_src_path in original_source:
                     abs_src_path = original_source[abs_src_path]
+                
                 assert Path(abs_src_path).exists()
                 abs_src_path = str(Path(abs_src_path).absolute())
                 result = pool.apply_async(self.util.get_git_commit_timestamp, args=(abs_src_path, is_first_commit))
@@ -182,11 +192,12 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
 
         try:
             if not self.last_revision_commits:
-                self.parallel_compute_commit_timestamps(files=files, original_source=original_source, is_first_commit=False)
+               self.parallel_compute_commit_timestamps(files=files, original_source=original_source, is_first_commit=False)
             if not self.created_commits:
                 self.parallel_compute_commit_timestamps(files=files, original_source=original_source, is_first_commit=True)
         except Exception as e:
             logging.warning(f"Parallel processing failed: {str(e)}.\n To fall back to serial processing, use 'enable_parallel_processing: False' setting.")
+            raise e
             
 
     def on_page_markdown(self, markdown: str, page: Page, config: config_options.Config, files, **kwargs) -> str:
