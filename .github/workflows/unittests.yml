@@ -2,7 +2,7 @@ name: Unit tests
 on: [pull_request]
 jobs:
   run:
-    name: Run unit tests with codecov upload
+    name: Run unit tests
     runs-on: ${{ matrix.os }}
     env:
       USING_COVERAGE: '3.10'
