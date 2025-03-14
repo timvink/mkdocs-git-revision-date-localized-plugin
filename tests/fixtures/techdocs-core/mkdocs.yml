@@ -1,0 +1,13 @@
+site_name: Cats API
+
+nav:
+  - Intro: 'index.md'
+  - Authentication: 'authentication.md'
+
+theme:
+  name: material
+
+plugins:
+  - techdocs-core
+  - git-revision-date-localized:
+      enable_creation_date: true

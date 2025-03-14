@@ -351,6 +351,7 @@ MKDOCS_FILES = [
     "basic_project/mkdocs_timeago_locale.yml",
     "basic_project/mkdocs_timeago.yml",
     "basic_project/mkdocs_with_override.yml",
+    "techdocs-core/mkdocs.yml",
     # 'i18n/mkdocs.yml'
 ]
 
