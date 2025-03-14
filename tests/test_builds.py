@@ -371,6 +371,8 @@ def test_tags_are_replaced(tmp_path, mkdocs_file):
     """
     Make sure the {{ }} tags are replaced properly.
     """
+    if sys.platform.startswith("win") and ("monorepo" in mkdocs_file or "techdocs" in mkdocs_file):
+        pytest.skip("monorepo plugin windows issue (even without this plugin)")
     testproject_path = setup_clean_mkdocs_folder(mkdocs_yml_path=f"tests/fixtures/{mkdocs_file}", output_path=tmp_path)
     setup_commit_history(testproject_path)
     result = build_docs_setup(testproject_path)
