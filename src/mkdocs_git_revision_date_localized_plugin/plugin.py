@@ -184,8 +184,9 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             return
 
         # Support monorepo/techdocs, which copies the docs_dir to a temporary directory
-        if "monorepo" in config.get("plugins", {}):
-            original_source = config.get("plugins").get("monorepo").merger.files_source_dir
+        mono_repo_plugin = config.get("plugins", {}).get("monorepo", None)
+        if mono_repo_plugin is not None and hasattr(mono_repo_plugin, "merger") and mono_repo_plugin.merger is not None:
+            original_source = mono_repo_plugin.merger.files_source_dir
         else:
             original_source = None
 
