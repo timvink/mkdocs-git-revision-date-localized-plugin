@@ -10,6 +10,7 @@ def test_get_dates():
     expected_output = {
         "date": "January 1, 1970",
         "datetime": "January 1, 1970 00:00:00",
+        "datetime-timezone": "January 1, 1970 00:00:00 UTC",
         "iso_date": "1970-01-01",
         "iso_datetime": "1970-01-01 00:00:00",
         "timeago": '<span class="timeago" datetime="1970-01-01T00:00:00+00:00" locale="en"></span>',
@@ -26,6 +27,7 @@ def test_get_dates():
     expected_output = {
         "date": "1 janvier 1970",
         "datetime": "1 janvier 1970 00:00:00",
+        "datetime-timezone": "1 janvier 1970 00:00:00 UTC",
         "iso_date": "1970-01-01",
         "iso_datetime": "1970-01-01 00:00:00",
         "timeago": '<span class="timeago" datetime="1970-01-01T00:00:00+00:00" locale="fr"></span>',
@@ -37,6 +39,7 @@ def test_get_dates():
     expected_output = {
         "date": "1 de janeiro de 1970",
         "datetime": "1 de janeiro de 1970 00:00:00",
+        "datetime-timezone": "1 de janeiro de 1970 00:00:00 UTC",
         "iso_date": "1970-01-01",
         "iso_datetime": "1970-01-01 00:00:00",
         "timeago": '<span class="timeago" datetime="1970-01-01T00:00:00+00:00" locale="pt_BR"></span>',
@@ -52,6 +55,7 @@ def test_get_dates():
     expected_output = {
         "date": "January 1, 1970",
         "datetime": "January 1, 1970 00:00:00",
+        "datetime-timezone": "January 1, 1970 00:00:00 UTC",
         "iso_date": "1970-01-01",
         "iso_datetime": "1970-01-01 00:00:00",
         "timeago": '<span class="timeago" datetime="1970-01-01T00:00:00+00:00" locale="en"></span>',
@@ -63,6 +67,7 @@ def test_get_dates():
     expected_output = {
         "date": "January 1, 1970",
         "datetime": "January 1, 1970 02:00:00",
+        "datetime-timezone": "January 1, 1970 02:00:00 CET",
         "iso_date": "1970-01-01",
         "iso_datetime": "1970-01-01 02:00:00",
         "timeago": '<span class="timeago" datetime="1970-01-01T02:00:00+01:00" locale="en"></span>',
@@ -84,6 +89,7 @@ def test_get_dates():
     expected_output = {
         "date": "October 15, 2023",
         "datetime": "October 15, 2023 13:32:04",
+        "datetime-timezone": "October 15, 2023 13:32:04 CEST",
         "iso_date": "2023-10-15",
         "iso_datetime": "2023-10-15 13:32:04",
         "timeago": '<span class="timeago" datetime="2023-10-15T13:32:04+02:00" locale="en"></span>',
@@ -94,6 +100,7 @@ def test_get_dates():
     assert get_date_formats(1582397529) == {
         "date": "February 22, 2020",
         "datetime": "February 22, 2020 18:52:09",
+        "datetime-timezone": "February 22, 2020 18:52:09 UTC",
         "iso_date": "2020-02-22",
         "iso_datetime": "2020-02-22 18:52:09",
         "timeago": '<span class="timeago" datetime="2020-02-22T18:52:09+00:00" locale="en"></span>',
