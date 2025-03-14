@@ -33,6 +33,12 @@ def get_date_formats(
                 loc_revision_date.strftime("%H:%M:%S"),
             ]
         ),
+        "datetime-timezone": " ".join(
+            [
+                format_date(loc_revision_date, format="long", locale=locale),
+                loc_revision_date.strftime("%H:%M:%S %Z"),
+            ]
+        ),
         "iso_date": loc_revision_date.strftime("%Y-%m-%d"),
         "iso_datetime": loc_revision_date.strftime("%Y-%m-%d %H:%M:%S"),
         "timeago": '<span class="timeago" datetime="%s" locale="%s"></span>' % (loc_revision_date.isoformat(), locale),
