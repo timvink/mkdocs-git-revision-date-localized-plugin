@@ -145,9 +145,9 @@ We can use the [mkdocs template variables](https://www.mkdocs.org/dev-guide/them
     {% endblock %}
     ```
 
-## Example: Populate `sitemap.xlm`
+## Example: Populate `sitemap.xml`
 
-Having a correct lastmod in your `sitemap.xlm` is important for SEO, as it indicates to Search engines when to re-index pages, see [this blog from Bing](https://blogs.bing.com/webmaster/february-2023/The-Importance-of-Setting-the-lastmod-Tag-in-Your-Sitemap).
+Having a correct lastmod in your `sitemap.xml` is important for SEO, as it indicates to Search engines when to re-index pages, see [this blog from Bing](https://blogs.bing.com/webmaster/february-2023/The-Importance-of-Setting-the-lastmod-Tag-in-Your-Sitemap).
 
 [`@thesuperzapper`](https://github.com/thesuperzapper) shared this [override](https://squidfunk.github.io/mkdocs-material/customization/?h=overri#extending-the-theme) in [mkdocs-git-revision-date-localized-plugin#120](https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/120):
 
@@ -157,12 +157,18 @@ Having a correct lastmod in your `sitemap.xlm` is important for SEO, as it indic
 {%- for file in pages -%}
     {% if not file.page.is_link and (file.page.abs_url or file.page.canonical_url) %}
     <url>
-         <loc>{% if file.page.canonical_url %}{{ file.page.canonical_url|e }}{% else %}{{ file.page.abs_url|e }}{% endif %}</loc>
-         {#- NOTE: we exclude `lastmod` for pages using a template, as their update time is not correctly detected #}
-         {%- if not file.page.meta.template and file.page.meta.git_revision_date_localized_raw_iso_datetime %}
-         <lastmod>{{ (file.page.meta.git_revision_date_localized_raw_iso_datetime + "+00:00") | replace(" ", "T") }}</lastmod>
-         {%- endif %}
-         <changefreq>daily</changefreq>
+        <loc>{% if file.page.canonical_url %}{{ file.page.canonical_url|e }}{% else %}{{ file.page.abs_url|e }}{% endif %}</loc>
+        {#- NOTE: we exclude `lastmod` for pages using a template, as their update time is not correctly detected #}
+        {%- if not file.page.meta.template and file.page.meta.git_revision_date_localized_raw_iso_datetime %}
+        <lastmod>{{ (file.page.meta.git_revision_date_localized_raw_iso_datetime + "+00:00") | replace(" ", "T") }}</lastmod>
+        {%- endif %}
+        <changefreq>daily</changefreq>
+        {#- NOTE: You can add a priority to the front matter (meta) for a page. #}
+        {#- Valid values range from 0.0 to 1.0, if no value is set the default is 0.5. #}
+        {#- reference: https://www.sitemaps.org/protocol.html #}
+        {%- if file.page.meta.priority %}
+        <priority>{{ file.page.meta.priority }}</priority>
+        {%- endif %}
     </url>
     {%- endif -%}
 {% endfor %}
