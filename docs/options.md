@@ -76,9 +76,9 @@ hace 2 semanas                # with `type: timeago`
         locale: en_US
   ```
 
-!!! note when using `type: timeago`
+!!! note
 
-  When using `type: timeago` then [timeago.js](https://github.com/hustcc/timeago.js) is added to your website, which supports [these locales](https://github.com/hustcc/timeago.js/tree/master/src/lang). If you specify a locale not supported by timeago.js, the fallback is English (`en`). It might happen that your specific locale is supported by babel (used by date formats) but not by timeago. In that case open an issue with this plugin.
+    When using `type: timeago`, [timeago.js](https://github.com/hustcc/timeago.js) is added to your website, which supports [these locales](https://github.com/hustcc/timeago.js/tree/master/src/lang). If you specify a locale not supported by timeago.js, the fallback is English (`en`). It might happen that your specific locale is supported by babel (used by date formats) but not by timeago. In that case open an issue with this plugin.
 
 
 ## `fallback_to_build_date`
