@@ -454,9 +454,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#example-populate-sitemapxlm" class="md-nav__link">
+  <a href="#example-populate-sitemapxml" class="md-nav__link">
     <span class="md-ellipsis">
-      Example: Populate sitemap.xlm
+      Example: Populate sitemap.xml
     </span>
   </a>
   
@@ -553,9 +553,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#example-populate-sitemapxlm" class="md-nav__link">
+  <a href="#example-populate-sitemapxml" class="md-nav__link">
     <span class="md-ellipsis">
-      Example: Populate sitemap.xlm
+      Example: Populate sitemap.xml
     </span>
   </a>
   
@@ -717,20 +717,26 @@ Then you can extend the base <code>mkdocs</code> theme by adding a new file <cod
 </div>
 </div>
 </div>
-<h2 id="example-populate-sitemapxlm">Example: Populate <code>sitemap.xlm</code></h2>
-<p>Having a correct lastmod in your <code>sitemap.xlm</code> is important for SEO, as it indicates to Search engines when to re-index pages, see <a href="https://blogs.bing.com/webmaster/february-2023/The-Importance-of-Setting-the-lastmod-Tag-in-Your-Sitemap">this blog from Bing</a>.</p>
+<h2 id="example-populate-sitemapxml">Example: Populate <code>sitemap.xml</code></h2>
+<p>Having a correct lastmod in your <code>sitemap.xml</code> is important for SEO, as it indicates to Search engines when to re-index pages, see <a href="https://blogs.bing.com/webmaster/february-2023/The-Importance-of-Setting-the-lastmod-Tag-in-Your-Sitemap">this blog from Bing</a>.</p>
 <p><a href="https://github.com/thesuperzapper"><code>@thesuperzapper</code></a> shared this <a href="https://squidfunk.github.io/mkdocs-material/customization/?h=overri#extending-the-theme">override</a> in <a href="https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/120">mkdocs-git-revision-date-localized-plugin#120</a>:</p>
 <div class="highlight"><pre><span></span><code><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
 <span class="p">&lt;</span><span class="nt">urlset</span> <span class="na">xmlns</span><span class="o">=</span><span class="s">&quot;http://www.sitemaps.org/schemas/sitemap/0.9&quot;</span><span class="p">&gt;</span>
 {%- for file in pages -%}
     {% if not file.page.is_link and (file.page.abs_url or file.page.canonical_url) %}
     <span class="p">&lt;</span><span class="nt">url</span><span class="p">&gt;</span>
-         <span class="p">&lt;</span><span class="nt">loc</span><span class="p">&gt;</span>{% if file.page.canonical_url %}{{ file.page.canonical_url|e }}{% else %}{{ file.page.abs_url|e }}{% endif %}<span class="p">&lt;/</span><span class="nt">loc</span><span class="p">&gt;</span>
-         {#- NOTE: we exclude `lastmod` for pages using a template, as their update time is not correctly detected #}
-         {%- if not file.page.meta.template and file.page.meta.git_revision_date_localized_raw_iso_datetime %}
-         <span class="p">&lt;</span><span class="nt">lastmod</span><span class="p">&gt;</span>{{ (file.page.meta.git_revision_date_localized_raw_iso_datetime + &quot;+00:00&quot;) | replace(&quot; &quot;, &quot;T&quot;) }}<span class="p">&lt;/</span><span class="nt">lastmod</span><span class="p">&gt;</span>
-         {%- endif %}
-         <span class="p">&lt;</span><span class="nt">changefreq</span><span class="p">&gt;</span>daily<span class="p">&lt;/</span><span class="nt">changefreq</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">loc</span><span class="p">&gt;</span>{% if file.page.canonical_url %}{{ file.page.canonical_url|e }}{% else %}{{ file.page.abs_url|e }}{% endif %}<span class="p">&lt;/</span><span class="nt">loc</span><span class="p">&gt;</span>
+        {#- NOTE: we exclude `lastmod` for pages using a template, as their update time is not correctly detected #}
+        {%- if not file.page.meta.template and file.page.meta.git_revision_date_localized_raw_iso_datetime %}
+        <span class="p">&lt;</span><span class="nt">lastmod</span><span class="p">&gt;</span>{{ (file.page.meta.git_revision_date_localized_raw_iso_datetime + &quot;+00:00&quot;) | replace(&quot; &quot;, &quot;T&quot;) }}<span class="p">&lt;/</span><span class="nt">lastmod</span><span class="p">&gt;</span>
+        {%- endif %}
+        <span class="p">&lt;</span><span class="nt">changefreq</span><span class="p">&gt;</span>daily<span class="p">&lt;/</span><span class="nt">changefreq</span><span class="p">&gt;</span>
+        {#- NOTE: You can add a priority to the front matter (meta) for a page. #}
+        {#- Valid values range from 0.0 to 1.0, if no value is set the default is 0.5. #}
+        {#- reference: https://www.sitemaps.org/protocol.html #}
+        {%- if file.page.meta.priority %}
+        <span class="p">&lt;</span><span class="nt">priority</span><span class="p">&gt;</span>{{ file.page.meta.priority }}<span class="p">&lt;/</span><span class="nt">priority</span><span class="p">&gt;</span>
+        {%- endif %}
     <span class="p">&lt;/</span><span class="nt">url</span><span class="p">&gt;</span>
     {%- endif -%}
 {% endfor %}
@@ -758,7 +764,7 @@ Then you can extend the base <code>mkdocs</code> theme by adding a new file <cod
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="September 8, 2024 19:45:34"><span class="timeago" datetime="2024-09-08T19:45:34+02:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="September 8, 2024 19:45:34">2024-09-08</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="March 19, 2025 05:39:23 CET"><span class="timeago" datetime="2025-03-19T05:39:23+01:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="March 19, 2025 05:39:23 CET">2025-03-19</span>
   </span>
 
     
@@ -768,7 +774,7 @@ Then you can extend the base <code>mkdocs</code> theme by adding a new file <cod
     <span class="md-icon" title="Created">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="April 12, 2021 15:22:56"><span class="timeago" datetime="2021-04-12T15:22:56+02:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="April 12, 2021 15:22:56">2021-04-12</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="April 12, 2021 15:22:56 CEST"><span class="timeago" datetime="2021-04-12T15:22:56+02:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="April 12, 2021 15:22:56 CEST">2021-04-12</span>
   </span>
 
     
@@ -778,11 +784,12 @@ Then you can extend the base <code>mkdocs</code> theme by adding a new file <cod
   <span class="md-source-file__fact">
     <span class="md-icon" title="Contributors">
       
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 4a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 5.5A3.5 3.5 0 0 1 15.5 9a3.5 3.5 0 0 1-3.5 3.5A3.5 3.5 0 0 1 8.5 9 3.5 3.5 0 0 1 12 5.5M5 8c.56 0 1.08.15 1.53.42-.15 1.43.27 2.85 1.13 3.96C7.16 13.34 6.16 14 5 14a3 3 0 0 1-3-3 3 3 0 0 1 3-3m14 0a3 3 0 0 1 3 3 3 3 0 0 1-3 3c-1.16 0-2.16-.66-2.66-1.62a5.54 5.54 0 0 0 1.13-3.96c.45-.27.97-.42 1.53-.42M5.5 18.25c0-2.07 2.91-3.75 6.5-3.75s6.5 1.68 6.5 3.75V20h-13zM0 20v-1.5c0-1.39 1.89-2.56 4.45-2.9-.59.68-.95 1.62-.95 2.65V20zm24 0h-3.5v-1.75c0-1.03-.36-1.97-.95-2.65 2.56.34 4.45 1.51 4.45 2.9z"/></svg>
       
     </span>
     <nav>
       
+        <a href="mailto:348675+aceat64@users.noreply.github.com">Andrew LeCody</a>, 
         <a href="mailto:vinktim@gmail.com">Tim Vink</a>
     </nav>
   </span>
@@ -800,7 +807,7 @@ Then you can extend the base <code>mkdocs</code> theme by adding a new file <cod
   
     <div class="md-source-date">
       <small>
-          Authors: <span class='git-page-authors git-authors'><a href='mailto:vinktim@gmail.com'>Tim Vink</a></span>
+          Authors: <span class='git-page-authors git-authors'><a href='mailto:348675+aceat64@users.noreply.github.com'>Andrew LeCody</a>, <a href='mailto:vinktim@gmail.com'>Tim Vink</a></span>
       </small>
     </div>
   
