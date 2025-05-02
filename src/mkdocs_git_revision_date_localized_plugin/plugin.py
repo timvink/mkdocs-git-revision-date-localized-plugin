@@ -24,7 +24,7 @@ from mkdocs.structure.files import Files
 from mkdocs_git_revision_date_localized_plugin.util import Util
 from mkdocs_git_revision_date_localized_plugin.exclude import exclude
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Literal
 from collections import OrderedDict
 
 from packaging.version import Version
@@ -48,6 +48,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         ("exclude", config_options.Type(list, default=[])),
         ("enable_creation_date", config_options.Type(bool, default=False)),
         ("enabled", config_options.Type(bool, default=True)),
+        ("enabled_on_serve", config_options.Type(bool, default=True)),
         ("strict", config_options.Type(bool, default=True)),
         ("enable_git_follow", config_options.Type(bool, default=True)),
         ("ignored_commits_file", config_options.Type(str, default=None)),
@@ -58,6 +59,11 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         super().__init__()
         self.last_revision_commits = {}
         self.created_commits = {}
+        self.is_serve = False
+        self.is_enabled = True
+    
+    def on_startup(self, command: Literal["build", "gh-deploy", "serve"], dirty: bool, **kwargs) -> None:
+        self.is_serve = command == "serve"
 
     def on_config(self, config: config_options.Config, **kwargs) -> Dict[str, Any]:
         """
@@ -74,7 +80,8 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         Returns:
             dict: global configuration object
         """
-        if not self.config.get("enabled"):
+        self.is_enabled = self.config.get("enabled") and (not self.is_serve or self.config.get("enabled_on_serve"))
+        if not self.is_enabled:
             return config
 
         assert self.config["type"] in ["date", "datetime", "iso_date", "iso_datetime", "timeago", "custom"]
@@ -180,7 +187,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         """
         Compute commit timestamps for all files in parallel.
         """
-        if not self.config.get("enabled") or not self.config.get("enable_parallel_processing"):
+        if not self.is_enabled or not self.config.get("enable_parallel_processing"):
             return
 
         # Support monorepo/techdocs, which copies the docs_dir to a temporary directory
@@ -220,7 +227,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         Returns:
             str: Markdown source text of page as string
         """
-        if not self.config.get("enabled"):
+        if not self.is_enabled:
             return markdown
 
         # Exclude pages specified in config

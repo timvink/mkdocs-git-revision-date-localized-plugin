@@ -69,6 +69,12 @@
                 "markdownDescription": "https://timvink.github.io/mkdocs-git-revision-date-localized-plugin/options/#enabled",
                 "type": "boolean",
                 "default": true
+              },
+              "enabled_on_serve": {
+                "title": "Enable plugin when running `mkdocs serve`",
+                "markdownDescription": "https://timvink.github.io/mkdocs-git-revision-date-localized-plugin/options/#enabled_on_serve",
+                "type": "boolean",
+                "default": true
               }
             },
             "additionalProperties": false,
