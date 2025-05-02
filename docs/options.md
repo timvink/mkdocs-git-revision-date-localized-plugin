@@ -17,6 +17,7 @@ You can customize the plugin by setting options in `mkdocs.yml`. For example:
             - index.md
         enable_git_follow: true
         enabled: true
+        enabled_on_serve: true
         strict: true
         ignored_commits_file: .git-blame-ignore-revs
   ```
@@ -147,6 +148,10 @@ Which enables you to disable the plugin locally using:
 export ENABLED_GIT_REVISION_DATE=false
 mkdocs serve
 ```
+
+## `enabled_on_serve`
+
+Default is `true`. Allows you to deactivate this plugin when `mkdocs` is called with the command `serve`. A possible use case is local development where you might want faster build times and/or do not have git available.
 
 ## `strict`
 
