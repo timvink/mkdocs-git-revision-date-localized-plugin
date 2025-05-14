@@ -52,6 +52,12 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         ("enable_git_follow", config_options.Type(bool, default=True)),
         ("ignored_commits_file", config_options.Type(str, default=None)),
         ("enable_parallel_processing", config_options.Type(bool, default=True)),
+        # Enhanced frontmatter date processing options
+        ("include_relative_dates", config_options.Type(bool, default=False)),
+        ("date_format_in_metadata", config_options.Type(bool, default=True)),
+        # Custom frontmatter field names
+        ("creation_date_field_name", config_options.Type(str, default="date")),
+        ("update_date_field_name", config_options.Type(str, default="lastmod")),
     )
 
     def __init__(self):
@@ -249,19 +255,54 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         if not locale:
             locale = self.config.get("locale")
 
-        # Retrieve git commit timestamp
-        # Except for generated pages (f.e. by mkdocs-gen-files plugin)
-        if getattr(page.file, "generated_by", None):
-            last_revision_hash, last_revision_timestamp = "", int(time.time())
-        else:
-            last_revision_hash, last_revision_timestamp = self.last_revision_commits.get(
-                str(Path(page.file.abs_src_path).absolute()), (None, None)
-            )
-            if last_revision_timestamp is None:
-                last_revision_hash, last_revision_timestamp = self.util.get_git_commit_timestamp(
-                    path=page.file.abs_src_path,
-                    is_first_commit=False,
+        # Check frontmatter for modification date first
+        frontmatter_lastmod = None
+        update_field_name = self.config.get("update_date_field_name", "lastmod")
+        if update_field_name in page.meta:
+            try:
+                frontmatter_lastmod = self.util.parse_date_string(page.meta[update_field_name])
+                if frontmatter_lastmod > 0:
+                    logging.debug(f"[git-revision-date-localized-plugin] Using frontmatter '{update_field_name}' for {page.file.src_path}")
+                    last_revision_hash = ""  # No hash when using frontmatter dates
+                    last_revision_timestamp = frontmatter_lastmod
+                    
+                    # Add formatted date to metadata if enabled
+                    if self.config.get("date_format_in_metadata", True):
+                        date_formats = self.util.get_date_formats_for_timestamp(
+                            last_revision_timestamp, locale=locale, add_spans=False
+                        )
+                        # Use both the original field name and 'lastmod_formatted' for backward compatibility
+                        page.meta[f"{update_field_name}_formatted"] = date_formats[self.config["type"]]
+                        if update_field_name != "lastmod":
+                            page.meta["lastmod_formatted"] = date_formats[self.config["type"]]
+                        
+                    # Add relative date if enabled
+                    if self.config.get("include_relative_dates", False):
+                        rel_date = self.util.get_relative_time_string(last_revision_timestamp)
+                        # Use both the original field name and 'lastmod_relative' for backward compatibility
+                        page.meta[f"{update_field_name}_relative"] = rel_date
+                        if update_field_name != "lastmod":
+                            page.meta["lastmod_relative"] = rel_date
+                else:
+                    frontmatter_lastmod = None
+            except Exception as e:
+                logging.warning(f"[git-revision-date-localized-plugin] Failed to parse '{update_field_name}' in frontmatter: {str(e)}")
+                frontmatter_lastmod = None
+        
+        # Retrieve git commit timestamp if no valid frontmatter date found
+        if frontmatter_lastmod is None:
+            # Except for generated pages (f.e. by mkdocs-gen-files plugin)
+            if getattr(page.file, "generated_by", None):
+                last_revision_hash, last_revision_timestamp = "", int(time.time())
+            else:
+                last_revision_hash, last_revision_timestamp = self.last_revision_commits.get(
+                    str(Path(page.file.abs_src_path).absolute()), (None, None)
                 )
+                if last_revision_timestamp is None:
+                    last_revision_hash, last_revision_timestamp = self.util.get_git_commit_timestamp(
+                        path=page.file.abs_src_path,
+                        is_first_commit=False,
+                    )
 
         # Last revision date
         revision_dates = self.util.get_date_formats_for_timestamp(
@@ -320,24 +361,60 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             flags=re.IGNORECASE,
         )
 
+        # Initialize creation date variables
+        first_revision_hash = ""
+        first_revision_timestamp = None
+        
+        # Process creation date field from frontmatter if present
+        # This always processes the frontmatter field when present, regardless of enable_creation_date setting
+        creation_field_name = self.config.get("creation_date_field_name", "date")
+        if creation_field_name in page.meta:
+            try:
+                first_revision_timestamp = self.util.parse_date_string(page.meta[creation_field_name])
+                if first_revision_timestamp > 0:
+                    logging.debug(f"[git-revision-date-localized-plugin] Using frontmatter '{creation_field_name}' for {page.file.src_path}")
+                    first_revision_hash = ""  # No hash when using frontmatter dates
+                    
+                    # Add formatted date to metadata if enabled
+                    if self.config.get("date_format_in_metadata", True):
+                        date_formats = self.util.get_date_formats_for_timestamp(
+                            first_revision_timestamp, locale=locale, add_spans=False
+                        )
+                        # Use both the original field name and 'date_formatted' for backward compatibility
+                        page.meta[f"{creation_field_name}_formatted"] = date_formats[self.config["type"]]
+                        if creation_field_name != "date":
+                            page.meta["date_formatted"] = date_formats[self.config["type"]]
+                        
+                    # Add relative date if enabled
+                    if self.config.get("include_relative_dates", False):
+                        rel_date = self.util.get_relative_time_string(first_revision_timestamp)
+                        # Use both the original field name and 'date_relative' for backward compatibility
+                        page.meta[f"{creation_field_name}_relative"] = rel_date
+                        if creation_field_name != "date":
+                            page.meta["date_relative"] = rel_date
+            except Exception as e:
+                logging.warning(f"[git-revision-date-localized-plugin] Failed to parse '{creation_field_name}' in frontmatter: {str(e)}")
+                first_revision_timestamp = None
+
         # If creation date not enabled, return markdown
         # This is for speed: prevents another `git log` operation each file
         if not self.config.get("enable_creation_date"):
             return markdown
-
-        # Retrieve git commit timestamp
-        # Except for generated pages (f.e. by mkdocs-gen-files plugin)
-        if getattr(page.file, "generated_by", None):
-            first_revision_hash, first_revision_timestamp = "", int(time.time())
-        else:
-            first_revision_hash, first_revision_timestamp = self.created_commits.get(
-                str(Path(page.file.abs_src_path).absolute()), (None, None)
-            )
-            if first_revision_timestamp is None:
-                first_revision_hash, first_revision_timestamp = self.util.get_git_commit_timestamp(
-                    path=page.file.abs_src_path,
-                    is_first_commit=True,
+        
+        # Retrieve git commit timestamp if no valid frontmatter date found
+        if first_revision_timestamp is None:
+            # Except for generated pages (f.e. by mkdocs-gen-files plugin)
+            if getattr(page.file, "generated_by", None):
+                first_revision_hash, first_revision_timestamp = "", int(time.time())
+            else:
+                first_revision_hash, first_revision_timestamp = self.created_commits.get(
+                    str(Path(page.file.abs_src_path).absolute()), (None, None)
                 )
+                if first_revision_timestamp is None:
+                    first_revision_hash, first_revision_timestamp = self.util.get_git_commit_timestamp(
+                        path=page.file.abs_src_path,
+                        is_first_commit=True,
+                    )
 
         if first_revision_timestamp > last_revision_timestamp:
             # See also https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/111

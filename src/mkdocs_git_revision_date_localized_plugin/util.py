@@ -4,6 +4,7 @@ import logging
 import os
 import time
 from pathlib import Path
+import dateutil.parser
 
 from mkdocs_git_revision_date_localized_plugin.ci import raise_ci_warnings
 from mkdocs_git_revision_date_localized_plugin.dates import get_date_formats
@@ -238,6 +239,53 @@ class Util:
             )
         return date_formats
 
+    def parse_date_string(self, date_value) -> int:
+        """
+        Parse a date value from frontmatter to a UNIX timestamp.
+        Enhanced to handle various date formats and object types.
+        
+        Args:
+            date_value: Date value to parse - can be:
+                - string in ISO format (e.g. "2010-12-03T23:29:00+02:00")
+                - string in human-readable format (e.g. "January 15, 2023")
+                - datetime object
+                - date object
+                - other object with year/month/day attributes
+            
+        Returns:
+            int: UNIX timestamp or 0 if parsing failed
+            
+        Raises:
+            ValueError: If the date value cannot be parsed
+        """
+        if not date_value:
+            return 0
+            
+        try:
+            # If it's already a datetime object
+            if hasattr(date_value, 'timestamp'):
+                return int(date_value.timestamp())
+                
+            # If it's a date object (no time component)
+            elif hasattr(date_value, 'year') and hasattr(date_value, 'month') and hasattr(date_value, 'day'):
+                from datetime import datetime, timezone
+                dt = datetime(date_value.year, date_value.month, date_value.day, 
+                             tzinfo=timezone.utc)
+                return int(dt.timestamp())
+                
+            # Otherwise, parse it as a string (handles various formats)
+            dt = dateutil.parser.parse(str(date_value))
+            
+            # Ensure timezone awareness
+            if dt.tzinfo is None:
+                from datetime import timezone
+                dt = dt.replace(tzinfo=timezone.utc)
+                
+            return int(dt.timestamp())
+        except Exception as e:
+            logging.warning(f"[git-revision-date-localized-plugin] Failed to parse date: {date_value}. Error: {str(e)}")
+            return 0
+
     @staticmethod
     def parse_git_ignore_revs(filename: str) -> List[str]:
         """
@@ -290,3 +338,68 @@ class Util:
         except Exception as e:
             logger.debug(f"Error getting tag for commit {commit_hash}: {str(e)}")
             return ""
+
+    def get_relative_time_string(self, timestamp_or_datetime) -> str:
+        """
+        Get a human-readable relative time description from a timestamp or datetime.
+        
+        Args:
+            timestamp_or_datetime: Unix timestamp (int) or datetime object
+            
+        Returns:
+            str: Human-readable relative time (e.g., "2 days ago", "in 3 months")
+        """
+        from datetime import datetime, timezone
+        
+        # Convert timestamp to datetime if needed
+        if isinstance(timestamp_or_datetime, int):
+            dt = datetime.fromtimestamp(timestamp_or_datetime, tz=timezone.utc)
+        elif hasattr(timestamp_or_datetime, 'timestamp'):
+            dt = timestamp_or_datetime
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+        else:
+            return "unknown time"
+            
+        # Use datetime.now() for current time
+        now = datetime.now(timezone.utc)
+        diff = now - dt
+        days = diff.days
+        
+        # Future date
+        if days < 0:
+            days = abs(days)
+            if days == 0:
+                return "today"
+            elif days == 1:
+                return "tomorrow"
+            elif days < 30:
+                return f"in {days} days"
+            elif days < 365:
+                months = days // 30
+                return f"in {months} month{'s' if months > 1 else ''}"
+            else:
+                years = days // 365
+                return f"in {years} year{'s' if years > 1 else ''}"
+        # Past date
+        else:
+            if days == 0:
+                seconds = diff.seconds
+                if seconds < 60:
+                    return "just now"
+                elif seconds < 3600:
+                    minutes = seconds // 60
+                    return f"{minutes} minute{'s' if minutes > 1 else ''} ago"
+                else:
+                    hours = seconds // 3600
+                    return f"{hours} hour{'s' if hours > 1 else ''} ago"
+            elif days == 1:
+                return "yesterday"
+            elif days < 30:
+                return f"{days} days ago"
+            elif days < 365:
+                months = days // 30
+                return f"{months} month{'s' if months > 1 else ''} ago"
+            else:
+                years = days // 365
+                return f"{years} year{'s' if years > 1 else ''} ago"

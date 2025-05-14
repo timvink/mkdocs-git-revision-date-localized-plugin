@@ -189,3 +189,75 @@ Default is `true`. When enabled, the plugin will use `multiprocessing` to iterat
     - git-revision-date-localized:
         enable_parallel_processing: True
   ```
+
+## `creation_date_field_name`
+
+Default is `date`. The name of the field in frontmatter that contains the creation date. This allows compatibility with different CMS systems or existing documentation frameworks that might use different field names for creation dates.
+
+=== ":octicons-file-code-16: mkdocs.yml"
+
+  ```yaml
+  plugins:
+    - git-revision-date-localized:
+        creation_date_field_name: created
+  ```
+
+=== ":octicons-markdown-16: page.md"
+
+  ```yaml
+  ---
+  title: My Page
+  created: 2023-01-15  # Will be used as the creation date
+  ---
+  ```
+
+## `update_date_field_name`
+
+Default is `lastmod`. The name of the field in frontmatter that contains the last modification date. This allows compatibility with different CMS systems or existing documentation frameworks that might use different field names for update dates.
+
+=== ":octicons-file-code-16: mkdocs.yml"
+
+  ```yaml
+  plugins:
+    - git-revision-date-localized:
+        update_date_field_name: modified
+  ```
+
+=== ":octicons-markdown-16: page.md"
+
+  ```yaml
+  ---
+  title: My Page
+  modified: 2023-05-20  # Will be used as the last modification date
+  ---
+  ```
+
+## `include_relative_dates`
+
+Default is `false`. When enabled, adds relative time descriptions (e.g., "2 days ago", "in 3 months") for each date field to the page metadata. These are available as `{field_name}_relative` in your templates.
+
+## `date_format_in_metadata`
+
+Default is `true`. When enabled, adds formatted date strings for each date field to the page metadata. These are available as `{field_name}_formatted` in your templates.
+
+## Frontmatter dates
+
+The plugin will first look at markdown frontmatter for date information:
+
+- If `date` exists in frontmatter, it will use it as the creation date
+- If `lastmod` exists in frontmatter, it will use it as the last modification date
+- If no frontmatter dates are found, it falls back to using git history
+
+Example of a markdown page with frontmatter dates:
+
+```markdown
+---
+title: "My Page"
+date: "2023-01-10T12:00:00+02:00"  # Creation date
+lastmod: "2023-05-15T14:30:00+02:00"  # Last modification date
+---
+
+## Content
+
+Lorem ipsum dolor sit amet...
+```
