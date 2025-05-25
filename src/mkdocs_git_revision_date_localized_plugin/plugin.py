@@ -84,9 +84,16 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         )
 
         # Save last commit timestamp for entire site
-        self.last_site_revision_hash, self.last_site_revision_timestamp = self.util.get_git_commit_timestamp(
-            config.get("docs_dir")
-        )
+        # Support monorepo/techdocs, which copies the docs_dir to a temporary directory
+        mono_repo_plugin = config.get("plugins", {}).get("monorepo", None)
+        if mono_repo_plugin is not None and hasattr(mono_repo_plugin, "originalDocsDir") and mono_repo_plugin.originalDocsDir is not None:
+            self.last_site_revision_hash, self.last_site_revision_timestamp = self.util.get_git_commit_timestamp(
+                mono_repo_plugin.originalDocsDir
+            )
+        else:
+            self.last_site_revision_hash, self.last_site_revision_timestamp = self.util.get_git_commit_timestamp(
+                config.get("docs_dir")
+            )
 
         # Get locale from plugin configuration
         plugin_locale = self.config.get("locale", None)
