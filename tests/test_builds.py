@@ -538,7 +538,7 @@ def test_type_unknown(mkdocs_file, error, tmp_path):
     result = build_docs_setup(testproject_path)
     assert result.exit_code == 1
 
-    assert error in result.stdout or error in str(result.exc_info[0])
+    assert error in result.output or error in str(result.exc_info[0])
 
 
 def test_exclude_pages(tmp_path):
