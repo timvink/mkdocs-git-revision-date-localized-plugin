@@ -34,7 +34,7 @@ To allow for more flexibility when overriding a theme there are also variables f
 - `page.meta.git_revision_date_localized_raw_timeago`
 - `page.meta.git_revision_date_localized_raw_custom`
 
-Their are also available on the entire site level:
+They are also available on the entire site level:
 
 - `page.meta.git_site_revision_date_localized_raw_datetime`
 - `page.meta.git_site_revision_date_localized_raw_iso_date`
