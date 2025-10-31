@@ -1,6 +1,6 @@
 # Specify a locale
 
-`locale` is aa two letter [ISO639](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code (f.e. `en`) or [5-letter language code with added territory/region/country](https://www.mkdocs.org/user-guide/localizing-your-theme/#supported-locales) (`en_US`) that `git-revision-date-localized` uses to display dates in your preferred language.
+`locale` is a two letter [ISO639](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code (f.e. `en`) or [5-letter language code with added territory/region/country](https://www.mkdocs.org/user-guide/localizing-your-theme/#supported-locales) (`en_US`) that `git-revision-date-localized` uses to display dates in your preferred language.
 
 For example:
 
