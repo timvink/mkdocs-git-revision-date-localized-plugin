@@ -57,6 +57,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         super().__init__()
         self.last_revision_commits = {}
         self.created_commits = {}
+        self.is_serve_dirty_build = False
 
     def on_startup(self, *, command: str, dirty: bool) -> None:
         """
@@ -70,7 +71,15 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             command (str): The mkdocs command being run.
             dirty (bool): Whether the build is dirty.
         """
-        pass
+        # Track if this is an incremental rebuild during mkdocs serve
+        # dirty=True means it's a rebuild triggered by file changes
+        # dirty=False means it's a clean/initial build
+        self.is_serve_dirty_build = dirty
+        
+        # Clear cache on clean builds to ensure fresh data
+        if not dirty:
+            self.last_revision_commits = {}
+            self.created_commits = {}
 
     def on_config(self, config: config_options.Config, **kwargs) -> Dict[str, Any]:
         """
@@ -179,7 +188,9 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             elif exclude(f.src_path, self.config.get("exclude", [])):
                 continue
             else:
+                temp_abs_src_path = str(Path(f.abs_src_path).absolute())
                 abs_src_path = f.abs_src_path
+                
                 # Support plugins like monorepo that might have moved the files from the original source that is under git
                 if original_source and abs_src_path in original_source:
                     abs_src_path = original_source[abs_src_path]
@@ -187,7 +198,10 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
                 assert Path(abs_src_path).exists()
                 abs_src_path = str(Path(abs_src_path).absolute())
                 result = pool.apply_async(self.util.get_git_commit_timestamp, args=(abs_src_path, is_first_commit))
+                # Store both the original path and temp path (if different) so cache lookups work either way
                 results.append((abs_src_path, result))
+                if temp_abs_src_path != abs_src_path:
+                    results.append((temp_abs_src_path, result))
         pool.close()
         pool.join()
         if is_first_commit:
@@ -202,6 +216,13 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         Compute commit timestamps for all files in parallel.
         """
         if not self.config.get("enabled") or not self.config.get("enable_parallel_processing"):
+            return
+
+        # Skip parallel processing on incremental rebuilds (dirty builds during mkdocs serve)
+        # This avoids the overhead of creating a new multiprocessing pool on every file save
+        # The cache from the initial build will be reused
+        if self.is_serve_dirty_build:
+            logging.debug("[git-revision-date-localized] Skipping parallel processing on incremental rebuild, using cache")
             return
 
         # Support monorepo/techdocs, which copies the docs_dir to a temporary directory
@@ -275,10 +296,18 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         if getattr(page.file, "generated_by", None):
             last_revision_hash, last_revision_timestamp = "", int(time.time())
         else:
-            last_revision_hash, last_revision_timestamp = self.last_revision_commits.get(
-                str(Path(page.file.abs_src_path).absolute()), (None, None)
-            )
-            if last_revision_timestamp is None:
+            # Use cached results if parallel processing is enabled and cache is populated
+            if self.config.get("enable_parallel_processing") and self.last_revision_commits:
+                last_revision_hash, last_revision_timestamp = self.last_revision_commits.get(
+                    str(Path(page.file.abs_src_path).absolute()), (None, None)
+                )
+                if last_revision_timestamp is None:
+                    last_revision_hash, last_revision_timestamp = self.util.get_git_commit_timestamp(
+                        path=page.file.abs_src_path,
+                        is_first_commit=False,
+                    )
+            else:
+                # Directly call git if parallel processing is disabled or cache is empty
                 last_revision_hash, last_revision_timestamp = self.util.get_git_commit_timestamp(
                     path=page.file.abs_src_path,
                     is_first_commit=False,
@@ -351,10 +380,18 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         if getattr(page.file, "generated_by", None):
             first_revision_hash, first_revision_timestamp = "", int(time.time())
         else:
-            first_revision_hash, first_revision_timestamp = self.created_commits.get(
-                str(Path(page.file.abs_src_path).absolute()), (None, None)
-            )
-            if first_revision_timestamp is None:
+            # Use cached results if parallel processing is enabled and cache is populated
+            if self.config.get("enable_creation_date") and self.config.get("enable_parallel_processing") and self.created_commits:
+                first_revision_hash, first_revision_timestamp = self.created_commits.get(
+                    str(Path(page.file.abs_src_path).absolute()), (None, None)
+                )
+                if first_revision_timestamp is None:
+                    first_revision_hash, first_revision_timestamp = self.util.get_git_commit_timestamp(
+                        path=page.file.abs_src_path,
+                        is_first_commit=True,
+                    )
+            else:
+                # Directly call git if parallel processing is disabled or cache is empty
                 first_revision_hash, first_revision_timestamp = self.util.get_git_commit_timestamp(
                     path=page.file.abs_src_path,
                     is_first_commit=True,
