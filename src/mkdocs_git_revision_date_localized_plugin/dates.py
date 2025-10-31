@@ -22,6 +22,12 @@ def get_date_formats(
     assert time_zone is not None
     assert locale is not None
 
+    # Normalize locale for Babel: convert hyphens to underscores (e.g., pt-BR -> pt_BR)
+    # This is needed for compatibility with mkdocs-static-i18n and other plugins
+    # that may use hyphenated locale codes, while Babel expects underscores
+    if locale:
+        locale = str(locale).replace("-", "_")
+
     utc_revision_date = datetime.fromtimestamp(int(unix_timestamp), tz=timezone.utc)
     loc_revision_date = utc_revision_date.replace(tzinfo=get_timezone("UTC")).astimezone(get_timezone(time_zone))
 
