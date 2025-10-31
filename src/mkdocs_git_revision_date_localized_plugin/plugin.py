@@ -9,7 +9,6 @@ import logging
 import re
 import os
 import time
-import multiprocessing
 from pathlib import Path
 
 from mkdocs import __version__ as mkdocs_version
@@ -58,6 +57,20 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         super().__init__()
         self.last_revision_commits = {}
         self.created_commits = {}
+
+    def on_startup(self, *, command: str, dirty: bool) -> None:
+        """
+        Run on startup.
+
+        Note that "The presence of an on_startup method (even if empty) 
+        migrates the plugin to the new system where the plugin object is 
+        kept across builds within one mkdocs serve."
+
+        Args:
+            command (str): The mkdocs command being run.
+            dirty (bool): Whether the build is dirty.
+        """
+        pass
 
     def on_config(self, config: config_options.Config, **kwargs) -> Dict[str, Any]:
         """
@@ -153,6 +166,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         return config
 
     def parallel_compute_commit_timestamps(self, files, original_source: Optional[Dict] = None, is_first_commit=False):
+        import multiprocessing
         pool = multiprocessing.Pool(processes=min(10, multiprocessing.cpu_count()))
         results = []
         for f in files:
