@@ -291,6 +291,12 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         if not locale:
             locale = self.config.get("locale")
 
+        # Normalize locale for Babel: convert hyphens to underscores (e.g., pt-BR -> pt_BR)
+        # This is needed for compatibility with mkdocs-static-i18n and other plugins
+        # that may use hyphenated locale codes, while Babel expects underscores
+        if locale:
+            locale = str(locale).replace("-", "_")
+
         # Retrieve git commit timestamp
         # Except for generated pages (f.e. by mkdocs-gen-files plugin)
         if getattr(page.file, "generated_by", None):

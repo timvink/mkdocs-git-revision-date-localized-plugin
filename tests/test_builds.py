@@ -341,6 +341,7 @@ MKDOCS_FILES = [
     "basic_project/mkdocs.yml",
     "basic_project/mkdocs_theme_timeago_locale.yml",
     "basic_project/mkdocs_theme_language.yml",
+    "basic_project/mkdocs_theme_locale_and_language_5char.yml",
     "basic_project/mkdocs_theme_locale_and_language.yml",
     "basic_project/mkdocs_theme_locale_disabled.yml",
     "basic_project/mkdocs_theme_timeago.yml",
@@ -376,7 +377,7 @@ def test_tags_are_replaced(tmp_path, mkdocs_file):
     testproject_path = setup_clean_mkdocs_folder(mkdocs_yml_path=f"tests/fixtures/{mkdocs_file}", output_path=tmp_path)
     setup_commit_history(testproject_path)
     result = build_docs_setup(testproject_path)
-    assert result.exit_code == 0, f"'mkdocs build' command failed with:\n{result.stdout}\nReplicate with 'cd {testproject_path} && uv run mkdocs build'"
+    assert result.exit_code == 0, f"'mkdocs build' command failed with:\n{result.stdout}\nReplicate with 'uv run mkdocs serve -f tests/fixtures/{mkdocs_file}'"
 
     plugin_config = get_plugin_config_from_mkdocs(str(testproject_path / "mkdocs.yml"))
     tags_file = testproject_path / "site/page_with_tag/index.html"
