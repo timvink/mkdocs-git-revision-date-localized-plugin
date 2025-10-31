@@ -22,12 +22,11 @@ classifiers=[
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "License :: OSI Approved :: MIT License",
 ]
 
@@ -36,8 +35,7 @@ dependencies = [
     "babel>=2.7.0",
     "gitpython>=3.1.44",
     "mkdocs>=1.0",
-    "mkdocs-techdocs-core>=1.6.0",
-    "pytz>=2025.1",
+    "tzdata>=2023.3; sys_platform == 'win32'",
 ]
 
 [project.urls]
