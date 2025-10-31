@@ -97,28 +97,18 @@ class Util:
                 if commit_timestamp != "":
                     commit_timestamp = commit_timestamp.split()[-1]
             else:
-                # Latest commit touching a specific file
-                commit_timestamp = git.log(
-                    realpath,
-                    date="unix",
-                    format="%at",
-                    diff_filter="r",
-                    n=1,
-                    no_show_signature=True,
-                    follow=follow_option,
-                    ignore_all_space=True,
-                    ignore_blank_lines=True,
-                )
-
                 # Retrieve the history for the file in the format <hash> <timestamp>
                 # The maximum number of commits we will ever need to examine is 1 more than the number of ignored commits.
                 lines = git.log(
                     realpath,
                     date="unix",
                     format="%H %at",
+                    diff_filter="r",
                     n=len(self.ignored_commits) + 1,
                     no_show_signature=True,
                     follow=follow_option,
+                    ignore_all_space=True,
+                    ignore_blank_lines=True,
                 ).split("\n")
 
                 # process the commits for the file in reverse-chronological order. Ignore any commit that is on the
