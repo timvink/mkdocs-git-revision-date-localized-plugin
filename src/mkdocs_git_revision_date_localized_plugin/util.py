@@ -118,6 +118,7 @@ class Util:
                     format="%H %at",
                     n=len(self.ignored_commits) + 1,
                     no_show_signature=True,
+                    follow=follow_option,
                 ).split("\n")
 
                 # process the commits for the file in reverse-chronological order. Ignore any commit that is on the

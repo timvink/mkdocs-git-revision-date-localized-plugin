@@ -320,7 +320,7 @@ def validate_mkdocs_file(temp_path: str, mkdocs_yml_file: str):
     testproject_path = setup_clean_mkdocs_folder(mkdocs_yml_path=mkdocs_yml_file, output_path=temp_path)
     setup_commit_history(testproject_path)
     result = build_docs_setup(testproject_path)
-    assert result.exit_code == 0, f"'mkdocs build' command failed with output:\n{result.stdout}"
+    assert result.exit_code == 0, f"'mkdocs build' command failed with output:\n{result.stdout}\nReplicate with 'cd {testproject_path} && uv run mkdocs build'"
 
     # validate build with locale retrieved from mkdocs config file
     validate_build(testproject_path, plugin_config=get_plugin_config_from_mkdocs(mkdocs_yml_file))
@@ -376,7 +376,7 @@ def test_tags_are_replaced(tmp_path, mkdocs_file):
     testproject_path = setup_clean_mkdocs_folder(mkdocs_yml_path=f"tests/fixtures/{mkdocs_file}", output_path=tmp_path)
     setup_commit_history(testproject_path)
     result = build_docs_setup(testproject_path)
-    assert result.exit_code == 0, "'mkdocs build' command failed"
+    assert result.exit_code == 0, f"'mkdocs build' command failed with:\n{result.stdout}\nReplicate with 'cd {testproject_path} && uv run mkdocs build'"
 
     plugin_config = get_plugin_config_from_mkdocs(str(testproject_path / "mkdocs.yml"))
     tags_file = testproject_path / "site/page_with_tag/index.html"
@@ -647,7 +647,7 @@ def test_mkdocs_genfiles_plugin(tmp_path):
     )
     setup_commit_history(testproject_path)
     result = build_docs_setup(testproject_path)
-    assert result.exit_code == 0, f"'mkdocs build' command failed with {result.stdout}"
+    assert result.exit_code == 0, f"'mkdocs build' command failed with {result.stdout}\nReplicate with 'cd {testproject_path} && uv run mkdocs build'"
 
     # validate the build
     plugin_config = get_plugin_config_from_mkdocs(str(testproject_path / "mkdocs.yml"))
@@ -691,14 +691,14 @@ def test_monorepo_compat(tmp_path):
     testproject_path = setup_clean_mkdocs_folder("tests/fixtures/monorepo/mkdocs.yml", tmp_path)
     setup_commit_history(testproject_path)
     result = build_docs_setup(testproject_path)
-    assert result.exit_code == 0, f"'mkdocs build' command failed with:\n\n{result.stdout}"
+    assert result.exit_code == 0, f"'mkdocs build' command failed with:\n\n{result.stdout}\nReplicate with 'cd {testproject_path} && uv run mkdocs build'"
 
 @pytest.mark.skipif(sys.platform.startswith("win"), reason="monorepo plugin did not work for me on windows (even without this plugin)")
 def test_monorepo_compat_reverse_order(tmp_path):
     testproject_path = setup_clean_mkdocs_folder("tests/fixtures/monorepo/mkdocs_reverse_order.yml", tmp_path)
     setup_commit_history(testproject_path)
     result = build_docs_setup(testproject_path)
-    assert result.exit_code == 0, f"'mkdocs build' command failed with:\n\n{result.stdout}"
+    assert result.exit_code == 0, f"'mkdocs build' command failed with:\n\n{result.stdout}\nReplicate with 'cd {testproject_path} && uv run mkdocs build'"
 
 
 def test_genfiles_plugin(tmp_path):
@@ -706,7 +706,7 @@ def test_genfiles_plugin(tmp_path):
     setup_commit_history(testproject_path)
 
     result = build_docs_setup(testproject_path)
-    assert result.exit_code == 0, f"'mkdocs build' command failed with:\n\n{result.stdout}"
+    assert result.exit_code == 0, f"'mkdocs build' command failed with:\n\n{result.stdout}\nReplicate with 'cd {testproject_path} && uv run mkdocs build'"
 
     page_with_tag = testproject_path / "site/foo/index.html"
     contents = page_with_tag.read_text(encoding="utf8")
