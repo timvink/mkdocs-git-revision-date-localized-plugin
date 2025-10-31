@@ -638,7 +638,6 @@ def test_low_fetch_depth(tmp_path, caplog):
     assert "Running on GitHub Actions might" in caplog.text
 
 
-@pytest.mark.skip(reason="waiting for PR from mkdocs-genfiles-plugin to be merged first")
 def test_mkdocs_genfiles_plugin(tmp_path):
     """
     Make sure the mkdocs-gen-files plugin works correctly.
