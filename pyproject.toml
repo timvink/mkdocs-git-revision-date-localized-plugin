@@ -16,7 +16,7 @@ license = { text = "MIT" }
 description="Mkdocs plugin that enables displaying the localized date of the last git modification of a markdown file."
 readme = { file = "README.md", content-type = "text/markdown" }
 
-requires-python=">=3.9"
+requires-python=">=3.10"
 
 classifiers=[
     "Operating System :: OS Independent",
