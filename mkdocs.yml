@@ -10,6 +10,7 @@ nav:
       - howto/specify-locale.md
       - howto/custom-styling.md
       - howto/override-a-theme.md
+      - howto/use-in-alpine-docker.md
   - options.md
 
 theme:
