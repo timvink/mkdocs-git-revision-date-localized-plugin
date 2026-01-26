@@ -14,7 +14,7 @@
         <link rel="prev" href="../custom-styling/">
       
       
-        <link rel="next" href="../../options/">
+        <link rel="next" href="../use-in-alpine-docker/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -482,6 +482,29 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../use-in-alpine-docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Use in Alpine Linux Docker
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -596,7 +619,7 @@
 <h1 id="customize-a-theme">Customize a theme</h1>
 <p>You can <a href="https://www.mkdocs.org/user-guide/styling-your-docs/#customizing-a-theme">customize an existing theme</a> by overriding blocks or partials. You might want to do this because your theme is not natively supported, or you would like more control on the formatting. Below are some examples to help get you started.</p>
 <h2 id="example-default-mkdocs-theme">Example: default <code>mkdocs</code> theme</h2>
-<p>To add a revision date to the default <code>mkdocs</code> theme, add a <code>overrides/partials</code> folder to your <code>docs</code> folder and update your <code>mkdocs.yml</code> file. 
+<p>To add a revision date to the default <code>mkdocs</code> theme, add a <code>overrides/partials</code> folder to your <code>docs</code> folder and update your <code>mkdocs.yml</code> file.
 Then you can extend the base <code>mkdocs</code> theme by adding a new file <code>docs/overrides/content.html</code>:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M4 1.75C4 .784 4.784 0 5.75 0h5.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v8.586A1.75 1.75 0 0 1 14.25 15h-9a.75.75 0 0 1 0-1.5h9a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 10 4.25V1.5H5.75a.25.25 0 0 0-.25.25v2.5a.75.75 0 0 1-1.5 0Zm1.72 4.97a.75.75 0 0 1 1.06 0l2 2a.75.75 0 0 1 0 1.06l-2 2a.749.749 0 0 1-1.275-.326.75.75 0 0 1 .215-.734l1.47-1.47-1.47-1.47a.75.75 0 0 1 0-1.06M3.28 7.78 1.81 9.25l1.47 1.47a.75.75 0 0 1-.018 1.042.75.75 0 0 1-1.042.018l-2-2a.75.75 0 0 1 0-1.06l2-2a.75.75 0 0 1 1.042.018.75.75 0 0 1 .018 1.042m8.22-6.218V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914z"/></svg></span> mkdocs.yml</label><label for="__tabbed_1_2"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M4 1.75C4 .784 4.784 0 5.75 0h5.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v8.586A1.75 1.75 0 0 1 14.25 15h-9a.75.75 0 0 1 0-1.5h9a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 10 4.25V1.5H5.75a.25.25 0 0 0-.25.25v2.5a.75.75 0 0 1-1.5 0Zm1.72 4.97a.75.75 0 0 1 1.06 0l2 2a.75.75 0 0 1 0 1.06l-2 2a.749.749 0 0 1-1.275-.326.75.75 0 0 1 .215-.734l1.47-1.47-1.47-1.47a.75.75 0 0 1 0-1.06M3.28 7.78 1.81 9.25l1.47 1.47a.75.75 0 0 1-.018 1.042.75.75 0 0 1-1.042.018l-2-2a.75.75 0 0 1 0-1.06l2-2a.75.75 0 0 1 1.042.018.75.75 0 0 1 .018 1.042m8.22-6.218V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914z"/></svg></span> docs/overrides/content.html</label></div>
 <div class="tabbed-content">
@@ -607,7 +630,7 @@ Then you can extend the base <code>mkdocs</code> theme by adding a new file <cod
 </code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="cm">&lt;!-- Overwrites content.html base mkdocs theme, taken from </span>
+<div class="highlight"><pre><span></span><code><span class="cm">&lt;!-- Overwrites content.html base mkdocs theme, taken from</span>
 <span class="cm">https://github.com/mkdocs/mkdocs/blob/master/mkdocs/themes/mkdocs/content.html --&gt;</span>
 
 {% if page.meta.source %}
@@ -632,7 +655,7 @@ Then you can extend the base <code>mkdocs</code> theme by adding a new file <cod
 </div>
 </div>
 <h2 id="example-mkdocs-material-theme">Example: <code>mkdocs-material</code> theme</h2>
-<p><a href="https://squidfunk.github.io/mkdocs-material/">mkdocs-material</a> has built-in support for <code>git_revision_date_localized</code> and <code>git_created_date_localized</code>. You can see that when viewing their <a href="https://github.com/squidfunk/mkdocs-material/blob/master/src/partials/source-file.html"><code>source-file.html</code></a> partial. </p>
+<p><a href="https://squidfunk.github.io/mkdocs-material/">mkdocs-material</a> has built-in support for <code>git_revision_date_localized</code> and <code>git_created_date_localized</code>. You can see that when viewing their <a href="https://github.com/squidfunk/mkdocs-material/blob/master/src/partials/source-file.html"><code>source-file.html</code></a> partial.</p>
 <p>If you want, you can customize further by <a href="https://squidfunk.github.io/mkdocs-material/customization/#extending-the-theme">extending the mkdocs-material theme</a> and overriding the <code>source-file.html</code> partial as follows:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M4 1.75C4 .784 4.784 0 5.75 0h5.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v8.586A1.75 1.75 0 0 1 14.25 15h-9a.75.75 0 0 1 0-1.5h9a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 10 4.25V1.5H5.75a.25.25 0 0 0-.25.25v2.5a.75.75 0 0 1-1.5 0Zm1.72 4.97a.75.75 0 0 1 1.06 0l2 2a.75.75 0 0 1 0 1.06l-2 2a.749.749 0 0 1-1.275-.326.75.75 0 0 1 .215-.734l1.47-1.47-1.47-1.47a.75.75 0 0 1 0-1.06M3.28 7.78 1.81 9.25l1.47 1.47a.75.75 0 0 1-.018 1.042.75.75 0 0 1-1.042.018l-2-2a.75.75 0 0 1 0-1.06l2-2a.75.75 0 0 1 1.042.018.75.75 0 0 1 .018 1.042m8.22-6.218V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914z"/></svg></span> mkdocs.yml</label><label for="__tabbed_2_2"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M4 1.75C4 .784 4.784 0 5.75 0h5.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v8.586A1.75 1.75 0 0 1 14.25 15h-9a.75.75 0 0 1 0-1.5h9a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 10 4.25V1.5H5.75a.25.25 0 0 0-.25.25v2.5a.75.75 0 0 1-1.5 0Zm1.72 4.97a.75.75 0 0 1 1.06 0l2 2a.75.75 0 0 1 0 1.06l-2 2a.749.749 0 0 1-1.275-.326.75.75 0 0 1 .215-.734l1.47-1.47-1.47-1.47a.75.75 0 0 1 0-1.06M3.28 7.78 1.81 9.25l1.47 1.47a.75.75 0 0 1-.018 1.042.75.75 0 0 1-1.042.018l-2-2a.75.75 0 0 1 0-1.06l2-2a.75.75 0 0 1 1.042.018.75.75 0 0 1 .018 1.042m8.22-6.218V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914z"/></svg></span> docs/overrides/partials/source-file.html</label></div>
 <div class="tabbed-content">
@@ -645,7 +668,7 @@ Then you can extend the base <code>mkdocs</code> theme by adding a new file <cod
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code>{% import &quot;partials/language.html&quot; as lang with context %}
 
-<span class="cm">&lt;!-- taken from </span>
+<span class="cm">&lt;!-- taken from</span>
 <span class="cm">https://github.com/squidfunk/mkdocs-material/blob/master/src/partials/source-file.html --&gt;</span>
 
 <span class="p">&lt;</span><span class="nt">hr</span> <span class="p">/&gt;</span>
@@ -673,7 +696,7 @@ Then you can extend the base <code>mkdocs</code> theme by adding a new file <cod
 </div>
 </div>
 </div>
-<p><a href="https://squidfunk.github.io/mkdocs-material/">mkdocs-material</a> also supports <a href="https://squidfunk.github.io/mkdocs-material/setup/changing-the-language/#custom-translations">custom translations</a> that you can use to specify alternative translations for <code>source.file.date.updated</code> ("Last updated") and <code>source.file.date.created</code> ("Created"). </p>
+<p><a href="https://squidfunk.github.io/mkdocs-material/">mkdocs-material</a> also supports <a href="https://squidfunk.github.io/mkdocs-material/setup/changing-the-language/#custom-translations">custom translations</a> that you can use to specify alternative translations for <code>source.file.date.updated</code> ("Last updated") and <code>source.file.date.created</code> ("Created").</p>
 <h2 id="example-list-last-updated-pages">Example: List last updated pages</h2>
 <p>Let's say we want to insert a list of the last 10 updated pages into our home page.</p>
 <p>We can use the <a href="https://www.mkdocs.org/dev-guide/themes/#template-variables">mkdocs template variables</a> together with <a href="https://jinja.palletsprojects.com/en/latest/templates/#filters">jinja2 filters</a> to
@@ -776,7 +799,7 @@ Then you can extend the base <code>mkdocs</code> theme by adding a new file <cod
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="March 19, 2025 05:39:23 CET"><span class="timeago" datetime="2025-03-19T05:39:23+01:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="March 19, 2025 05:39:23 CET">2025-03-19</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="January 26, 2026 08:59:27 CET"><span class="timeago" datetime="2026-01-26T08:59:27+01:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="January 26, 2026 08:59:27 CET">2026-01-26</span>
   </span>
 
     

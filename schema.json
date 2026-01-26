@@ -38,7 +38,7 @@
                 "title": "Custom format",
                 "markdownDescription": "https://timvink.github.io/mkdocs-git-revision-date-localized-plugin/options#custom_format",
                 "type": "string"
-              },            
+              },
               "locale": {
                 "title": "Date locale",
                 "markdownDescription": "https://timvink.github.io/mkdocs-git-revision-date-localized-plugin/options/#locale",
