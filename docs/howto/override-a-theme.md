@@ -32,10 +32,10 @@ Then you can extend the base `mkdocs` theme by adding a new file `docs/overrides
     {{ page.content }}
 
     <!-- This section adds support for localized revision dates -->
-    {% if page.meta.git_revision_date_localized %}
+    {% if page and page.meta.git_revision_date_localized %}
         <small>Last update: {{ page.meta.git_revision_date_localized }}</small>
     {% endif %}
-    {% if page.meta.git_created_date_localized %}
+    {% if page and page.meta.git_created_date_localized %}
         <small>Created: {{ page.meta.git_created_date_localized }}</small>
     {% endif %}
     ```
