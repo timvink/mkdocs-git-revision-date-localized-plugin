@@ -11,6 +11,6 @@ https://github.com/mkdocs/mkdocs/blob/master/mkdocs/themes/mkdocs/content.html -
 
 {{ page.content }}
 
-{% if page.meta.git_revision_date_localized %}
+{% if page and page.meta.git_revision_date_localized %}
     <small>Last update: {{ page.meta.git_revision_date_localized }}</small>
 {% endif %}
