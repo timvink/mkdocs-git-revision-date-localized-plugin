@@ -34,7 +34,7 @@ dynamic = ["version"]
 dependencies = [
     "babel>=2.7.0",
     "gitpython>=3.1.44",
-    "mkdocs>=1.0",
+    "mkdocs>=1.0,<2",
     "tzdata>=2023.3; sys_platform == 'win32'",
 ]
 

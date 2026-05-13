@@ -596,7 +596,7 @@ dev = [
 requires-dist = [
     { name = "babel", specifier = ">=2.7.0" },
     { name = "gitpython", specifier = ">=3.1.44" },
-    { name = "mkdocs", specifier = ">=1.0" },
+    { name = "mkdocs", specifier = ">=1.0,<2" },
     { name = "tzdata", marker = "sys_platform == 'win32'", specifier = ">=2023.3" },
 ]
 
