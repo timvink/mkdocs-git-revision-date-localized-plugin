@@ -52,3 +52,32 @@ and keeps things consistent with the rest of the code.
 We run `ruff format` to automatically style the code.
 
 We use Google-style docstrings.
+
+## Creating a Release
+
+Releases are published to PyPI automatically via a GitHub Action triggered by publishing a GitHub release.
+
+1. Make sure you are on `master` and up to date:
+
+    ```bash
+    git checkout master
+    git pull
+    ```
+
+2. Bump the version in `src/mkdocs_git_revision_date_localized_plugin/__init__.py` (e.g. `1.5.1` → `1.5.2`).
+
+3. Commit the version bump:
+
+    ```bash
+    git commit -am "Bump version to 1.5.2"
+    git push
+    ```
+
+4. Tag the commit with the new version (prefixed with `v`) and push the tag:
+
+    ```bash
+    git tag v1.5.2
+    git push origin v1.5.2
+    ```
+
+5. Create a new GitHub release for the tag, accept the auto-generated changelog (clean it up where needed), and publish it. Publishing the release triggers the GitHub Action that builds and uploads the package to PyPI.
