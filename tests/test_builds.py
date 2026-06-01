@@ -133,6 +133,40 @@ def setup_clean_mkdocs_folder(mkdocs_yml_path, output_path):
     return testproject_path
 
 
+def init_test_repo(path) -> git.Repo:
+    """
+    Initializes a git repo with deterministic, isolated configuration for tests.
+
+    The test suite creates many commits in rapid succession. Left to inherit the
+    ambient git configuration, this is non-deterministic across machines:
+    automatic gc/maintenance can run in the background and repack objects while a
+    subsequent commit is reading them, causing the intermittent
+    ``error: invalid object ... Error building trees`` failures we have seen in CI.
+    Inherited commit signing (``commit.gpgsign=true``) is a further source of
+    flakiness and slowness.
+
+    We therefore pin identity, disable signing, and disable automatic
+    gc/maintenance on the repository itself so the tests do not depend on the
+    contributor's (or CI runner's) global git config.
+
+    Args:
+        path: Path in which to initialize the repository
+
+    Returns:
+        repo (git.Repo): git.Repo object
+    """
+    repo = git.Repo.init(path, bare=False)
+    with repo.config_writer() as cw:
+        cw.set_value("user", "name", "Test Person")
+        cw.set_value("user", "email", "testtest@gmail.com")
+        cw.set_value("commit", "gpgsign", "false")
+        cw.set_value("tag", "gpgsign", "false")
+        cw.set_value("gc", "auto", "0")
+        cw.set_value("gc", "autoDetach", "false")
+        cw.set_value("maintenance", "auto", "false")
+    return repo
+
+
 def setup_commit_history(testproject_path):
     """
     Initializes and creates a git commit history
@@ -149,7 +183,7 @@ def setup_commit_history(testproject_path):
     """
     assert not (testproject_path / ".git").exists()
 
-    repo = git.Repo.init(testproject_path, bare=False)
+    repo = init_test_repo(testproject_path)
     repo.git.checkout("-b", "master")
     author = "Test Person <testtest@gmail.com>"
 
@@ -532,7 +566,7 @@ def test_type_unknown(mkdocs_file, error, tmp_path):
     assert not os.path.exists(str(testproject_path / ".git"))
     testproject_path = str(testproject_path)
 
-    repo = git.Repo.init(testproject_path, bare=False)
+    repo = init_test_repo(testproject_path)
     author = "Test Person <testtest@gmail.com>"
 
     with working_directory(testproject_path):
@@ -573,7 +607,7 @@ def test_git_in_docs_dir(tmp_path):
 
     # Setup git repo in the 'docs' dir
     testproject_docs = str(testproject_path / "docs")
-    repo = git.Repo.init(testproject_docs, bare=False)
+    repo = init_test_repo(testproject_docs)
     author = "Test Person <testtest@gmail.com>"
 
     # Change the working directory
@@ -614,7 +648,7 @@ def test_low_fetch_depth(tmp_path, caplog):
     # os.mkdir(cloned_folder)
 
     # Clone the local repo with fetch depth of 1
-    repo = git.Repo.init(cloned_folder, bare=False)
+    repo = init_test_repo(cloned_folder)
     try:
         repo.heads.main.rename("master", force=True)
     except:
