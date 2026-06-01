@@ -17,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - name: Install uv and set the python version
-      uses: astral-sh/setup-uv@v8
+      uses: astral-sh/setup-uv@v7
     - name: Run unit tests
       run: |
         git config --global user.name "Github Action"
