@@ -128,6 +128,13 @@ dev = [
     "prek>=0.3.0",
 ]
 
+[tool.uv]
+# mkdocs-techdocs-core hard-pins pymdown-extensions==10.21.2, which is affected
+# by a path-traversal vulnerability in pymdownx.snippets. Override to the
+# patched 10.21.3 (an API-compatible patch release) so the dev/CI environment
+# is not resolved to the vulnerable version.
+override-dependencies = ["pymdown-extensions>=10.21.3"]
+
 [tool.ty.environment]
 python-version = "3.10"
 
