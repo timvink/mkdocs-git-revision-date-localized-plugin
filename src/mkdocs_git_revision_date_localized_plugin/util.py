@@ -1,6 +1,5 @@
 """Utility class for mkdocs plugin."""
 
-import logging
 import os
 import time
 from pathlib import Path
@@ -13,11 +12,12 @@ from git import (
     NoSuchPathError,
     Repo,
 )
+from mkdocs.plugins import get_plugin_logger
 
 from mkdocs_git_revision_date_localized_plugin.ci import raise_ci_warnings
 from mkdocs_git_revision_date_localized_plugin.dates import get_date_formats
 
-logger = logging.getLogger("mkdocs.plugins")
+logger = get_plugin_logger(__name__)
 
 
 class Util:
@@ -88,14 +88,19 @@ class Util:
             # Ignored commits are only considered for the most recent update, not for creation
             if is_first_commit:
                 # diff_filter="A" will select the commit that created the file
-                commit_timestamp = git.log(
-                    realpath, date="unix", format="%at", diff_filter="Ar", no_show_signature=True, follow=follow_option
-                )
+                lines = git.log(
+                    realpath,
+                    date="unix",
+                    format="%H %at",
+                    diff_filter="Ar",
+                    no_show_signature=True,
+                    follow=follow_option,
+                ).strip()
                 # A file can be created multiple times, through a file renamed.
                 # Commits are ordered with most recent commit first
                 # Get the oldest commit only
-                if commit_timestamp != "":
-                    commit_timestamp = commit_timestamp.split()[-1]
+                if lines != "":
+                    commit_hash, commit_timestamp = lines.split("\n")[-1].split(" ")
             else:
                 # Retrieve the history for the file in the format <hash> <timestamp>
                 # The maximum number of commits we will ever need to examine is 1 more than the number of ignored commits.
@@ -115,7 +120,8 @@ class Util:
                 # ignored list. If the line is empty, we've reached the end and need to use the fallback behavior.
                 for line in lines:
                     if not line:
-                        commit_timestamp = ""
+                        # Every commit was ignored, so we have no hash to report either
+                        commit_hash, commit_timestamp = "", ""
                         break
                     commit_hash, commit_timestamp = line.split(" ")
                     if not any(commit_hash.startswith(x) for x in self.ignored_commits):
@@ -126,26 +132,26 @@ class Util:
         except (InvalidGitRepositoryError, NoSuchPathError) as err:
             if self.config.get("fallback_to_build_date"):
                 log(
-                    "[git-revision-date-localized-plugin] Unable to find a git directory and/or git is not installed."
+                    "Unable to find a git directory and/or git is not installed."
                     " Option 'fallback_to_build_date' set to 'true': Falling back to build date"
                 )
                 commit_timestamp = time.time()
             else:
                 log(
-                    "[git-revision-date-localized-plugin] Unable to find a git directory and/or git is not installed."
+                    "Unable to find a git directory and/or git is not installed."
                     " To ignore this error, set option 'fallback_to_build_date: true'"
                 )
                 raise err
         except GitCommandError as err:
             if self.config.get("fallback_to_build_date"):
                 log(
-                    f"[git-revision-date-localized-plugin] Unable to read git logs of '{path}'. Is git log readable?"
+                    f"Unable to read git logs of '{path}'. Is git log readable?"
                     " Option 'fallback_to_build_date' set to 'true': Falling back to build date"
                 )
                 commit_timestamp = time.time()
             else:
                 logger.error(
-                    f"[git-revision-date-localized-plugin] Unable to read git logs of '{path}'. "
+                    f"Unable to read git logs of '{path}'. "
                     " To ignore this error, set option 'fallback_to_build_date: true'"
                 )
                 raise err
@@ -154,26 +160,26 @@ class Util:
                 raise err
             if self.config.get("fallback_to_build_date"):
                 log(
-                    "[git-revision-date-localized-plugin] Unable to perform command: 'git log'. Is git installed?"
+                    "Unable to perform command: 'git log'. Is git installed?"
                     " Option 'fallback_to_build_date' set to 'true': Falling back to build date"
                 )
                 commit_timestamp = time.time()
             else:
                 log(
-                    "[git-revision-date-localized-plugin] Unable to perform command 'git log'. Is git installed?"
+                    "Unable to perform command 'git log'. Is git installed?"
                     " To ignore this error, set option 'fallback_to_build_date: true'"
                 )
                 raise err
         except Exception as err:
             if self.config.get("fallback_to_build_date"):
                 log(
-                    f"[git-revision-date-localized-plugin] An unexpected error occurred: {str(err)}"
+                    f"An unexpected error occurred: {str(err)}"
                     " Option 'fallback_to_build_date' set to 'true': Falling back to build date"
                 )
                 commit_timestamp = time.time()
             else:
                 logger.error(
-                    f"[git-revision-date-localized-plugin] An unexpected error occurred: {str(err)}"
+                    f"An unexpected error occurred: {str(err)}"
                     " To ignore this error, set option 'fallback_to_build_date: true'"
                 )
                 raise err
@@ -181,7 +187,7 @@ class Util:
         # create timestamp
         if commit_timestamp == "":
             commit_timestamp = time.time()
-            msg = f"[git-revision-date-localized-plugin] '{path}' has no git logs, using current timestamp"
+            msg = f"'{path}' has no git logs, using current timestamp"
             if n_ignored_commits:
                 msg += f" (ignored {n_ignored_commits} commits)"
             log(msg)

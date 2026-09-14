@@ -36,7 +36,20 @@ November 28, 2019 13:57:28  # type: datetime
 
 ## `custom_format`
 
-Default is `%d. %B %Y`. The date format used when `type: custom`. Passed to python's `strftime`, see the [cheatsheat](https://strftime.org/) for details.
+Default is `%d. %B %Y`. The date format used when `type: custom`. Uses python's `strftime` directives, see the [cheatsheat](https://strftime.org/) for details.
+
+Any text around the directives is kept as-is, so you can write things like:
+
+=== ":octicons-file-code-16: mkdocs.yml"
+
+  ```yaml
+  plugins:
+    - git-revision-date-localized:
+        type: custom
+        custom_format: "Last edited on %d %B %Y"
+  ```
+
+Note that the month and weekday names are translated using the [`locale`](#locale), but any literal text you add is not.
 
 ## `timezone`
 

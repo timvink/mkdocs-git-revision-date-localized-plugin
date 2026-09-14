@@ -4,7 +4,7 @@ import pytest
 from babel.core import UnknownLocaleError
 from babel.dates import get_timezone
 
-from mkdocs_git_revision_date_localized_plugin.dates import get_date_formats
+from mkdocs_git_revision_date_localized_plugin.dates import get_date_formats, strftime_to_babel_format
 
 
 def test_get_dates():
@@ -108,3 +108,46 @@ def test_get_dates():
         "timeago": '<span class="timeago" datetime="2020-02-22T18:52:09+00:00" locale="en"></span>',
         "custom": "22. February 2020",
     }
+
+
+@pytest.mark.parametrize(
+    "custom_format, expected",
+    [
+        # Formats made up purely of directives keep working as before
+        ("%d. %B %Y", "01. January 1970"),
+        ("%Y-%m-%d %H:%M", "1970-01-01 00:00"),
+        ("%-d/%-m/%Y", "1/1/1970"),
+        # Literal text must survive verbatim, instead of having its letters
+        # interpreted as Babel pattern characters.
+        # See https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/224
+        ("Updated on %d %B %Y", "Updated on 01 January 1970"),
+        ("Last edited: %B %Y", "Last edited: January 1970"),
+        # A literal single quote is the escape character in Babel patterns
+        ("It's %B", "It's January"),
+        # '%%' is an escaped percent sign
+        ("100%% done on %d", "100% done on 01"),
+        # Unknown directives are left alone rather than silently mangled
+        ("%Q %d", "%Q 01"),
+    ],
+)
+def test_custom_format_keeps_literal_text(custom_format, expected):
+    assert get_date_formats(0, custom_format=custom_format)["custom"] == expected
+
+
+def test_custom_format_literal_text_is_not_translated():
+    """Literal text is passed through as-is, whatever the locale."""
+    assert get_date_formats(0, locale="fr", custom_format="Mise a jour %d %B")["custom"] == "Mise a jour 01 janvier"
+
+
+@pytest.mark.parametrize(
+    "custom_format, expected_pattern",
+    [
+        ("%d. %B %Y", "dd. MMMM yyyy"),
+        ("Updated on %d", "'Updated on 'dd"),
+        ("It's %B", "'It''s 'MMMM"),
+        ("%-d", "d"),
+        ("%%", "%"),
+    ],
+)
+def test_strftime_to_babel_format(custom_format, expected_pattern):
+    assert strftime_to_babel_format(custom_format) == expected_pattern

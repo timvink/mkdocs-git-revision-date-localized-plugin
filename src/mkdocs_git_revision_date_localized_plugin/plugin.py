@@ -5,7 +5,6 @@ https://www.mkdocs.org/
 https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/
 """
 
-import logging
 import os
 import re
 import time
@@ -16,7 +15,7 @@ from mkdocs import __version__ as mkdocs_version
 from mkdocs.config import config_options
 from mkdocs.config.defaults import MkDocsConfig
 from mkdocs.exceptions import ConfigurationError
-from mkdocs.plugins import BasePlugin
+from mkdocs.plugins import BasePlugin, get_plugin_logger
 from mkdocs.structure.files import Files
 from mkdocs.structure.nav import Page
 from mkdocs.utils import copy_file
@@ -24,6 +23,8 @@ from packaging.version import Version
 
 from mkdocs_git_revision_date_localized_plugin.exclude import exclude
 from mkdocs_git_revision_date_localized_plugin.util import Util
+
+logger = get_plugin_logger(__name__)
 
 HERE = Path(__file__).parent.absolute()
 
@@ -129,28 +130,28 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
                 if Version(mkdocs_version) >= Version("1.6.0")
                 else custom_theme._vars.get("language")
             )
-            logging.debug(f"Locale '{theme_locale}' extracted from the custom theme: '{custom_theme.name}'")
+            logger.debug(f"Locale '{theme_locale}' extracted from the custom theme: '{custom_theme.name}'")
         elif custom_theme is not None and "locale" in custom_theme:
             theme_locale = (
                 custom_theme.locale if Version(mkdocs_version) >= Version("1.6.0") else custom_theme._vars.get("locale")
             )
-            logging.debug(f"Locale '{theme_locale}' extracted from the custom theme: '{custom_theme.name}'")
+            logger.debug(f"Locale '{theme_locale}' extracted from the custom theme: '{custom_theme.name}'")
         else:
             theme_locale = None
-            logging.debug("No locale found in theme configuration (or no custom theme set)")
+            logger.debug("No locale found in theme configuration (or no custom theme set)")
 
         # First prio: plugin locale
         if plugin_locale:
             locale_set = plugin_locale
-            logging.debug(f"Using locale from plugin configuration: {locale_set}")
+            logger.debug(f"Using locale from plugin configuration: {locale_set}")
         # Second prio: theme locale
         elif theme_locale:
             locale_set = theme_locale
-            logging.debug(f"Locale not set in plugin. Fallback to theme configuration: {locale_set}")
+            logger.debug(f"Locale not set in plugin. Fallback to theme configuration: {locale_set}")
         # Lastly, fallback is English
         else:
             locale_set = "en"
-            logging.debug(f"No locale set. Fallback to: {locale_set}")
+            logger.debug(f"No locale set. Fallback to: {locale_set}")
 
         # Validate locale
         locale_set = str(locale_set)
@@ -168,7 +169,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         plugins = [*OrderedDict(config["plugins"])]
         if "i18n" in plugins:
             if plugins.index("git-revision-date-localized") < plugins.index("i18n"):
-                msg = "[git-revision-date-localized] should be defined after the i18n plugin in your mkdocs.yml file. "
+                msg = "should be defined after the i18n plugin in your mkdocs.yml file. "
                 msg += "This is because i18n adds a 'locale' variable to markdown pages that this plugin supports."
                 raise ConfigurationError(msg)
 
@@ -223,9 +224,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         # This avoids the overhead of creating a new multiprocessing pool on every file save
         # The cache from the initial build will be reused
         if self.is_serve_dirty_build:
-            logging.debug(
-                "[git-revision-date-localized] Skipping parallel processing on incremental rebuild, using cache"
-            )
+            logger.debug("Skipping parallel processing on incremental rebuild, using cache")
             return
 
         # Support monorepo/techdocs, which copies the docs_dir to a temporary directory
@@ -245,7 +244,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
                     files=files, original_source=original_source, is_first_commit=True
                 )
         except Exception as e:
-            logging.warning(
+            logger.warning(
                 f"Parallel processing failed: {str(e)}.\n To fall back to serial processing, use 'enable_parallel_processing: False' setting."
             )
             raise e
@@ -276,7 +275,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         # Exclude pages specified in config
         excluded_pages = self.config.get("exclude", [])
         if exclude(page.file.src_path, excluded_pages):
-            logging.debug("Excluding page " + page.file.src_path)
+            logger.debug("Excluding page " + page.file.src_path)
             return markdown
 
         # Find the locale
@@ -416,7 +415,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             # See also https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/111
             msg = f"First revision timestamp is older than last revision timestamp for page {page.file.src_path}. "
             msg += "This can be due to a quirk in `git` follow behaviour. You can try to set `enable_git_follow: false` in the plugin configuration."
-            logging.warning(msg)
+            logger.warning(msg)
             first_revision_hash, first_revision_timestamp = last_revision_hash, last_revision_timestamp
 
         # Creation date formats
