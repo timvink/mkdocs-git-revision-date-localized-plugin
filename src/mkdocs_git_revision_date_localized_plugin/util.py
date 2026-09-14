@@ -30,6 +30,10 @@ class Util:
         """Initialize utility class."""
         self.config = config
         self.repo_cache = {}
+        # Tag lookups shell out to git, and the same commit is looked up for
+        # every page (the site revision commit especially), so cache them.
+        # Invalidated in _get_repo() whenever a new repository shows up.
+        self.tag_cache: dict[str, str] = {}
 
         ignore_commits_file = self.config.get("ignored_commits_file")
         if ignore_commits_file:
@@ -44,6 +48,9 @@ class Util:
 
         if path not in self.repo_cache:
             self.repo_cache[path] = Repo(path, search_parent_directories=True).git
+            # Tags are looked up across every known repository, so a new one can
+            # turn a previously cached "no tag" answer into a hit.
+            self.tag_cache.clear()
             # Checks if user is running builds on CI
             # and raise appropriate warnings
             raise_ci_warnings(self.repo_cache[path])
@@ -270,6 +277,14 @@ class Util:
         if not commit_hash:
             return ""
 
+        if commit_hash in self.tag_cache:
+            return self.tag_cache[commit_hash]
+
+        self.tag_cache[commit_hash] = tag = self._lookup_tag_name_for_commit(commit_hash)
+        return tag
+
+    def _lookup_tag_name_for_commit(self, commit_hash: str) -> str:
+        """Ask git for the tag pointing at a commit. See get_tag_name_for_commit()."""
         try:
             for path, git in self.repo_cache.items():
                 try:
