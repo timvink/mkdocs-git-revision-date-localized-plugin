@@ -11,6 +11,7 @@ You can reproduce locally with:
 """
 
 # standard lib
+import io
 import logging
 import os
 import re
@@ -27,8 +28,10 @@ from click.testing import CliRunner
 # MkDocs
 from mkdocs.__main__ import build_command
 from mkdocs.config import load_config
+from mkdocs.structure.files import File
+from mkdocs.structure.pages import Page
 
-from mkdocs_git_revision_date_localized_plugin.ci import commit_count
+from mkdocs_git_revision_date_localized_plugin.ci import commit_count, is_shallow_clone
 from mkdocs_git_revision_date_localized_plugin.dates import get_date_formats
 
 # package module
@@ -67,6 +70,37 @@ def working_directory(path):
         yield
     finally:
         os.chdir(prev_cwd)
+
+
+@contextmanager
+def capture_plugin_logs(level: int = logging.WARNING):
+    """
+    Capture log messages emitted by this plugin.
+
+    We cannot use pytest's `caplog` fixture here: the plugin logs through the
+    'mkdocs' logger tree, and MkDocs sets `propagate = False` on it, so records
+    never reach the root logger that `caplog` listens on.
+
+    Usage:
+    ```python
+    with capture_plugin_logs() as logs:
+        build_docs_setup(path)
+    assert "some message" in logs.getvalue()
+    ```
+    """
+    stream = io.StringIO()
+    handler = logging.StreamHandler(stream)
+    handler.setLevel(level)
+
+    logger = logging.getLogger("mkdocs.plugins.mkdocs_git_revision_date_localized_plugin")
+    previous_level = logger.level
+    logger.addHandler(handler)
+    logger.setLevel(level)
+    try:
+        yield stream
+    finally:
+        logger.removeHandler(handler)
+        logger.setLevel(previous_level)
 
 
 def get_plugin_config_from_mkdocs(mkdocs_path) -> dict:
@@ -631,7 +665,7 @@ def test_git_in_docs_dir(tmp_path):
     )
 
 
-def test_low_fetch_depth(tmp_path, caplog):
+def test_low_fetch_depth(tmp_path):
     """
     On gitlab and github runners, a GIT might have a low fetch
     depth, which means commits are not available.
@@ -665,15 +699,17 @@ def test_low_fetch_depth(tmp_path, caplog):
 
     # should raise warning
     os.environ["GITLAB_CI"] = "1"
-    result = build_docs_setup(cloned_folder)
+    with capture_plugin_logs() as logs:
+        result = build_docs_setup(cloned_folder)
     assert result.exit_code == 0
-    assert "Running on a GitLab runner" in caplog.text
+    assert "Running on a GitLab runner" in logs.getvalue()
 
     del os.environ["GITLAB_CI"]
     os.environ["GITHUB_ACTIONS"] = "1"
-    result = build_docs_setup(cloned_folder)
+    with capture_plugin_logs() as logs:
+        result = build_docs_setup(cloned_folder)
     assert result.exit_code == 0
-    assert "Running on GitHub Actions might" in caplog.text
+    assert "Running on GitHub Actions might" in logs.getvalue()
 
 
 def test_mkdocs_genfiles_plugin(tmp_path):
@@ -762,3 +798,77 @@ def test_genfiles_plugin(tmp_path):
     page_with_tag = testproject_path / "site/foo/index.html"
     contents = page_with_tag.read_text(encoding="utf8")
     assert "Bar, world!" in contents
+
+
+def test_creation_commit_hash_is_returned(tmp_path):
+    """
+    The creation date lookup should report the commit hash, not an empty string.
+
+    See https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/225
+    """
+    testproject_path = setup_clean_mkdocs_folder("tests/fixtures/basic_project/mkdocs_creation_date.yml", tmp_path)
+    repo = setup_commit_history(testproject_path)
+
+    util = Util(config={"strict": False}, mkdocs_dir=str(testproject_path))
+    page = str(testproject_path / "docs/page_with_tag.md")
+
+    creation_hash, creation_timestamp = util.get_git_commit_timestamp(path=page, is_first_commit=True)
+    assert creation_timestamp == 1500854705
+    assert creation_hash, "No commit hash returned for the creation commit"
+
+    # It should be the commit that actually created the file, not the latest one
+    with working_directory(testproject_path):
+        expected = repo.git.log("docs/page_with_tag.md", format="%H", diff_filter="A").strip()
+    assert creation_hash == expected
+
+    revision_hash, _ = util.get_git_commit_timestamp(path=page, is_first_commit=False)
+    assert revision_hash != creation_hash, "Creation commit should differ from the most recent commit"
+
+
+def test_creation_date_hash_and_tag_in_page_meta(tmp_path):
+    """The creation hash and tag should reach page.meta, so themes can use them."""
+    testproject_path = setup_clean_mkdocs_folder("tests/fixtures/basic_project/mkdocs_creation_date.yml", tmp_path)
+    repo = setup_commit_history(testproject_path)
+
+    with working_directory(testproject_path):
+        creation_hash = repo.git.log("docs/page_with_tag.md", format="%H", diff_filter="A").strip()
+        repo.git.tag("v1.0.0", creation_hash)
+
+        config = load_config("mkdocs.yml")
+        plugin = config["plugins"]["git-revision-date-localized"]
+        plugin.on_config(config)
+
+        file = File("page_with_tag.md", str(testproject_path / "docs"), str(testproject_path / "site"), True)
+        page = Page(title=None, file=file, config=config)
+        page.meta = {}
+        plugin.on_page_markdown("", page, config, files=None)
+
+    assert page.meta["git_creation_date_localized_hash"] == creation_hash
+    assert page.meta["git_creation_date_localized_tag"] == "v1.0.0"
+    assert page.meta["git_revision_date_localized_hash"], "No commit hash for the last revision"
+
+
+def test_is_shallow_clone_outside_working_directory(tmp_path):
+    """
+    is_shallow_clone() should inspect the repository it is given, not the
+    current working directory.
+
+    See https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/226
+    """
+    testproject_path = setup_clean_mkdocs_folder("tests/fixtures/basic_project/mkdocs.yml", tmp_path)
+    setup_commit_history(testproject_path)
+
+    shallow_folder = str(tmp_path / "shallowrepo")
+    shallow_repo = init_test_repo(shallow_folder)
+    origin = shallow_repo.create_remote("origin", str(testproject_path))
+    origin.fetch(depth=1, prune=True)
+    shallow_repo.create_head("master", origin.refs.master)
+    shallow_repo.heads.master.checkout()
+
+    full = Util(config={}, mkdocs_dir=str(testproject_path))._get_repo(str(testproject_path))
+    shallow = Util(config={}, mkdocs_dir=shallow_folder)._get_repo(shallow_folder)
+
+    # The current working directory is the repo of this plugin itself, so a
+    # cwd-relative '.git/shallow' check would report False for both repos.
+    assert is_shallow_clone(shallow) is True
+    assert is_shallow_clone(full) is False

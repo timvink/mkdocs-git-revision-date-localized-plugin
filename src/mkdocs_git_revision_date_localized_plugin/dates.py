@@ -3,6 +3,40 @@ from typing import Any
 
 from babel.dates import format_date, format_datetime, get_timezone
 
+# Dictionary mapping strftime directives to Babel format patterns.
+# Directives are matched longest-first, so '%-d' wins over '%d'.
+STRFTIME_TO_BABEL = {
+    "%a": "EEE",  # Weekday abbreviated
+    "%A": "EEEE",  # Weekday full
+    "%b": "MMM",  # Month abbreviated
+    "%B": "MMMM",  # Month full
+    "%c": "",  # Locale's date and time (not directly mappable)
+    "%d": "dd",  # Day of month zero-padded
+    "%-d": "d",  # Day of month
+    "%e": "d",  # Day of month space-padded
+    "%f": "SSSSSS",  # Microsecond
+    "%H": "HH",  # Hour 24h zero-padded
+    "%-H": "H",  # Hour 24h
+    "%I": "hh",  # Hour 12h zero-padded
+    "%-I": "h",  # Hour 12h
+    "%j": "DDD",  # Day of year
+    "%m": "MM",  # Month zero-padded
+    "%-m": "M",  # Month
+    "%M": "mm",  # Minute zero-padded
+    "%-M": "m",  # Minute
+    "%p": "a",  # AM/PM
+    "%S": "ss",  # Second zero-padded
+    "%-S": "s",  # Second
+    "%w": "e",  # Weekday as number
+    "%W": "w",  # Week of year
+    "%x": "",  # Locale's date (not directly mappable)
+    "%X": "",  # Locale's time (not directly mappable)
+    "%y": "yy",  # Year without century
+    "%Y": "yyyy",  # Year with century
+    "%z": "Z",  # UTC offset
+    "%Z": "z",  # Timezone name
+}
+
 
 def get_date_formats(
     unix_timestamp: float, locale: str = "en", time_zone: str = "UTC", custom_format: str = "%d. %B %Y"
@@ -52,9 +86,40 @@ def get_date_formats(
     }
 
 
+def quote_babel_literal(text: str) -> str:
+    """
+    Quote a run of literal text so Babel does not read it as a format pattern.
+
+    In CLDR patterns every ASCII letter is reserved, so literal text containing
+    letters has to be wrapped in single quotes. A literal single quote is
+    escaped by doubling it.
+
+    Args:
+        text (str): Literal text to include in a Babel pattern.
+
+    Returns:
+        str: The text, safe to concatenate into a Babel pattern.
+    """
+    if not text:
+        return ""
+
+    text = text.replace("'", "''")
+
+    # Only letters are reserved, so leave punctuation and whitespace unquoted
+    # to keep the generated pattern readable.
+    if any(c.isascii() and c.isalpha() for c in text):
+        return f"'{text}'"
+
+    return text
+
+
 def strftime_to_babel_format(fmt: str) -> str:
     """
     Convert strftime format string to Babel format pattern.
+
+    Literal text between directives is quoted, so a format like
+    ``"Updated on %d %B"`` keeps the words "Updated on" intact instead of
+    having their letters interpreted as Babel pattern characters.
 
     Args:
         fmt (str): strftime format string
@@ -62,42 +127,39 @@ def strftime_to_babel_format(fmt: str) -> str:
     Returns:
         str: Babel format pattern
     """
-    # Dictionary mapping strftime directives to Babel format patterns
-    mapping = {
-        "%a": "EEE",  # Weekday abbreviated
-        "%A": "EEEE",  # Weekday full
-        "%b": "MMM",  # Month abbreviated
-        "%B": "MMMM",  # Month full
-        "%c": "",  # Locale's date and time (not directly mappable)
-        "%d": "dd",  # Day of month zero-padded
-        "%-d": "d",  # Day of month
-        "%e": "d",  # Day of month space-padded
-        "%f": "SSSSSS",  # Microsecond
-        "%H": "HH",  # Hour 24h zero-padded
-        "%-H": "H",  # Hour 24h
-        "%I": "hh",  # Hour 12h zero-padded
-        "%-I": "h",  # Hour 12h
-        "%j": "DDD",  # Day of year
-        "%m": "MM",  # Month zero-padded
-        "%-m": "M",  # Month
-        "%M": "mm",  # Minute zero-padded
-        "%-M": "m",  # Minute
-        "%p": "a",  # AM/PM
-        "%S": "ss",  # Second zero-padded
-        "%-S": "s",  # Second
-        "%w": "e",  # Weekday as number
-        "%W": "w",  # Week of year
-        "%x": "",  # Locale's date (not directly mappable)
-        "%X": "",  # Locale's time (not directly mappable)
-        "%y": "yy",  # Year without century
-        "%Y": "yyyy",  # Year with century
-        "%z": "Z",  # UTC offset
-        "%Z": "z",  # Timezone name
-        "%%": "%",  # Literal %
-    }
+    result = []
+    literal: list[str] = []
 
-    result = fmt
-    for strftime_code, babel_code in mapping.items():
-        result = result.replace(strftime_code, babel_code)
+    def flush_literal() -> None:
+        result.append(quote_babel_literal("".join(literal)))
+        literal.clear()
 
-    return result
+    i = 0
+    while i < len(fmt):
+        if fmt[i] != "%":
+            literal.append(fmt[i])
+            i += 1
+            continue
+
+        # '%%' is an escaped percent sign, which is literal text
+        if fmt[i : i + 2] == "%%":
+            literal.append("%")
+            i += 2
+            continue
+
+        # Match the longest directive first, so '%-d' is not read as '%' + '-d'
+        for length in (3, 2):
+            directive = fmt[i : i + length]
+            if directive in STRFTIME_TO_BABEL:
+                flush_literal()
+                result.append(STRFTIME_TO_BABEL[directive])
+                i += length
+                break
+        else:
+            # Unknown directive: keep it as literal text rather than letting
+            # Babel interpret the character as a pattern of its own.
+            literal.append(fmt[i])
+            i += 1
+
+    flush_literal()
+    return "".join(result)

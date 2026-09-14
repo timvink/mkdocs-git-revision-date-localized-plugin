@@ -4,8 +4,12 @@ Helper functions related to continuous integration (CI).
 This is because often CI runners do not have access to full git history.
 """
 
-import logging
 import os
+
+from git import GitCommandError
+from mkdocs.plugins import get_plugin_logger
+
+logger = get_plugin_logger(__name__)
 
 
 def raise_ci_warnings(repo) -> None:
@@ -23,9 +27,9 @@ def raise_ci_warnings(repo) -> None:
     # Gitlab Runners
     if os.getenv("GITLAB_CI") is not None and n_commits < 50:
         # Default is GIT_DEPTH of 50 for gitlab
-        logging.warning(
+        logger.warning(
             """
-                [git-revision-date-localized-plugin] Running on a GitLab runner might lead to wrong
+                Running on a GitLab runner might lead to wrong
                 Git revision dates due to a shallow git fetch depth.
 
                 Make sure to set GIT_DEPTH to 0 in your .gitlab-ci.yml file
@@ -37,9 +41,9 @@ def raise_ci_warnings(repo) -> None:
     elif os.getenv("GITHUB_ACTIONS") is not None and n_commits == 1:
         # See also https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
         # Default is fetch-depth of 1 for github actions
-        logging.warning(
+        logger.warning(
             """
-                [git-revision-date-localized-plugin] Running on GitHub Actions might lead to wrong
+                Running on GitHub Actions might lead to wrong
                 Git revision dates due to a shallow git fetch depth.
 
                 Try setting `fetch-depth: 0` in your GitHub Action.
@@ -50,9 +54,9 @@ def raise_ci_warnings(repo) -> None:
     # Azure Devops Pipeline
     # Does not limit fetch-depth by default
     elif int(os.getenv("Agent.Source.Git.ShallowFetchDepth", 10e99)) < n_commits:
-        logging.warning(
+        logger.warning(
             """
-                [git-revision-date-localized-plugin] Running on Azure pipelines with limited
+                Running on Azure pipelines with limited
                 fetch-depth might lead to wrong git revision dates due to a shallow git fetch depth.
 
                 Remove any Shallow Fetch settings
@@ -63,9 +67,9 @@ def raise_ci_warnings(repo) -> None:
     # Bitbucket pipelines
     elif os.getenv("BITBUCKET_BUILD_NUMBER") is not None and n_commits < 50:
         # Default is fetch-depth of 50 for bitbucket pipelines
-        logging.warning(
+        logger.warning(
             """
-                [git-revision-date-localized-plugin] Running on bitbucket pipelines might lead to wrong
+                Running on bitbucket pipelines might lead to wrong
                 Git revision dates due to a shallow git fetch depth.
 
                 Try setting "clone: depth" to "full" in your pipeline
@@ -102,4 +106,12 @@ def is_shallow_clone(repo) -> bool:
     Returns:
         bool: If a repo is shallow clone
     """
-    return os.path.exists(".git/shallow")
+    # Ask git about the repository itself, rather than looking for a '.git/shallow'
+    # relative to the current working directory. The working directory is not
+    # necessarily the repository root: the repo can live in `docs/`, or be a
+    # temporary checkout created by plugins such as monorepo.
+    try:
+        return repo.rev_parse("--is-shallow-repository").strip() == "true"
+    except GitCommandError:
+        # '--is-shallow-repository' requires git 2.15 (2017)
+        return os.path.exists(os.path.join(repo.rev_parse("--absolute-git-dir").strip(), "shallow"))
