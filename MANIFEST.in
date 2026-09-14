@@ -1,2 +1,3 @@
 include src/mkdocs_git_revision_date_localized_plugin/js/*.js
 include src/mkdocs_git_revision_date_localized_plugin/css/*.css
+include src/mkdocs_git_revision_date_localized_plugin/py.typed

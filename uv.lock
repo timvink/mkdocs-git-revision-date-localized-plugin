@@ -574,6 +574,7 @@ dependencies = [
     { name = "babel" },
     { name = "gitpython" },
     { name = "mkdocs" },
+    { name = "packaging" },
     { name = "tzdata", marker = "sys_platform == 'win32'" },
 ]
 
@@ -599,7 +600,8 @@ dev = [
 requires-dist = [
     { name = "babel", specifier = ">=2.7.0" },
     { name = "gitpython", specifier = ">=3.1.59" },
-    { name = "mkdocs", specifier = ">=1.0,<2" },
+    { name = "mkdocs", specifier = ">=1.4,<2" },
+    { name = "packaging", specifier = ">=20.0" },
     { name = "tzdata", marker = "sys_platform == 'win32'", specifier = ">=2023.3" },
 ]
 

@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=70.0", "setuptools-scm>=8.0"]
+requires = ["setuptools>=70.0"]
 build-backend = "setuptools.build_meta"
 
 [project.entry-points."mkdocs.plugins"]
@@ -34,7 +34,10 @@ dynamic = ["version"]
 dependencies = [
     "babel>=2.7.0",
     "gitpython>=3.1.59",
-    "mkdocs>=1.0,<2",
+    # MkDocsConfig and the on_startup event both require mkdocs 1.4
+    "mkdocs>=1.4,<2",
+    # Imported directly in plugin.py; do not rely on mkdocs pulling it in
+    "packaging>=20.0",
     "tzdata>=2023.3; sys_platform == 'win32'",
 ]
 
@@ -57,15 +60,11 @@ markers = [
 lint.select= ["E", "F", "I", "UP"]
 
 # Exclude rules
-lint.ignore = ['D104'
-        ,'D212'
-        ,'D200'
-        ,'D412'
-        ,'E731'
-        ,'E501'
-        ,'E722'
-        ,'D104'
-        ,'E402'
+lint.ignore = [
+    'E731',
+    'E501',
+    'E722',
+    'E402',
 ]
 
 # Exclude files in tests dir

@@ -427,7 +427,7 @@ MKDOCS_FILES = [
 ]
 
 INVALID_MKDOCS_FILES = [
-    ("basic_project/mkdocs_unknown_type.yml", "AssertionError"),
+    ("basic_project/mkdocs_unknown_type.yml", "Expected one of"),
     ("i18n/mkdocs_wrong_order.yml", "should be defined after the i18n plugin in your mkdocs.yml"),
 ]
 
