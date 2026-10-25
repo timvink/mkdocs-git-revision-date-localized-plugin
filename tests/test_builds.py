@@ -910,11 +910,13 @@ def test_generated_page_dates_do_not_depend_on_clock_ticks(tmp_path):
     )
 
 
-@pytest.mark.parametrize("dirty", [False, True])
-def test_serve_rebuild_picks_up_new_commits(tmp_path, dirty):
+@pytest.mark.parametrize("amend", [False, True], ids=["new-commit", "amend"])
+@pytest.mark.parametrize("dirty", [False, True], ids=["serve", "serve-dirty"])
+def test_serve_rebuild_picks_up_new_commits(tmp_path, dirty, amend):
     """
     `mkdocs serve` keeps the plugin object across rebuilds. A commit made while
     serve runs should show up on the next rebuild, not only after a restart.
+    Amending rewrites history, which takes a different path than a new commit.
 
     See https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/215
     """
@@ -939,7 +941,9 @@ def test_serve_rebuild_picks_up_new_commits(tmp_path, dirty):
         with open("docs/page_with_tag.md", "a") as f:
             f.write("edited while serving\n")
         repo.git.add("docs/page_with_tag.md")
-        repo.git.commit(message="edit while serving", author="Test Person <testtest@gmail.com>", date="1700000000")
+        repo.git.commit(
+            message="edit while serving", author="Test Person <testtest@gmail.com>", date="1700000000", amend=amend
+        )
 
         build(load_config("mkdocs.yml"), dirty=dirty)
         assert page_revision_date() == "November 14, 2023"

@@ -57,6 +57,44 @@ class Util:
 
         return self.repo_cache[path]
 
+    def get_head_commit(self, path: str) -> str:
+        """
+        Get the hash of the commit HEAD points to, in the repository that contains path.
+
+        Args:
+            path (str): Location of a file or directory that is part of a Git repository.
+
+        Returns:
+            str: commit hash, or an empty string if it cannot be determined.
+        """
+        try:
+            return self._get_repo(os.path.realpath(path)).rev_parse("HEAD")
+        except Exception:
+            return ""
+
+    def get_files_changed_between(self, old_commit: str, new_commit: str, path: str) -> set[str] | None:
+        """
+        Get the files touched by the commits from old_commit up to new_commit.
+
+        Args:
+            old_commit (str): commit hash to start from (excluded).
+            new_commit (str): commit hash to end at (included).
+            path (str): Location of a file or directory that is part of the Git repository.
+
+        Returns:
+            set[str] | None: real paths of the touched files, or None when new_commit does
+                not descend from old_commit (f.e. after a rebase or branch switch) or git fails.
+        """
+        try:
+            git = self._get_repo(os.path.realpath(path))
+            # Raises when old_commit is not an ancestor of new_commit
+            git.merge_base(old_commit, new_commit, is_ancestor=True)
+            toplevel = git.rev_parse(show_toplevel=True)
+            names = git.log(f"{old_commit}..{new_commit}", name_only=True, format="", no_show_signature=True)
+        except Exception:
+            return None
+        return {os.path.realpath(os.path.join(toplevel, name)) for name in names.splitlines() if name}
+
     def get_git_commit_timestamp(self, path: str, is_first_commit: bool = False) -> tuple[str, int]:
         """
         Get a list of commit dates in unix timestamp, starts with the most recent commit.
