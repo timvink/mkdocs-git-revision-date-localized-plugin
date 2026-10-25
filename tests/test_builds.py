@@ -1004,3 +1004,29 @@ def test_serve_rebuild_picks_up_ignored_commits_changes(tmp_path):
         ignored_commits.write_text(repo.git.log("docs/page_with_tag.md", format="%H", n=1), encoding="utf-8")
         build(load_config("mkdocs.yml"))
         assert page_revision_date(page) == "May 4, 2018"
+
+
+@pytest.mark.parametrize(
+    "mkdocs_file, expect_creation_lookups",
+    [
+        ("tests/fixtures/basic_project/mkdocs.yml", False),
+        ("tests/fixtures/basic_project/mkdocs_creation_date.yml", True),
+    ],
+)
+def test_creation_commits_only_looked_up_when_enabled(tmp_path, mkdocs_file, expect_creation_lookups):
+    """
+    Looking up creation commits runs an extra `git log` per page, so a build should
+    only do it when `enable_creation_date` is set.
+    """
+    from mkdocs.commands.build import build
+
+    testproject_path = setup_clean_mkdocs_folder(mkdocs_file, tmp_path)
+    setup_commit_history(testproject_path)
+
+    with working_directory(testproject_path):
+        config = load_config("mkdocs.yml")
+        build(config)
+    plugin = config["plugins"]["git-revision-date-localized"]
+
+    assert plugin.last_revision_commits, "Last revision commits should always be looked up"
+    assert bool(plugin.created_commits) is expect_creation_lookups
