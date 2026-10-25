@@ -296,6 +296,16 @@ def setup_commit_history(testproject_path):
     return repo
 
 
+def page_revision_date(html_file: Path) -> str:
+    """Return the page revision date from a page built from page_with_tag.md.
+
+    The page renders the page revision date first, and the site revision date after it.
+    """
+    match = re.search(r"renders as: <span[^>]*>([^<]*)</span>", html_file.read_text(encoding="utf8"))
+    assert match, f"No rendered revision date found in {html_file}"
+    return match.group(1)
+
+
 def build_docs_setup(testproject_path):
     """
     Runs the `mkdocs build` command
@@ -924,19 +934,13 @@ def test_serve_rebuild_picks_up_new_commits(tmp_path, dirty, amend):
     repo = setup_commit_history(testproject_path)
     page = testproject_path / "site/page_with_tag/index.html"
 
-    def page_revision_date() -> str:
-        # The first date on the page is the page revision date; a later one is the site revision date
-        match = re.search(r"renders as: <span[^>]*>([^<]*)</span>", page.read_text(encoding="utf8"))
-        assert match, "No rendered revision date found"
-        return match.group(1)
-
     with working_directory(testproject_path):
         # Mimic mkdocs.commands.serve: on_startup runs once, then every rebuild
         # loads a fresh config that reuses the same plugin objects.
         config = load_config("mkdocs.yml")
         config.plugins.on_startup(command="serve", dirty=dirty)
         build(config, dirty=dirty)
-        assert page_revision_date() == "January 23, 2022"
+        assert page_revision_date(page) == "January 23, 2022"
 
         with open("docs/page_with_tag.md", "a") as f:
             f.write("edited while serving\n")
@@ -946,4 +950,51 @@ def test_serve_rebuild_picks_up_new_commits(tmp_path, dirty, amend):
         )
 
         build(load_config("mkdocs.yml"), dirty=dirty)
-        assert page_revision_date() == "November 14, 2023"
+        assert page_revision_date(page) == "November 14, 2023"
+        # The page is cached again, so later rebuilds do not ask git for it
+        plugin = load_config("mkdocs.yml").plugins["git-revision-date-localized"]
+        assert str((testproject_path / "docs/page_with_tag.md").absolute()) in plugin.last_revision_commits
+
+
+def test_serve_rebuild_picks_up_new_commits_for_non_ascii_filenames(tmp_path):
+    """git quotes non-ASCII paths by default, which must not hide them from cache invalidation."""
+    testproject_path = setup_clean_mkdocs_folder("tests/fixtures/basic_project/mkdocs.yml", tmp_path)
+    repo = setup_commit_history(testproject_path)
+    author = "Test Person <testtest@gmail.com>"
+
+    with working_directory(testproject_path):
+        shutil.copy("docs/page_with_tag.md", "docs/café.md")
+        repo.git.add("docs/café.md")
+        repo.git.commit(message="add café", author=author, date="1600000000")
+
+        config = load_config("mkdocs.yml")
+        config.plugins.on_startup(command="serve", dirty=False)
+        build(config)
+
+        with open("docs/café.md", "a", encoding="utf8") as f:
+            f.write("edited while serving\n")
+        repo.git.add("docs/café.md")
+        repo.git.commit(message="edit café", author=author, date="1700000000")
+
+        build(load_config("mkdocs.yml"))
+
+    assert page_revision_date(testproject_path / "site/café/index.html") == "November 14, 2023"
+
+
+def test_serve_rebuild_picks_up_ignored_commits_changes(tmp_path):
+    """Editing the ignored commits file while serving should apply on the next rebuild."""
+    testproject_path = setup_clean_mkdocs_folder("tests/fixtures/basic_project/mkdocs_ignored_commits.yml", tmp_path)
+    repo = setup_commit_history(testproject_path)
+    page = testproject_path / "site/page_with_tag/index.html"
+    ignored_commits = testproject_path / "ignored-commits.txt"
+    ignored_commits.write_text("", encoding="utf-8")
+
+    with working_directory(testproject_path):
+        config = load_config("mkdocs.yml")
+        config.plugins.on_startup(command="serve", dirty=False)
+        build(config)
+        assert page_revision_date(page) == "January 23, 2022"
+
+        ignored_commits.write_text(repo.git.log("docs/page_with_tag.md", format="%H", n=1), encoding="utf-8")
+        build(load_config("mkdocs.yml"))
+        assert page_revision_date(page) == "May 4, 2018"
