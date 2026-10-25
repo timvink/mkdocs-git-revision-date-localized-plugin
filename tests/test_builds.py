@@ -12,6 +12,7 @@ You can reproduce locally with:
 
 # standard lib
 import io
+import itertools
 import logging
 import os
 import re
@@ -19,6 +20,7 @@ import shutil
 import sys
 from contextlib import contextmanager
 from pathlib import Path
+from unittest.mock import patch
 
 # other 3rd party
 import git
@@ -872,3 +874,36 @@ def test_is_shallow_clone_outside_working_directory(tmp_path):
     # cwd-relative '.git/shallow' check would report False for both repos.
     assert is_shallow_clone(shallow) is True
     assert is_shallow_clone(full) is False
+
+
+def test_generated_page_dates_do_not_depend_on_clock_ticks(tmp_path):
+    """
+    A generated page has no git history, so both of its dates come from the clock.
+    Reading the clock once per date lets the creation date land a second after the
+    last revision date, which logs a warning that fails `mkdocs build --strict`.
+
+    See https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/231
+    """
+    testproject_path = setup_clean_mkdocs_folder("tests/fixtures/basic_project/mkdocs_creation_date.yml", tmp_path)
+    setup_commit_history(testproject_path)
+
+    with working_directory(testproject_path):
+        config = load_config("mkdocs.yml")
+        plugin = config["plugins"]["git-revision-date-localized"]
+
+        file = File("generated.md", src_dir=None, dest_dir=str(testproject_path / "site"), use_directory_urls=True)
+        file.generated_by = "mkdocs-gen-files"
+        page = Page(title=None, file=file, config=config)
+        page.meta = {}
+
+        # Every clock read returns a later second than the one before
+        clock = itertools.count(1700000000)
+        with patch("time.time", side_effect=lambda: next(clock)), capture_plugin_logs() as logs:
+            plugin.on_config(config)
+            plugin.on_page_markdown("", page, config, files=None)
+
+    assert "First revision timestamp is older" not in logs.getvalue()
+    assert (
+        page.meta["git_creation_date_localized_raw_iso_datetime"]
+        == (page.meta["git_revision_date_localized_raw_iso_datetime"])
+    )
