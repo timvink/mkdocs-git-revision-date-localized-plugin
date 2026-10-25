@@ -29,6 +29,7 @@ from click.testing import CliRunner
 
 # MkDocs
 from mkdocs.__main__ import build_command
+from mkdocs.commands.build import build
 from mkdocs.config import load_config
 from mkdocs.structure.files import File
 from mkdocs.structure.pages import Page
@@ -907,3 +908,38 @@ def test_generated_page_dates_do_not_depend_on_clock_ticks(tmp_path):
         page.meta["git_creation_date_localized_raw_iso_datetime"]
         == (page.meta["git_revision_date_localized_raw_iso_datetime"])
     )
+
+
+@pytest.mark.parametrize("dirty", [False, True])
+def test_serve_rebuild_picks_up_new_commits(tmp_path, dirty):
+    """
+    `mkdocs serve` keeps the plugin object across rebuilds. A commit made while
+    serve runs should show up on the next rebuild, not only after a restart.
+
+    See https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/215
+    """
+    testproject_path = setup_clean_mkdocs_folder("tests/fixtures/basic_project/mkdocs.yml", tmp_path)
+    repo = setup_commit_history(testproject_path)
+    page = testproject_path / "site/page_with_tag/index.html"
+
+    def page_revision_date() -> str:
+        # The first date on the page is the page revision date; a later one is the site revision date
+        match = re.search(r"renders as: <span[^>]*>([^<]*)</span>", page.read_text(encoding="utf8"))
+        assert match, "No rendered revision date found"
+        return match.group(1)
+
+    with working_directory(testproject_path):
+        # Mimic mkdocs.commands.serve: on_startup runs once, then every rebuild
+        # loads a fresh config that reuses the same plugin objects.
+        config = load_config("mkdocs.yml")
+        config.plugins.on_startup(command="serve", dirty=dirty)
+        build(config, dirty=dirty)
+        assert page_revision_date() == "January 23, 2022"
+
+        with open("docs/page_with_tag.md", "a") as f:
+            f.write("edited while serving\n")
+        repo.git.add("docs/page_with_tag.md")
+        repo.git.commit(message="edit while serving", author="Test Person <testtest@gmail.com>", date="1700000000")
+
+        build(load_config("mkdocs.yml"), dirty=dirty)
+        assert page_revision_date() == "November 14, 2023"
