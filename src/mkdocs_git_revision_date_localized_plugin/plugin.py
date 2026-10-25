@@ -198,7 +198,9 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             docs_dir (str): Path to a directory in the repository that holds the docs.
         """
         head_commit = self.util.get_head_commit(docs_dir)
-        history_options = (self.config.get("enable_git_follow"), tuple(self.util.ignored_commits))
+        # Any change to the plugin options (f.e. enable_git_follow) or the ignored commits
+        # can change which commit a page gets, so treat it like rewritten history
+        history_options = (dict(self.config), tuple(self.util.ignored_commits))
         if head_commit == self.cached_head_commit and history_options == self.cached_history_options:
             return
 
@@ -217,6 +219,8 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
                 self.created_commits.pop(key, None)
                 del self.cached_source_paths[key]
 
+        # If every cached page was dropped, the caches are empty and on_files()
+        # recomputes all pages, the same as on a first build
         self.cached_head_commit = head_commit
         self.cached_history_options = history_options
 

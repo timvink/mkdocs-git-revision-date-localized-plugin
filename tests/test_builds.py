@@ -942,6 +942,11 @@ def test_serve_rebuild_picks_up_new_commits(tmp_path, dirty, amend):
         build(config, dirty=dirty)
         assert page_revision_date(page) == "January 23, 2022"
 
+        # Mark a page the commit below does not touch, to see whether its cache entry survives
+        plugin = config.plugins["git-revision-date-localized"]
+        untouched_key = str((testproject_path / "docs/index.md").absolute())
+        plugin.last_revision_commits[untouched_key] = ("untouched", 0)
+
         with open("docs/page_with_tag.md", "a") as f:
             f.write("edited while serving\n")
         repo.git.add("docs/page_with_tag.md")
@@ -952,8 +957,9 @@ def test_serve_rebuild_picks_up_new_commits(tmp_path, dirty, amend):
         build(load_config("mkdocs.yml"), dirty=dirty)
         assert page_revision_date(page) == "November 14, 2023"
         # The page is cached again, so later rebuilds do not ask git for it
-        plugin = load_config("mkdocs.yml").plugins["git-revision-date-localized"]
         assert str((testproject_path / "docs/page_with_tag.md").absolute()) in plugin.last_revision_commits
+        # A new commit only drops the pages it touched; rewriting history clears everything
+        assert (plugin.last_revision_commits.get(untouched_key) == ("untouched", 0)) is not amend
 
 
 def test_serve_rebuild_picks_up_new_commits_for_non_ascii_filenames(tmp_path):
