@@ -1025,6 +1025,9 @@ def test_creation_commits_only_looked_up_when_enabled(tmp_path, mkdocs_file, exp
 
     with working_directory(testproject_path):
         config = load_config("mkdocs.yml")
+        # MkDocs reuses plugin instances across load_config() calls; start a clean
+        # build like `mkdocs build` does so no commit cache leaks in from other tests
+        config.plugins.on_startup(command="build", dirty=False)
         build(config)
     plugin = config["plugins"]["git-revision-date-localized"]
 

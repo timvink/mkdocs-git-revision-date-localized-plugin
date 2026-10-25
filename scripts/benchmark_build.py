@@ -82,7 +82,12 @@ def time_builds(repo: Path, enable_creation_date: bool, repeats: int) -> tuple[l
     for _ in range(repeats):
         config = load_config(str(config_file), site_dir=str(repo / "site"))
         start_wall, start_cpu = time.perf_counter(), children_cpu_seconds()
+        # MkDocs reuses plugin instances across load_config() calls, and build() does not
+        # call on_startup. Call it like `mkdocs build` does, so the plugin clears its
+        # commit caches and every build reads the git history again.
+        config.plugins.on_startup(command="build", dirty=False)
         build(config)
+        config.plugins.on_shutdown()
         wall.append(time.perf_counter() - start_wall)
         cpu.append(children_cpu_seconds() - start_cpu)
     return wall, cpu
