@@ -82,18 +82,29 @@ class Util:
             path (str): Location of a file or directory that is part of the Git repository.
 
         Returns:
-            set[str] | None: real paths of the touched files, or None when new_commit does
-                not descend from old_commit (f.e. after a rebase or branch switch) or git fails.
+            set[str] | None: touched files as normalized paths (see normalize_path), or None
+                when new_commit does not descend from old_commit (f.e. after a rebase or branch
+                switch) or git fails.
         """
         try:
             git = self._get_repo(os.path.realpath(path))
             # Raises when old_commit is not an ancestor of new_commit
             git.merge_base(old_commit, new_commit, is_ancestor=True)
             toplevel = git.rev_parse(show_toplevel=True)
-            names = git.log(f"{old_commit}..{new_commit}", name_only=True, format="", no_show_signature=True)
+            # -z separates names with NUL and stops git from quoting non-ASCII paths
+            names = git.log(f"{old_commit}..{new_commit}", name_only=True, format="", z=True, no_show_signature=True)
         except Exception:
             return None
-        return {os.path.realpath(os.path.join(toplevel, name)) for name in names.splitlines() if name}
+        return {
+            self.normalize_path(os.path.join(toplevel, name.strip("\n")))
+            for name in names.split("\0")
+            if name.strip("\n")
+        }
+
+    @staticmethod
+    def normalize_path(path: str) -> str:
+        """Resolve symlinks, and case on case-insensitive filesystems, so paths compare equal."""
+        return os.path.normcase(os.path.realpath(path))
 
     def get_git_commit_timestamp(self, path: str, is_first_commit: bool = False) -> tuple[str, int]:
         """

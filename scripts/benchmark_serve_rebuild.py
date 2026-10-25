@@ -77,6 +77,7 @@ def main() -> None:
 
         page = root / "docs/page_0.md"
         no_commit, after_commit = [], []
+        stale = 0
         for i in range(args.rebuilds):
             # A save without a commit: the common case while writing
             page.write_text(page.read_text() + "edit\n")
@@ -87,11 +88,16 @@ def main() -> None:
             repo.git.commit(page, message=f"edit {i}", author=AUTHOR, date=str(1700000000 + i))
             after_commit.append(timed_build(config_file, args.dirty))
 
+            # Fast but stale is a bug, so check the rebuilt page shows the new commit
+            html = (root / "site/page_0/index.html").read_text(encoding="utf8")
+            stale += "November 14, 2023" not in html
+
     mode = "serve --dirty" if args.dirty else "serve"
     print(f"{mode}, {args.pages} pages, median of {args.rebuilds} rebuilds")
     print(f"  initial build            {initial:7.2f}s")
     print(f"  rebuild, no new commit   {statistics.median(no_commit):7.2f}s")
-    print(f"  rebuild after a commit   {statistics.median(after_commit):7.2f}s")
+    print(f"  rebuild after a commit   {statistics.median(after_commit):7.2f}s", end="")
+    print(f"  (STALE date in {stale} of {args.rebuilds})" if stale else "")
 
 
 if __name__ == "__main__":
