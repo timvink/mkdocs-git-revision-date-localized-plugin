@@ -102,6 +102,10 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         config_file_path = config.get("config_file_path") or ""
         self.util = Util(config=self.config, mkdocs_dir=os.path.abspath(os.path.dirname(config_file_path)))
 
+        # Generated pages are not in git and get the build time as both their creation
+        # and last revision date. Read the clock once so the two dates always match.
+        self.build_timestamp = int(time.time())
+
         # Save last commit timestamp for entire site
         # Support monorepo/techdocs, which copies the docs_dir to a temporary directory
         mono_repo_plugin = config.get("plugins", {}).get("monorepo", None)
@@ -293,7 +297,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         """
         # Generated pages (f.e. by the mkdocs-gen-files plugin) are not in git
         if getattr(page.file, "generated_by", None):
-            return "", int(time.time())
+            return "", self.build_timestamp
 
         # abs_src_path should always be set for documentation pages
         assert page.file.abs_src_path is not None
