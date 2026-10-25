@@ -57,6 +57,7 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         super().__init__()
         self.last_revision_commits = {}
         self.created_commits = {}
+        self.generated_timestamps = {}
         self.is_serve_dirty_build = False
 
     def on_startup(self, *, command: str, dirty: bool) -> None:
@@ -80,6 +81,10 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         if not dirty:
             self.last_revision_commits = {}
             self.created_commits = {}
+
+    def on_pre_build(self, *, config: MkDocsConfig) -> None:
+        # Generated pages get a timestamp per build; start fresh for every (re)build
+        self.generated_timestamps = {}
 
     def on_config(self, config: MkDocsConfig) -> MkDocsConfig | None:
         """
@@ -291,9 +296,11 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         Returns:
             tuple[str, int]: commit hash and commit date in unix timestamp.
         """
-        # Generated pages (f.e. by the mkdocs-gen-files plugin) are not in git
+        # Generated pages (f.e. by the mkdocs-gen-files plugin) are not in git.
+        # Use a single timestamp per page, so the creation date can never be
+        # later than the last revision date when the clock ticks between the two calls.
         if getattr(page.file, "generated_by", None):
-            return "", int(time.time())
+            return "", self.generated_timestamps.setdefault(page.file.src_uri, int(time.time()))
 
         # abs_src_path should always be set for documentation pages
         assert page.file.abs_src_path is not None
