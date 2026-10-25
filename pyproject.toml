@@ -34,7 +34,7 @@ classifiers=[
 dynamic = ["version"]
 dependencies = [
     "babel>=2.7.0",
-    "gitpython>=3.1.62",
+    "gitpython>=3.2.1",
     # MkDocsConfig and the on_startup event both require mkdocs 1.4
     "mkdocs>=1.4,<2",
     # Imported directly in plugin.py; do not rely on mkdocs pulling it in
