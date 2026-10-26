@@ -58,7 +58,13 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         self.last_revision_commits = {}
         self.created_commits = {}
         self.generated_timestamps = {}
-        self.is_serve_dirty_build = False
+        # Maps each cache key to the path of the file under git. They differ when
+        # monorepo moved the file; both paths are cache keys.
+        self.cached_source_paths: dict[str, str] = {}
+        # HEAD commit and history options the caches above are valid for. A commit
+        # made during `mkdocs serve` moves HEAD, which makes some cached timestamps stale.
+        self.cached_head_commit = ""
+        self.cached_history_options: tuple = ()
 
     def on_startup(self, *, command: str, dirty: bool) -> None:
         """
@@ -70,17 +76,16 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
 
         Args:
             command (str): The mkdocs command being run.
-            dirty (bool): Whether the build is dirty.
+            dirty (bool): Whether the --dirty flag was passed. Note this is set once for
+                the whole invocation, not per rebuild.
         """
-        # Track if this is an incremental rebuild during mkdocs serve
-        # dirty=True means it's a rebuild triggered by file changes
-        # dirty=False means it's a clean/initial build
-        self.is_serve_dirty_build = dirty
-
-        # Clear cache on clean builds to ensure fresh data
-        if not dirty:
-            self.last_revision_commits = {}
-            self.created_commits = {}
+        # Runs once per invocation, before the first build. The caches then persist
+        # across `mkdocs serve` rebuilds and are invalidated in on_config().
+        self.last_revision_commits = {}
+        self.created_commits = {}
+        self.cached_source_paths = {}
+        self.cached_head_commit = ""
+        self.cached_history_options = ()
 
     def on_pre_build(self, *, config: MkDocsConfig) -> None:
         # Generated pages get a timestamp per build; start fresh for every (re)build
@@ -107,7 +112,6 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         config_file_path = config.get("config_file_path") or ""
         self.util = Util(config=self.config, mkdocs_dir=os.path.abspath(os.path.dirname(config_file_path)))
 
-        # Save last commit timestamp for entire site
         # Support monorepo/techdocs, which copies the docs_dir to a temporary directory
         mono_repo_plugin = config.get("plugins", {}).get("monorepo", None)
         if (
@@ -115,14 +119,14 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             and hasattr(mono_repo_plugin, "originalDocsDir")
             and mono_repo_plugin.originalDocsDir is not None
         ):
-            self.last_site_revision_hash, self.last_site_revision_timestamp = self.util.get_git_commit_timestamp(
-                mono_repo_plugin.originalDocsDir
-            )
+            docs_dir = mono_repo_plugin.originalDocsDir
         else:
             docs_dir = config.get("docs_dir") or ""
-            self.last_site_revision_hash, self.last_site_revision_timestamp = self.util.get_git_commit_timestamp(
-                docs_dir
-            )
+
+        # Save last commit timestamp for entire site
+        self.last_site_revision_hash, self.last_site_revision_timestamp = self.util.get_git_commit_timestamp(docs_dir)
+
+        self._invalidate_stale_commits(docs_dir)
 
         # Get locale from plugin configuration
         plugin_locale = self.config.get("locale", None)
@@ -180,6 +184,46 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
 
         return config
 
+    def _invalidate_stale_commits(self, docs_dir: str) -> None:
+        """
+        Drop cached page timestamps that commits since the previous build made stale.
+
+        Only matters for `mkdocs serve`, which keeps this plugin object across rebuilds.
+        After new commits on top of the cached HEAD, only the files those commits
+        touched are dropped; _get_commit() then asks git for them directly. After
+        anything else (a branch switch, rebase or amend, or a change to the options that
+        decide which commits count) the caches are cleared and on_files() recomputes them.
+
+        Args:
+            docs_dir (str): Path to a directory in the repository that holds the docs.
+        """
+        head_commit = self.util.get_head_commit(docs_dir)
+        # Any change to the plugin options (f.e. enable_git_follow) or the ignored commits
+        # can change which commit a page gets, so treat it like rewritten history
+        history_options = (dict(self.config), tuple(self.util.ignored_commits))
+        if head_commit == self.cached_head_commit and history_options == self.cached_history_options:
+            return
+
+        changed = None
+        if self.cached_head_commit and head_commit and history_options == self.cached_history_options:
+            changed = self.util.get_files_changed_between(self.cached_head_commit, head_commit, docs_dir)
+
+        if changed is None:
+            self.last_revision_commits = {}
+            self.created_commits = {}
+            self.cached_source_paths = {}
+        else:
+            stale = [k for k, src in self.cached_source_paths.items() if self.util.normalize_path(src) in changed]
+            for key in stale:
+                self.last_revision_commits.pop(key, None)
+                self.created_commits.pop(key, None)
+                del self.cached_source_paths[key]
+
+        # If every cached page was dropped, the caches are empty and on_files()
+        # recomputes all pages, the same as on a first build
+        self.cached_head_commit = head_commit
+        self.cached_history_options = history_options
+
     def parallel_compute_commit_timestamps(self, files, original_source: dict | None = None, is_first_commit=False):
         import multiprocessing
 
@@ -206,30 +250,21 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
                 abs_src_path = str(Path(abs_src_path).absolute())
                 result = pool.apply_async(self.util.get_git_commit_timestamp, args=(abs_src_path, is_first_commit))
                 # Store both the original path and temp path (if different) so cache lookups work either way
-                results.append((abs_src_path, result))
+                results.append((abs_src_path, abs_src_path, result))
                 if temp_abs_src_path != abs_src_path:
-                    results.append((temp_abs_src_path, result))
+                    results.append((temp_abs_src_path, abs_src_path, result))
         pool.close()
         pool.join()
-        if is_first_commit:
-            for src_uri, result in results:
-                self.created_commits[src_uri] = result.get()
-        else:
-            for src_uri, result in results:
-                self.last_revision_commits[src_uri] = result.get()
+        cache = self.created_commits if is_first_commit else self.last_revision_commits
+        for src_uri, source_path, result in results:
+            cache[src_uri] = result.get()
+            self.cached_source_paths[src_uri] = source_path
 
     def on_files(self, files: Files, config: MkDocsConfig):
         """
         Compute commit timestamps for all files in parallel.
         """
         if not self.config.get("enabled") or not self.config.get("enable_parallel_processing"):
-            return
-
-        # Skip parallel processing on incremental rebuilds (dirty builds during mkdocs serve)
-        # This avoids the overhead of creating a new multiprocessing pool on every file save
-        # The cache from the initial build will be reused
-        if self.is_serve_dirty_build:
-            logger.debug("Skipping parallel processing on incremental rebuild, using cache")
             return
 
         # Support monorepo/techdocs, which copies the docs_dir to a temporary directory
@@ -240,6 +275,8 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
             original_source = None
 
         try:
+            # On `mkdocs serve` rebuilds the caches are still filled from an earlier build,
+            # unless on_config() cleared them, so this only does work when needed.
             if not self.last_revision_commits:
                 self.parallel_compute_commit_timestamps(
                     files=files, original_source=original_source, is_first_commit=False
@@ -307,13 +344,18 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         abs_src_path = page.file.abs_src_path
 
         cache = self.created_commits if is_first_commit else self.last_revision_commits
-        if self.config.get("enable_parallel_processing") and cache:
-            commit_hash, commit_timestamp = cache.get(str(Path(abs_src_path).absolute()), (None, None))
-            if commit_timestamp is not None:
-                return commit_hash, commit_timestamp
+        use_cache = self.config.get("enable_parallel_processing") and cache
+        cache_key = str(Path(abs_src_path).absolute())
+        if use_cache and cache_key in cache:
+            return cache[cache_key]
 
         # Directly call git if parallel processing is disabled, or the page is not cached
-        return self.util.get_git_commit_timestamp(path=abs_src_path, is_first_commit=is_first_commit)
+        commit = self.util.get_git_commit_timestamp(path=abs_src_path, is_first_commit=is_first_commit)
+        if use_cache:
+            # Pages dropped by _invalidate_stale_commits() are cached again here
+            cache[cache_key] = commit
+            self.cached_source_paths[cache_key] = cache_key
+        return commit
 
     def _render_date(
         self,

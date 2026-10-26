@@ -29,6 +29,7 @@ from click.testing import CliRunner
 
 # MkDocs
 from mkdocs.__main__ import build_command
+from mkdocs.commands.build import build
 from mkdocs.config import load_config
 from mkdocs.structure.files import File
 from mkdocs.structure.pages import Page
@@ -293,6 +294,16 @@ def setup_commit_history(testproject_path):
         repo.git.commit(message="homepage", author=author, date="1643911026")  # 	Thu Feb 03 2022 17:57:06 GMT+0000
 
     return repo
+
+
+def page_revision_date(html_file: Path) -> str:
+    """Return the page revision date from a page built from page_with_tag.md.
+
+    The page renders the page revision date first, and the site revision date after it.
+    """
+    match = re.search(r"renders as: <span[^>]*>([^<]*)</span>", html_file.read_text(encoding="utf8"))
+    assert match, f"No rendered revision date found in {html_file}"
+    return match.group(1)
 
 
 def build_docs_setup(testproject_path):
@@ -907,3 +918,89 @@ def test_generated_page_dates_do_not_depend_on_clock_ticks(tmp_path):
         page.meta["git_creation_date_localized_raw_iso_datetime"]
         == (page.meta["git_revision_date_localized_raw_iso_datetime"])
     )
+
+
+@pytest.mark.parametrize("amend", [False, True], ids=["new-commit", "amend"])
+@pytest.mark.parametrize("dirty", [False, True], ids=["serve", "serve-dirty"])
+def test_serve_rebuild_picks_up_new_commits(tmp_path, dirty, amend):
+    """
+    `mkdocs serve` keeps the plugin object across rebuilds. A commit made while
+    serve runs should show up on the next rebuild, not only after a restart.
+    Amending rewrites history, which takes a different path than a new commit.
+
+    See https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/215
+    """
+    testproject_path = setup_clean_mkdocs_folder("tests/fixtures/basic_project/mkdocs.yml", tmp_path)
+    repo = setup_commit_history(testproject_path)
+    page = testproject_path / "site/page_with_tag/index.html"
+
+    with working_directory(testproject_path):
+        # Mimic mkdocs.commands.serve: on_startup runs once, then every rebuild
+        # loads a fresh config that reuses the same plugin objects.
+        config = load_config("mkdocs.yml")
+        config.plugins.on_startup(command="serve", dirty=dirty)
+        build(config, dirty=dirty)
+        assert page_revision_date(page) == "January 23, 2022"
+
+        # Mark a page the commit below does not touch, to see whether its cache entry survives
+        plugin = config.plugins["git-revision-date-localized"]
+        untouched_key = str((testproject_path / "docs/index.md").absolute())
+        plugin.last_revision_commits[untouched_key] = ("untouched", 0)
+
+        with open("docs/page_with_tag.md", "a") as f:
+            f.write("edited while serving\n")
+        repo.git.add("docs/page_with_tag.md")
+        repo.git.commit(
+            message="edit while serving", author="Test Person <testtest@gmail.com>", date="1700000000", amend=amend
+        )
+
+        build(load_config("mkdocs.yml"), dirty=dirty)
+        assert page_revision_date(page) == "November 14, 2023"
+        # The page is cached again, so later rebuilds do not ask git for it
+        assert str((testproject_path / "docs/page_with_tag.md").absolute()) in plugin.last_revision_commits
+        # A new commit only drops the pages it touched; rewriting history clears everything
+        assert (plugin.last_revision_commits.get(untouched_key) == ("untouched", 0)) is not amend
+
+
+def test_serve_rebuild_picks_up_new_commits_for_non_ascii_filenames(tmp_path):
+    """git quotes non-ASCII paths by default, which must not hide them from cache invalidation."""
+    testproject_path = setup_clean_mkdocs_folder("tests/fixtures/basic_project/mkdocs.yml", tmp_path)
+    repo = setup_commit_history(testproject_path)
+    author = "Test Person <testtest@gmail.com>"
+
+    with working_directory(testproject_path):
+        shutil.copy("docs/page_with_tag.md", "docs/café.md")
+        repo.git.add("docs/café.md")
+        repo.git.commit(message="add café", author=author, date="1600000000")
+
+        config = load_config("mkdocs.yml")
+        config.plugins.on_startup(command="serve", dirty=False)
+        build(config)
+
+        with open("docs/café.md", "a", encoding="utf8") as f:
+            f.write("edited while serving\n")
+        repo.git.add("docs/café.md")
+        repo.git.commit(message="edit café", author=author, date="1700000000")
+
+        build(load_config("mkdocs.yml"))
+
+    assert page_revision_date(testproject_path / "site/café/index.html") == "November 14, 2023"
+
+
+def test_serve_rebuild_picks_up_ignored_commits_changes(tmp_path):
+    """Editing the ignored commits file while serving should apply on the next rebuild."""
+    testproject_path = setup_clean_mkdocs_folder("tests/fixtures/basic_project/mkdocs_ignored_commits.yml", tmp_path)
+    repo = setup_commit_history(testproject_path)
+    page = testproject_path / "site/page_with_tag/index.html"
+    ignored_commits = testproject_path / "ignored-commits.txt"
+    ignored_commits.write_text("", encoding="utf-8")
+
+    with working_directory(testproject_path):
+        config = load_config("mkdocs.yml")
+        config.plugins.on_startup(command="serve", dirty=False)
+        build(config)
+        assert page_revision_date(page) == "January 23, 2022"
+
+        ignored_commits.write_text(repo.git.log("docs/page_with_tag.md", format="%H", n=1), encoding="utf-8")
+        build(load_config("mkdocs.yml"))
+        assert page_revision_date(page) == "May 4, 2018"
