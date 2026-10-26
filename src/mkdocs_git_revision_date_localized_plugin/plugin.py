@@ -281,7 +281,8 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
                 self.parallel_compute_commit_timestamps(
                     files=files, original_source=original_source, is_first_commit=False
                 )
-            if not self.created_commits:
+            # Creation dates need another `git log` per page, so only look them up when they are used
+            if self.config.get("enable_creation_date") and not self.created_commits:
                 self.parallel_compute_commit_timestamps(
                     files=files, original_source=original_source, is_first_commit=True
                 )
