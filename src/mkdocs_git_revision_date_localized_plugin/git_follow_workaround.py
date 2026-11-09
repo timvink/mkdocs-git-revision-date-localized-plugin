@@ -66,7 +66,7 @@ def find_creation_past_renames(git: Git, path: str, max_renames: int = 10) -> st
     toplevel = os.path.realpath(git.rev_parse(show_toplevel=True))
     rev = "HEAD"
     oldest = ""
-    for _ in range(max_renames + 1):
+    for _ in range(max_renames):
         followed = git.log(rev, "--", path, **LOG_OPTIONS).strip()
         if not followed:
             break

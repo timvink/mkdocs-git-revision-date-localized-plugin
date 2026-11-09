@@ -18,6 +18,7 @@ import os
 import re
 import shutil
 import sys
+import time
 from contextlib import contextmanager
 from pathlib import Path
 from unittest.mock import patch
@@ -1035,10 +1036,13 @@ def test_creation_commits_only_looked_up_when_enabled(tmp_path, mkdocs_file, exp
     assert bool(plugin.created_commits) is expect_creation_lookups
 
 
-@pytest.fixture
-def repo_where_follow_stops_at_rename(tmp_path):
+DAY = 86400
+START = 1577836800  # 2020-01-01
+
+
+def make_history_where_follow_stops_at_renames(testproject_path, repo, names):
     """
-    A repo where `git log --follow docs/new.md` stops at the rename on git >= 2.56.0.
+    Commit a page under each of names in turn, so `git log --follow` stops at every rename on git >= 2.56.0.
 
     Since git commit 304812ed33 ("log: improve --follow following renames for
     non-linear history", git 2.56.0), --follow stops at a rename when the parent of
@@ -1047,59 +1051,78 @@ def repo_where_follow_stops_at_rename(tmp_path):
     (`--diff-filter=Ar`) then returns nothing. On older git, --follow reaches "add".
     See https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/241
 
-    History (author dates 2020-01-01 .. 2020-01-05):
-        add (old.md) -> side (other.txt, side branch)
-        add -> rename (old.md -> new.md) -> rewrite (new.md) -> merge side
+    History per rename, one day apart, starting 2020-01-01 with "add" of names[0]:
+        side branch from HEAD (other.txt) | rename (15 of 20 lines kept) -> rewrite -> merge side
+
+    Returns:
+        dict: commit message -> author timestamp.
     """
-    testproject_path = setup_clean_mkdocs_folder("tests/fixtures/basic_project/mkdocs_creation_date.yml", tmp_path)
-    repo = init_test_repo(testproject_path)
+    timestamps = {}
+    clock = itertools.count(START, DAY)
 
-    def commit(message, timestamp, *args):
-        with repo.git.custom_environment(GIT_AUTHOR_DATE=timestamp, GIT_COMMITTER_DATE=timestamp):
-            repo.git.commit("-m", message, *args)
+    def commit(message, *args, merge=None):
+        timestamp = next(clock)
+        timestamps[message] = timestamp
+        env = {"GIT_AUTHOR_DATE": f"{timestamp} +0000", "GIT_COMMITTER_DATE": f"{timestamp} +0000"}
+        with repo.git.custom_environment(**env):
+            if merge:
+                repo.git.merge("--no-ff", merge, "-m", message)
+            else:
+                repo.git.commit("-m", message, *args)
 
-    def write(path, lines):
-        (testproject_path / path).write_text("".join(f"{line}\n" for line in lines))
+    def write(path, content):
+        (testproject_path / path).write_text("".join(f"{line}\n" for line in content))
 
-    with working_directory(testproject_path):
-        write("docs/old.md", range(1, 21))
-        write("other.txt", ["x"])
-        repo.git.add(".")
-        commit("add", "1577836800 +0000")
-        main = repo.active_branch.name
+    content = list(range(1, 21))
+    write(names[0], content)
+    write("other.txt", ["side 0"])
+    repo.git.add(".")
+    commit("add")
+    main = repo.active_branch.name
 
-        repo.git.checkout("-b", "side")
-        write("other.txt", ["y"])
-        commit("side", "1577923200 +0000", "-a")
+    for i, (old, new) in enumerate(itertools.pairwise(names), start=1):
+        repo.git.checkout("-b", f"side{i}")
+        write("other.txt", [f"side {i}"])
+        commit(f"side{i}", "-a")
 
         repo.git.checkout(main)
-        repo.git.mv("docs/old.md", "docs/new.md")
+        (testproject_path / new).parent.mkdir(parents=True, exist_ok=True)
+        repo.git.mv(old, new)
         # 15 of 20 lines kept: detected as a rename by the commit itself
-        write("docs/new.md", [*range(1, 16), *range(101, 106)])
-        commit("rename", "1578009600 +0000", "-a")
-        # Too different from docs/old.md for a rename between the side branch and the merge
-        write("docs/new.md", range(201, 221))
-        commit("rewrite", "1578096000 +0000", "-a")
-        with repo.git.custom_environment(GIT_AUTHOR_DATE="1578182400 +0000", GIT_COMMITTER_DATE="1578182400 +0000"):
-            repo.git.merge("--no-ff", "side", "-m", "merge")
+        content = content[:15] + list(range(i * 1000, i * 1000 + 5))
+        write(new, content)
+        commit(f"rename{i}", "-a")
+        # Too different from the old name for a rename between the side branch and the merge
+        content = list(range(i * 1000 + 100, i * 1000 + 120))
+        write(new, content)
+        commit(f"rewrite{i}", "-a")
+        commit(f"merge{i}", merge=f"side{i}")
+    return timestamps
 
-        yield testproject_path, repo
 
-
-def _creation_and_revision(testproject_path):
-    util = Util(config={"strict": True, "enable_git_follow": True}, mkdocs_dir=str(testproject_path))
-    page = str(testproject_path / "docs/new.md")
+def _creation_and_revision(testproject_path, page, enable_git_follow=True):
+    util = Util(config={"strict": True, "enable_git_follow": enable_git_follow}, mkdocs_dir=str(testproject_path))
+    page = str(testproject_path / page)
     creation = util.get_git_commit_timestamp(path=page, is_first_commit=True)
     revision = util.get_git_commit_timestamp(path=page, is_first_commit=False)
     return creation, revision
 
 
-def test_creation_date_not_after_revision_when_follow_stops_at_rename(repo_where_follow_stops_at_rename):
-    """The creation date comes from git history, not the build time, so --strict builds pass."""
-    testproject_path, _ = repo_where_follow_stops_at_rename
-    (_, creation_timestamp), (_, revision_timestamp) = _creation_and_revision(testproject_path)
+@pytest.fixture
+def project_with_repo(tmp_path):
+    testproject_path = setup_clean_mkdocs_folder("tests/fixtures/basic_project/mkdocs_creation_date.yml", tmp_path)
+    repo = init_test_repo(testproject_path)
+    with working_directory(testproject_path):
+        yield testproject_path, repo
 
-    assert creation_timestamp <= revision_timestamp == 1578096000
+
+def test_creation_date_not_after_revision_when_follow_stops_at_rename(project_with_repo):
+    """The creation date comes from git history, not the build time, so --strict builds pass."""
+    testproject_path, repo = project_with_repo
+    timestamps = make_history_where_follow_stops_at_renames(testproject_path, repo, ["docs/old.md", "docs/new.md"])
+    (_, creation_timestamp), (_, revision_timestamp) = _creation_and_revision(testproject_path, "docs/new.md")
+
+    assert creation_timestamp <= revision_timestamp == timestamps["rewrite1"]
 
     with capture_plugin_logs() as logs:
         build(load_config("mkdocs.yml"))
@@ -1107,10 +1130,45 @@ def test_creation_date_not_after_revision_when_follow_stops_at_rename(repo_where
     assert "First revision timestamp is older" not in logs.getvalue()
 
 
-def test_creation_date_continues_past_rename_when_follow_stops(repo_where_follow_stops_at_rename):
-    """The creation date is that of the commit that added the file under its old name."""
-    testproject_path, repo = repo_where_follow_stops_at_rename
-    (creation_hash, creation_timestamp), _ = _creation_and_revision(testproject_path)
+@pytest.mark.parametrize(
+    "names",
+    [
+        pytest.param(["docs/old.md", "docs/new.md"], id="one rename"),
+        # Non-ASCII and spaces: git quotes such paths unless -z is used
+        pytest.param(["docs/a.md", "docs/b é.md", "docs/sub/c.md"], id="two renames"),
+    ],
+)
+def test_creation_date_continues_past_renames_when_follow_stops(project_with_repo, names):
+    """The creation date is that of the commit that added the file under its first name."""
+    testproject_path, repo = project_with_repo
+    timestamps = make_history_where_follow_stops_at_renames(testproject_path, repo, names)
+    (creation_hash, creation_timestamp), _ = _creation_and_revision(testproject_path, names[-1])
 
-    assert creation_timestamp == 1577836800
+    assert creation_timestamp == timestamps["add"]
     assert creation_hash == repo.git.rev_list("--max-parents=0", "HEAD").strip()
+
+
+def test_creation_date_without_follow_is_the_rename(project_with_repo):
+    """Without enable_git_follow, a renamed page is created by the rename, and the workaround does not run."""
+    testproject_path, repo = project_with_repo
+    timestamps = make_history_where_follow_stops_at_renames(testproject_path, repo, ["docs/old.md", "docs/new.md"])
+    with patch(
+        "mkdocs_git_revision_date_localized_plugin.util.find_creation_past_renames",
+        side_effect=AssertionError("workaround should not run"),
+    ):
+        (_, creation_timestamp), _ = _creation_and_revision(testproject_path, "docs/new.md", enable_git_follow=False)
+
+    assert creation_timestamp == timestamps["rename1"]
+
+
+def test_creation_date_of_uncommitted_page_is_build_time(project_with_repo):
+    """A page with no history at all still falls back to the build time, also through the workaround."""
+    testproject_path, repo = project_with_repo
+    make_history_where_follow_stops_at_renames(testproject_path, repo, ["docs/old.md", "docs/new.md"])
+    (testproject_path / "docs/draft.md").write_text("# Draft\n")
+
+    before = time.time()
+    (creation_hash, creation_timestamp), _ = _creation_and_revision(testproject_path, "docs/draft.md")
+
+    assert creation_hash == ""
+    assert creation_timestamp >= int(before)
