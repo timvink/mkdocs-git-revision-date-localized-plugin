@@ -16,7 +16,7 @@ from mkdocs.plugins import get_plugin_logger
 
 from mkdocs_git_revision_date_localized_plugin.ci import raise_ci_warnings
 from mkdocs_git_revision_date_localized_plugin.dates import get_date_formats
-from mkdocs_git_revision_date_localized_plugin.git_follow_workaround import oldest_followed_commit
+from mkdocs_git_revision_date_localized_plugin.git_follow_workaround import find_creation_past_renames
 
 logger = get_plugin_logger(__name__)
 
@@ -155,7 +155,7 @@ class Util:
                 ).strip()
                 if lines == "" and follow_option:
                     # git >= 2.56.0: --follow can stop at a rename, see git_follow_workaround
-                    lines = oldest_followed_commit(git, realpath)
+                    lines = find_creation_past_renames(git, realpath)
                 # A file can be created multiple times, through a file renamed.
                 # Commits are ordered with most recent commit first
                 # Get the oldest commit only
