@@ -1033,3 +1033,84 @@ def test_creation_commits_only_looked_up_when_enabled(tmp_path, mkdocs_file, exp
 
     assert plugin.last_revision_commits, "Last revision commits should always be looked up"
     assert bool(plugin.created_commits) is expect_creation_lookups
+
+
+@pytest.fixture
+def repo_where_follow_stops_at_rename(tmp_path):
+    """
+    A repo where `git log --follow docs/new.md` stops at the rename on git >= 2.56.0.
+
+    Since git commit 304812ed33 ("log: improve --follow following renames for
+    non-linear history", git 2.56.0), --follow stops at a rename when the parent of
+    the rename commit also has an older child on a side branch that is merged after
+    the file has changed too much to match its old name. The creation query
+    (`--diff-filter=Ar`) then returns nothing. On older git, --follow reaches "add".
+    See https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/241
+
+    History (author dates 2020-01-01 .. 2020-01-05):
+        add (old.md) -> side (other.txt, side branch)
+        add -> rename (old.md -> new.md) -> rewrite (new.md) -> merge side
+    """
+    testproject_path = setup_clean_mkdocs_folder("tests/fixtures/basic_project/mkdocs_creation_date.yml", tmp_path)
+    repo = init_test_repo(testproject_path)
+
+    def commit(message, timestamp, *args):
+        with repo.git.custom_environment(GIT_AUTHOR_DATE=timestamp, GIT_COMMITTER_DATE=timestamp):
+            repo.git.commit("-m", message, *args)
+
+    def write(path, lines):
+        (testproject_path / path).write_text("".join(f"{line}\n" for line in lines))
+
+    with working_directory(testproject_path):
+        write("docs/old.md", range(1, 21))
+        write("other.txt", ["x"])
+        repo.git.add(".")
+        commit("add", "1577836800 +0000")
+        main = repo.active_branch.name
+
+        repo.git.checkout("-b", "side")
+        write("other.txt", ["y"])
+        commit("side", "1577923200 +0000", "-a")
+
+        repo.git.checkout(main)
+        repo.git.mv("docs/old.md", "docs/new.md")
+        # 15 of 20 lines kept: detected as a rename by the commit itself
+        write("docs/new.md", [*range(1, 16), *range(101, 106)])
+        commit("rename", "1578009600 +0000", "-a")
+        # Too different from docs/old.md for a rename between the side branch and the merge
+        write("docs/new.md", range(201, 221))
+        commit("rewrite", "1578096000 +0000", "-a")
+        with repo.git.custom_environment(GIT_AUTHOR_DATE="1578182400 +0000", GIT_COMMITTER_DATE="1578182400 +0000"):
+            repo.git.merge("--no-ff", "side", "-m", "merge")
+
+        yield testproject_path, repo
+
+
+def _creation_and_revision(testproject_path):
+    util = Util(config={"strict": True, "enable_git_follow": True}, mkdocs_dir=str(testproject_path))
+    page = str(testproject_path / "docs/new.md")
+    creation = util.get_git_commit_timestamp(path=page, is_first_commit=True)
+    revision = util.get_git_commit_timestamp(path=page, is_first_commit=False)
+    return creation, revision
+
+
+def test_creation_date_not_after_revision_when_follow_stops_at_rename(repo_where_follow_stops_at_rename):
+    """The creation date comes from git history, not the build time, so --strict builds pass."""
+    testproject_path, _ = repo_where_follow_stops_at_rename
+    (_, creation_timestamp), (_, revision_timestamp) = _creation_and_revision(testproject_path)
+
+    assert creation_timestamp <= revision_timestamp == 1578096000
+
+    with capture_plugin_logs() as logs:
+        build(load_config("mkdocs.yml"))
+    assert "docs/new.md" not in logs.getvalue()
+    assert "First revision timestamp is older" not in logs.getvalue()
+
+
+def test_creation_date_continues_past_rename_when_follow_stops(repo_where_follow_stops_at_rename):
+    """The creation date is that of the commit that added the file under its old name."""
+    testproject_path, repo = repo_where_follow_stops_at_rename
+    (creation_hash, creation_timestamp), _ = _creation_and_revision(testproject_path)
+
+    assert creation_timestamp == 1577836800
+    assert creation_hash == repo.git.rev_list("--max-parents=0", "HEAD").strip()
