@@ -13,37 +13,16 @@ See https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/
 
 The `mv/log-follow-speedup` series in git restores the full history. Once a git release
 with that fix is widely used, this module can be removed. The functions here only run
-when the creation query returns nothing, so other pages pay no extra cost.
-
-- oldest_followed_commit: one extra `git log`; returns the rename commit (too late).
-- find_creation_past_renames: also continues past each rename under the old name and
-  returns the real creation commit; two to three extra git calls per rename.
+when the creation query returns nothing, so other pages pay no extra cost: three to four
+git calls per rename continued past.
 """
 
 import os
-from pathlib import Path
 
 from git import Git, GitCommandError
 
-LOG_OPTIONS = {"date": "unix", "format": "%H %at", "no_show_signature": True, "follow": True}
-
-
-def oldest_followed_commit(git: Git, path: str) -> str:
-    """
-    Get the oldest commit that `git log --follow` reaches for a file.
-
-    When --follow stops at a rename, that is the rename commit: later than the real
-    creation, but never later than the last revision.
-
-    Args:
-        git (Git): git command wrapper for the repository that contains path.
-        path (str): Absolute path of the file.
-
-    Returns:
-        str: "<hash> <timestamp>" of the oldest followed commit, or "" if git finds no commit.
-    """
-    lines = git.log("--", path, **LOG_OPTIONS).strip()
-    return lines.split("\n")[-1] if lines else ""
+# Names from history must not be read as glob patterns (f.e. "old[1].md")
+LITERAL_PATHSPECS = {"GIT_LITERAL_PATHSPECS": "1"}
 
 
 def find_creation_past_renames(git: Git, path: str, max_renames: int = 10) -> str:
@@ -67,22 +46,66 @@ def find_creation_past_renames(git: Git, path: str, max_renames: int = 10) -> st
     rev = "HEAD"
     oldest = ""
     for _ in range(max_renames):
-        followed = git.log(rev, "--", path, **LOG_OPTIONS).strip()
+        followed = _follow(git, rev, path)
         if not followed:
             break
-        oldest = followed.split("\n")[-1]
+        oldest, name_at_oldest = followed[-1]
         oldest_hash = oldest.split(" ")[0]
 
-        old_path = _renamed_from(git, oldest_hash, Path(os.path.relpath(path, toplevel)).as_posix())
-        if old_path is None:
+        # --follow can cross newer renames before it stops, so compare with the name the
+        # file had in the oldest commit, not with path
+        old_name = _renamed_from(git, oldest_hash, name_at_oldest)
+        if old_name is None:
             # The oldest commit did not rename the file, so it is the best answer git gives
             break
-        path = os.path.join(toplevel, old_path)
+        path = os.path.join(toplevel, old_name)
         rev = f"{oldest_hash}^"
-        created = git.log(rev, "--", path, diff_filter="Ar", **LOG_OPTIONS).strip()
+        created = git.log(
+            rev,
+            "--",
+            path,
+            diff_filter="Ar",
+            follow=True,
+            date="unix",
+            format="%H %at",
+            no_show_signature=True,
+            env=LITERAL_PATHSPECS,
+        ).strip()
         if created:
             return created.split("\n")[-1]
     return oldest
+
+
+def _follow(git: Git, rev: str, path: str) -> list[tuple[str, str]]:
+    """
+    Get the commits `git log --follow` reaches from rev, newest first.
+
+    Returns:
+        list[tuple[str, str]]: ("<hash> <timestamp>", file name relative to the repository
+            root in that commit) per commit.
+    """
+    # With -z and --name-only, each commit is "<format>\0\n<name>\0". \x01 marks the
+    # format, so a merge commit without a name cannot shift the pairing.
+    out = git.log(
+        rev,
+        "--",
+        path,
+        follow=True,
+        name_only=True,
+        z=True,
+        date="unix",
+        format="%x01%H %at",
+        no_show_signature=True,
+        env=LITERAL_PATHSPECS,
+    )
+    commits = []
+    for token in out.split("\0"):
+        token = token.lstrip("\n")
+        if token.startswith("\x01"):
+            commits.append([token[1:], ""])
+        elif token and commits and not commits[-1][1]:
+            commits[-1][1] = token
+    return [(commit, name) for commit, name in commits]
 
 
 def _renamed_from(git: Git, commit: str, relative_path: str) -> str | None:

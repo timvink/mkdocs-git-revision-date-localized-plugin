@@ -1040,7 +1040,7 @@ DAY = 86400
 START = 1577836800  # 2020-01-01
 
 
-def make_history_where_follow_stops_at_renames(testproject_path, repo, names):
+def make_history_where_follow_stops_at_renames(testproject_path, repo, names, stalls=None):
     """
     Commit a page under each of names in turn, so `git log --follow` stops at every rename on git >= 2.56.0.
 
@@ -1053,6 +1053,7 @@ def make_history_where_follow_stops_at_renames(testproject_path, repo, names):
 
     History per rename, one day apart, starting 2020-01-01 with "add" of names[0]:
         side branch from HEAD (other.txt) | rename (15 of 20 lines kept) -> rewrite -> merge side
+    For a rename with stalls[i] False, only the rename commit is made, so --follow crosses it.
 
     Returns:
         dict: commit message -> author timestamp.
@@ -1080,18 +1081,22 @@ def make_history_where_follow_stops_at_renames(testproject_path, repo, names):
     commit("add")
     main = repo.active_branch.name
 
+    stalls = stalls or [True] * (len(names) - 1)
     for i, (old, new) in enumerate(itertools.pairwise(names), start=1):
-        repo.git.checkout("-b", f"side{i}")
-        write("other.txt", [f"side {i}"])
-        commit(f"side{i}", "-a")
+        if stalls[i - 1]:
+            repo.git.checkout("-b", f"side{i}")
+            write("other.txt", [f"side {i}"])
+            commit(f"side{i}", "-a")
+            repo.git.checkout(main)
 
-        repo.git.checkout(main)
         (testproject_path / new).parent.mkdir(parents=True, exist_ok=True)
         repo.git.mv(old, new)
         # 15 of 20 lines kept: detected as a rename by the commit itself
         content = content[:15] + list(range(i * 1000, i * 1000 + 5))
         write(new, content)
         commit(f"rename{i}", "-a")
+        if not stalls[i - 1]:
+            continue
         # Too different from the old name for a rename between the side branch and the merge
         content = list(range(i * 1000 + 100, i * 1000 + 120))
         write(new, content)
@@ -1131,21 +1136,31 @@ def test_creation_date_not_after_revision_when_follow_stops_at_rename(project_wi
 
 
 @pytest.mark.parametrize(
-    "names",
+    "names,stalls",
     [
-        pytest.param(["docs/old.md", "docs/new.md"], id="one rename"),
+        pytest.param(["docs/old.md", "docs/new.md"], None, id="one rename"),
         # Non-ASCII and spaces: git quotes such paths unless -z is used
-        pytest.param(["docs/a.md", "docs/b é.md", "docs/sub/c.md"], id="two renames"),
+        pytest.param(["docs/a.md", "docs/b é.md", "docs/sub/c.md"], None, id="two renames"),
+        # --follow crosses b -> c, then stops at a -> b, whose new name is b, not c
+        pytest.param(["docs/a.md", "docs/b.md", "docs/c.md"], [True, False], id="crossed rename after stop"),
+        # A glob pattern as a pathspec would also match the older docs/old1.md
+        pytest.param(["docs/old[1].md", "docs/new.md"], None, id="glob characters"),
     ],
 )
-def test_creation_date_continues_past_renames_when_follow_stops(project_with_repo, names):
+def test_creation_date_continues_past_renames_when_follow_stops(project_with_repo, names, stalls):
     """The creation date is that of the commit that added the file under its first name."""
     testproject_path, repo = project_with_repo
-    timestamps = make_history_where_follow_stops_at_renames(testproject_path, repo, names)
+    # A file that only a glob pattern for "old[1].md" matches, created before it
+    (testproject_path / "docs/old1.md").write_text("decoy\n")
+    repo.git.add("docs/old1.md")
+    with repo.git.custom_environment(GIT_AUTHOR_DATE=f"{START - DAY} +0000", GIT_COMMITTER_DATE=f"{START - DAY} +0000"):
+        repo.git.commit("-m", "decoy")
+
+    timestamps = make_history_where_follow_stops_at_renames(testproject_path, repo, names, stalls)
     (creation_hash, creation_timestamp), _ = _creation_and_revision(testproject_path, names[-1])
 
     assert creation_timestamp == timestamps["add"]
-    assert creation_hash == repo.git.rev_list("--max-parents=0", "HEAD").strip()
+    assert creation_hash == repo.git.log("--format=%H", "--grep=^add$").strip()
 
 
 def test_creation_date_without_follow_is_the_rename(project_with_repo):
