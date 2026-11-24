@@ -12,22 +12,26 @@ from mkdocs.plugins import get_plugin_logger
 logger = get_plugin_logger(__name__)
 
 
-def raise_ci_warnings(repo) -> None:
+def raise_ci_warnings(repo, strict: bool = True) -> None:
     """
     Raise warnings when users use plugin on CI build runners.
 
     Args:
         repo (GitPython.git.repo): The Git repo object.
+        strict (bool): Log at WARNING level. When False, log at INFO level instead,
+            like the other fallback messages of the plugin.
     """
     if not is_shallow_clone(repo):
         return None
+
+    log = logger.warning if strict else logger.info
 
     n_commits = commit_count(repo)
 
     # Gitlab Runners
     if os.getenv("GITLAB_CI") is not None and n_commits < 50:
         # Default is GIT_DEPTH of 50 for gitlab
-        logger.warning(
+        log(
             """
                 Running on a GitLab runner might lead to wrong
                 Git revision dates due to a shallow git fetch depth.
@@ -41,7 +45,7 @@ def raise_ci_warnings(repo) -> None:
     elif os.getenv("GITHUB_ACTIONS") is not None and n_commits == 1:
         # See also https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
         # Default is fetch-depth of 1 for github actions
-        logger.warning(
+        log(
             """
                 Running on GitHub Actions might lead to wrong
                 Git revision dates due to a shallow git fetch depth.
@@ -54,7 +58,7 @@ def raise_ci_warnings(repo) -> None:
     # Azure Devops Pipeline
     # Does not limit fetch-depth by default
     elif int(os.getenv("Agent.Source.Git.ShallowFetchDepth", 10e99)) < n_commits:
-        logger.warning(
+        log(
             """
                 Running on Azure pipelines with limited
                 fetch-depth might lead to wrong git revision dates due to a shallow git fetch depth.
@@ -67,7 +71,7 @@ def raise_ci_warnings(repo) -> None:
     # Bitbucket pipelines
     elif os.getenv("BITBUCKET_BUILD_NUMBER") is not None and n_commits < 50:
         # Default is fetch-depth of 50 for bitbucket pipelines
-        logger.warning(
+        log(
             """
                 Running on bitbucket pipelines might lead to wrong
                 Git revision dates due to a shallow git fetch depth.
