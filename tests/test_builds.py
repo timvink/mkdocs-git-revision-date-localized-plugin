@@ -726,6 +726,35 @@ def test_low_fetch_depth(tmp_path):
     assert "Running on GitHub Actions might" in logs.getvalue()
 
 
+@pytest.mark.parametrize(
+    "mkdocs_yml, aborts",
+    [
+        ("tests/fixtures/basic_project/mkdocs.yml", True),
+        ("tests/fixtures/basic_project/mkdocs_not_strict.yml", False),
+    ],
+)
+def test_low_fetch_depth_follows_strict(tmp_path, monkeypatch, mkdocs_yml, aborts):
+    """
+    The CI warning about a low fetch depth fails `mkdocs build --strict`,
+    unless the plugin is set to `strict: false`, like the other fallback messages.
+    """
+    testproject_path = setup_clean_mkdocs_folder(mkdocs_yml, tmp_path)
+    setup_commit_history(testproject_path)
+
+    cloned_folder = tmp_path.parent / f"{tmp_path.name}-clone"
+    git.Repo.clone_from(testproject_path.as_uri(), str(cloned_folder), depth=1)
+
+    monkeypatch.setenv("GITHUB_ACTIONS", "1")
+    cwd = os.getcwd()
+    os.chdir(cloned_folder)
+    try:
+        result = CliRunner().invoke(build_command, ["--strict"])
+    finally:
+        os.chdir(cwd)
+
+    assert (result.exit_code != 0) == aborts, result.output
+
+
 def test_mkdocs_genfiles_plugin(tmp_path):
     """
     Make sure the mkdocs-gen-files plugin works correctly.

@@ -54,7 +54,7 @@ class Util:
             self.tag_cache.clear()
             # Checks if user is running builds on CI
             # and raise appropriate warnings
-            raise_ci_warnings(self.repo_cache[path])
+            raise_ci_warnings(self.repo_cache[path], strict=self.config.get("strict", True))
 
         return self.repo_cache[path]
 

@@ -163,7 +163,7 @@ mkdocs serve
 
 ## `strict`
 
-Default is `true`. When enabled, the logs will show warnings when something is wrong but a fallback has been used. When disabled, the logger will use the INFO level instead.
+Default is `true`. When enabled, the logs will show warnings when something is wrong but a fallback has been used, or when a shallow clone on CI might lead to wrong dates. When disabled, the logger will use the INFO level instead.
 
 - If you want to raise an error when a warning is logged, use [mkdocs strict mode](https://www.mkdocs.org/user-guide/configuration/#strict) (with `mkdocs build --strict`).
 - If you are already using [mkdocs strict mode](https://www.mkdocs.org/user-guide/configuration/#strict), but do not care about these warnings, you can set `strict: false` to ensure no errors are raised.
