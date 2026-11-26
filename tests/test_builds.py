@@ -950,6 +950,42 @@ def test_generated_page_dates_do_not_depend_on_clock_ticks(tmp_path):
     )
 
 
+def test_uncommitted_page_dates_do_not_depend_on_clock_ticks(tmp_path):
+    """
+    Like generated pages, a page that is not committed yet has no git history.
+
+    See https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/246
+    """
+    testproject_path = setup_clean_mkdocs_folder("tests/fixtures/basic_project/mkdocs_creation_date.yml", tmp_path)
+    setup_commit_history(testproject_path)
+    (testproject_path / "docs/uncommitted.md").write_text("# Uncommitted\n")
+
+    with working_directory(testproject_path):
+        config = load_config("mkdocs.yml")
+        plugin = config["plugins"]["git-revision-date-localized"]
+
+        file = File(
+            "uncommitted.md",
+            src_dir=str(testproject_path / "docs"),
+            dest_dir=str(testproject_path / "site"),
+            use_directory_urls=True,
+        )
+        page = Page(title=None, file=file, config=config)
+        page.meta = {}
+
+        # Every clock read returns a later second than the one before
+        clock = itertools.count(1700000000)
+        with patch("time.time", side_effect=lambda: next(clock)), capture_plugin_logs() as logs:
+            plugin.on_config(config)
+            plugin.on_page_markdown("", page, config, files=None)
+
+    assert "First revision timestamp is older" not in logs.getvalue()
+    assert (
+        page.meta["git_creation_date_localized_raw_iso_datetime"]
+        == (page.meta["git_revision_date_localized_raw_iso_datetime"])
+    )
+
+
 @pytest.mark.parametrize("amend", [False, True], ids=["new-commit", "amend"])
 @pytest.mark.parametrize("dirty", [False, True], ids=["serve", "serve-dirty"])
 def test_serve_rebuild_picks_up_new_commits(tmp_path, dirty, amend):

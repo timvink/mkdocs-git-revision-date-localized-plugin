@@ -57,7 +57,6 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         super().__init__()
         self.last_revision_commits = {}
         self.created_commits = {}
-        self.generated_timestamps = {}
         # Maps each cache key to the path of the file under git. They differ when
         # monorepo moved the file; both paths are cache keys.
         self.cached_source_paths: dict[str, str] = {}
@@ -86,10 +85,6 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         self.cached_source_paths = {}
         self.cached_head_commit = ""
         self.cached_history_options = ()
-
-    def on_pre_build(self, *, config: MkDocsConfig) -> None:
-        # Generated pages get a timestamp per build; start fresh for every (re)build
-        self.generated_timestamps = {}
 
     def on_config(self, config: MkDocsConfig) -> MkDocsConfig | None:
         """
@@ -334,11 +329,9 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         Returns:
             tuple[str, int]: commit hash and commit date in unix timestamp.
         """
-        # Generated pages (f.e. by the mkdocs-gen-files plugin) are not in git.
-        # Use a single timestamp per page, so the creation date can never be
-        # later than the last revision date when the clock ticks between the two calls.
+        # Generated pages (f.e. by the mkdocs-gen-files plugin) are not in git
         if getattr(page.file, "generated_by", None):
-            return "", self.generated_timestamps.setdefault(page.file.src_uri, int(time.time()))
+            return "", int(time.time())
 
         # abs_src_path should always be set for documentation pages
         assert page.file.abs_src_path is not None
@@ -471,7 +464,12 @@ class GitRevisionDateLocalizedPlugin(BasePlugin):
         # Creation date of this page
         first_revision_hash, first_revision_timestamp = self._get_commit(page, is_first_commit=True)
 
-        if first_revision_timestamp > last_revision_timestamp:
+        if not first_revision_hash:
+            # No git history (generated or uncommitted page): both dates are the build time.
+            # Reading the clock again could land a second later than the last revision date.
+            # See https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/246
+            first_revision_hash, first_revision_timestamp = last_revision_hash, last_revision_timestamp
+        elif first_revision_timestamp > last_revision_timestamp:
             # See also https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/111
             msg = f"First revision timestamp is older than last revision timestamp for page {page.file.src_path}. "
             msg += "This can be due to a quirk in `git` follow behaviour. You can try to set `enable_git_follow: false` in the plugin configuration."
