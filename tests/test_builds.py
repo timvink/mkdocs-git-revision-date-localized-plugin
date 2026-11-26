@@ -950,6 +950,85 @@ def test_generated_page_dates_do_not_depend_on_clock_ticks(tmp_path):
     )
 
 
+def test_uncommitted_page_dates_do_not_depend_on_clock_ticks(tmp_path):
+    """
+    Like generated pages, a page that is not committed yet has no git history.
+
+    See https://github.com/timvink/mkdocs-git-revision-date-localized-plugin/issues/246
+    """
+    testproject_path = setup_clean_mkdocs_folder("tests/fixtures/basic_project/mkdocs_creation_date.yml", tmp_path)
+    setup_commit_history(testproject_path)
+    (testproject_path / "docs/uncommitted.md").write_text("# Uncommitted\n")
+
+    with working_directory(testproject_path):
+        config = load_config("mkdocs.yml")
+        plugin = config["plugins"]["git-revision-date-localized"]
+
+        file = File(
+            "uncommitted.md",
+            src_dir=str(testproject_path / "docs"),
+            dest_dir=str(testproject_path / "site"),
+            use_directory_urls=True,
+        )
+        page = Page(title=None, file=file, config=config)
+        page.meta = {}
+
+        # Every clock read returns a later second than the one before
+        clock = itertools.count(1700000000)
+        with patch("time.time", side_effect=lambda: next(clock)), capture_plugin_logs() as logs:
+            plugin.on_config(config)
+            plugin.on_page_markdown("", page, config, files=None)
+
+    assert "First revision timestamp is older" not in logs.getvalue()
+    assert (
+        page.meta["git_creation_date_localized_raw_iso_datetime"]
+        == (page.meta["git_revision_date_localized_raw_iso_datetime"])
+    )
+
+
+@pytest.mark.parametrize(
+    "last_revision_hash,creation_hash,warns",
+    [
+        # Uncommitted page: on_files() read the clock once per batch, a second apart (#246)
+        pytest.param("", "", False, id="no-history"),
+        # Real history where git follow found a later creation commit (#111)
+        pytest.param("last", "created", True, id="git-follow-quirk"),
+    ],
+)
+def test_creation_date_later_than_last_revision_from_parallel_batches(
+    tmp_path, last_revision_hash, creation_hash, warns
+):
+    """
+    With parallel processing, on_files() looks up both dates in separate batches.
+    A creation date later than the last revision date is clamped to it, and only warns
+    when git history produced it.
+    """
+    testproject_path = setup_clean_mkdocs_folder("tests/fixtures/basic_project/mkdocs_creation_date.yml", tmp_path)
+    setup_commit_history(testproject_path)
+
+    with working_directory(testproject_path):
+        config = load_config("mkdocs.yml")
+        plugin = config["plugins"]["git-revision-date-localized"]
+        plugin.on_config(config)
+
+        file = File("page_with_tag.md", str(testproject_path / "docs"), str(testproject_path / "site"), True)
+        cache_key = str(Path(file.abs_src_path).absolute())
+        plugin.last_revision_commits[cache_key] = (last_revision_hash, 1700000000)
+        plugin.created_commits[cache_key] = (creation_hash, 1700000001)
+
+        page = Page(title=None, file=file, config=config)
+        page.meta = {}
+        with capture_plugin_logs() as logs:
+            plugin.on_page_markdown("", page, config, files=None)
+
+    assert ("First revision timestamp is older" in logs.getvalue()) is warns
+    assert page.meta["git_creation_date_localized_hash"] == last_revision_hash
+    assert (
+        page.meta["git_creation_date_localized_raw_iso_datetime"]
+        == page.meta["git_revision_date_localized_raw_iso_datetime"]
+    )
+
+
 @pytest.mark.parametrize("amend", [False, True], ids=["new-commit", "amend"])
 @pytest.mark.parametrize("dirty", [False, True], ids=["serve", "serve-dirty"])
 def test_serve_rebuild_picks_up_new_commits(tmp_path, dirty, amend):
