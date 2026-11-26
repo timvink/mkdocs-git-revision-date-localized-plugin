@@ -137,6 +137,9 @@ override-dependencies = ["pymdown-extensions>=10.21.3"]
 # existing users can still install. Lock only for 3.11+ so dev dependencies
 # (such as filelock, whose patched releases need 3.11) are not held back.
 environments = ["python_version >= '3.11'"]
+# Only resolve releases at least a day old, to give the community time to
+# catch compromised packages before they reach this lockfile.
+exclude-newer = "24 hours"
 
 [tool.ty.environment]
 python-version = "3.10"
