@@ -21,6 +21,11 @@ repos:
       # Run the formatter.
       - id: ruff-format
 
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.33.1
+    hooks:
+      - id: zizmor
+
   - repo: local
     hooks:
       - id: ty
