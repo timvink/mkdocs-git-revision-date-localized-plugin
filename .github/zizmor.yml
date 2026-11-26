@@ -1,0 +1,6 @@
+rules:
+  artipacked:
+    ignore:
+      # The release job runs `mkdocs gh-deploy`, which pushes with the
+      # checkout's persisted token.
+      - pythonpublish.yml
